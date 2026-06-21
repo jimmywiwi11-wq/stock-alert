@@ -1,1 +1,1 @@
-Stock Alert V7.7 - small copy buttons + same/similar product prompt real fix
+Stock Alert V7.8 - Controlled update system. Future updates should prompt before applying.
