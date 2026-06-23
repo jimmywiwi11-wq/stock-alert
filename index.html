@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.3</title>
+<title>Stock Alert V7.13</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -105,15 +105,18 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.8</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.13</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">🔥</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">‹</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">‹</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
 <section id="listPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 id="listTitle" style="margin:0">รายการ</h2><div class="smallTitle" id="listSub">ดู / แก้ไข / ลบ</div></div></div><div id="listTopActions"></div><div class="card searchCard"><input class="input" id="listSearch" placeholder="ค้นหาในหน้านี้..." oninput="renderList()"></div><div id="listBox"></div></section>
-<section id="transferMenuPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">แบ่งของระหว่างสาขา</h2><div class="smallTitle">เลือกฝั่งที่ต้องจัดของก่อน</div></div></div><div class="dirStack"><button class="dirCard green" onclick="openTransferDirection(1,2)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 1 แบ่งให้สาขา 2</b><span>กดเข้าไปเพื่อจัดของให้สาขา 2</span></div></button><button class="dirCard blue" onclick="openTransferDirection(2,1)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 2 แบ่งให้สาขา 1</b><span>กดเข้าไปเพื่อจัดของให้สาขา 1</span></div></button></div></section>
+<section id="transferMenuPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">แบ่งของระหว่างสาขา</h2><div class="smallTitle">เลือกฝั่งที่ต้องจัดของก่อน</div></div></div><div class="dirStack"><button class="dirCard green" onclick="openTransferDirection(1,2)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 1 แบ่งให้สาขา 2</b><span>กดเข้าไปเพื่อจัดของให้สาขา 2</span></div></button><button class="dirCard blue" onclick="openTransferDirection(2,1)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 2 แบ่งให้สาขา 1</b><span>กดเข้าไปเพื่อจัดของให้สาขา 1</span></div></button></div><div class="archivedTransferSection"><h3>ของที่แบ่งไว้แล้ว</h3><button class="archivedTransferCard" onclick="openArchivedTransferRounds()"><span class="archivedTransferIcon">↔</span><span><b>เปิดรายการที่แบ่งไว้แล้ว</b><small>ดูแยกตามสาขา วันที่ และรอบ</small></span><span class="archivedTransferArrow">›</span></button></div></section>
 <section id="transferDetailPage" class="page"><div class="pageHeader"><button class="back" onclick="go('transferMenuPage')">‹</button><div><h2 id="transferDetailTitle" style="margin:0">รายการแบ่งของ</h2><div class="smallTitle">กดแบ่งแล้วเมื่อจัดของจริงเท่านั้น</div></div></div><div id="transferBox"></div></section>
 <section id="transferStatusPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">สถานะการแบ่ง</h2><div class="smallTitle">เลือกสาขาที่ต้องการดูสถานะ</div></div></div><div class="grid directionGrid"><div class="tile" onclick="openStatusDirection(1,2)"><div class="ico v1"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><b>สาขา 1<br>แบ่งให้สาขา 2</b></div><div class="tile" onclick="openStatusDirection(2,1)"><div class="ico v1"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><b>สาขา 2<br>แบ่งให้สาขา 1</b></div></div></section>
 <section id="transferStatusDetailPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 id="statusDetailTitle" style="margin:0">สถานะการแบ่ง</h2><div class="smallTitle">ดูสถานะอย่างเดียว ไม่มีปุ่มจัดของ</div></div></div><div id="transferStatusDetailBox"></div></section>
+<section id="archivedTransferBranchPage" class="page"><div class="pageHeader"><button class="back" onclick="go('transferMenuPage')">‹</button><div><h2 style="margin:0">ของที่แบ่งไว้แล้ว</h2><div class="smallTitle">เลือกสาขาที่มีของขาด</div></div></div><div class="dirStack"><button class="dirCard green" onclick="openArchivedTransferBranch(1)"><div><b>ของขาดสาขา 1</b><span>ดูรอบที่สาขา 2 แบ่งให้สาขา 1</span></div></button><button class="dirCard blue" onclick="openArchivedTransferBranch(2)"><div><b>ของขาดสาขา 2</b><span>ดูรอบที่สาขา 1 แบ่งให้สาขา 2</span></div></button></div></section>
+<section id="archivedTransferListPage" class="page"><div class="pageHeader"><button class="back" onclick="go('archivedTransferBranchPage')">‹</button><div><h2 id="archivedTransferListTitle" style="margin:0">ของขาดสาขา</h2><div class="smallTitle">รายการที่แบ่งไว้ แยกตามวันที่และรอบ</div></div></div><div id="archivedTransferListBox"></div></section>
+<section id="archivedTransferDetailPage" class="page"><div class="pageHeader"><button class="back" onclick="backToArchivedTransferList()">‹</button><div><h2 id="archivedTransferDetailTitle" style="margin:0">รายละเอียดรอบ</h2><div id="archivedTransferDetailSub" class="smallTitle">รายการของที่แบ่งไว้</div></div></div><div id="archivedTransferDetailBox"></div></section>
 <section id="orderPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ต้องสั่งเข้าใหม่</h2><div class="smallTitle">โชว์รายการของขาดที่ต้องสั่งทั้งหมด</div></div></div><div class="poPanel" onclick="openPOBuilder()"><div class="allShortageBody"><div class="allShortageIcon" style="background:linear-gradient(135deg,#ef174a,#f97316)"><svg viewBox="0 0 24 24"><path d="M7 8h10M7 12h10M7 16h7"/><path d="M5 4h14v16H5z"/></svg></div><div class="allShortageText"><h2 style="margin:0;font-size:20px">สร้างใบสั่งสินค้า</h2><div class="muted">เลือกบริษัท ใส่จำนวน แล้วคัดลอกหรือส่งออกเป็นรูปภาพ</div></div><div class="allShortageAction">สร้าง</div></div></div><div class="orderSubGrid"><button onclick="go('orderedCompaniesPage')"><b>สินค้าที่สั่งไปแล้ว</b><span>ดูรายการที่ยืนยันสั่งแล้ว แยกตามบริษัท</span></button><button onclick="go('receiveCompaniesPage')"><b>สินค้ามาส่ง</b><span>ตรวจรับสินค้า ครบ / ไม่ครบ</span></button></div><div id="orderBox"></div></section>
 <section id="poBuilderPage" class="page"><div class="pageHeader"><button class="back" onclick="go('orderPage')">‹</button><div><h2 style="margin:0">สร้างใบสั่งสินค้า</h2><div class="smallTitle">เลือกบริษัทที่จะสั่ง</div></div></div><div id="poSupplierBox"></div></section>
 <section id="poSupplierPage" class="page"><div class="pageHeader"><button class="back" onclick="go('poBuilderPage')">‹</button><div><h2 id="poSupplierTitle" style="margin:0">ใบสั่งสินค้า</h2><div class="smallTitle">ใส่จำนวนที่ต้องการสั่ง</div></div></div><div id="poItemsBox"></div></section>
@@ -140,15 +143,15 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.1</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.13</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
 let db=null, online=false;try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();online=true;}catch(e){console.warn(e)}
-const COLLECTION='stock_alert_beta1_items';const ACT='stock_alert_beta1_activity';let items=[], activities=[], currentBranch=1, currentStatus='out', listMode='all', editId=null, transferTarget=null;let currentPOSupplier='', poManualItems={};let purchaseOrders=JSON.parse(localStorage.getItem('stockAlertPurchaseOrders')||'[]');let deliveryHistory=JSON.parse(localStorage.getItem('stockAlertDeliveryHistory')||'[]');let currentOrderSupplier='', currentReceiveOrderId='', currentHistoryId='';let currentCategory='เบ็ดเตล็ด', selectedCategory='';let categories=JSON.parse(localStorage.getItem('stockAlertCategories')||'null')||['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด'];let suppliersMaster=JSON.parse(localStorage.getItem('stockAlertSuppliers')||'[]');let nickname=localStorage.getItem('stockAlertNickname')||'';
+const COLLECTION='stock_alert_beta1_items';const ACT='stock_alert_beta1_activity';let items=[], activities=[], currentBranch=1, currentStatus='out', listMode='all', editId=null, transferTarget=null;let transferFrom=1, transferTo=2, statusFrom=1, statusTo=2;let currentPOSupplier='', poManualItems={};let purchaseOrders=JSON.parse(localStorage.getItem('stockAlertPurchaseOrders')||'[]');let deliveryHistory=JSON.parse(localStorage.getItem('stockAlertDeliveryHistory')||'[]');let currentOrderSupplier='', currentReceiveOrderId='', currentHistoryId='';let currentCategory='เบ็ดเตล็ด', selectedCategory='';let categories=JSON.parse(localStorage.getItem('stockAlertCategories')||'null')||['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด'];let suppliersMaster=JSON.parse(localStorage.getItem('stockAlertSuppliers')||'[]');let nickname=localStorage.getItem('stockAlertNickname')||'';
 const icons={pen:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg>',list:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',truck:'<svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',swap:'<svg viewBox="0 0 24 24"><path d="M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3"/></svg>',chart:'<svg viewBox="0 0 24 24"><path d="M4 19h16"/><path d="M7 16v-5M12 16V7M17 16v-9"/><path d="M6 10l5-4 4 3 4-5"/></svg>',category:'<svg viewBox="0 0 24 24"><path d="M4 6.5h7l2 2h7v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M7 12h10M7 16h7"/></svg>',box:'<svg viewBox="0 0 24 24"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>'};
 const menu=[['ลงของขาด<br>สาขา 1','b1','pen',()=>openForm(1)],['ลงของขาด<br>สาขา 2','b2','pen',()=>openForm(2)],['รายการของขาด<br>สาขา 1','p1','list',()=>openList('branch1')],['รายการของขาด<br>สาขา 2','p2','list',()=>openList('branch2')],['ต้องสั่งเข้าใหม่','r1','truck',()=>go('orderPage')],['แบ่งของ<br>ระหว่างสาขา','s1','swap',()=>go('transferMenuPage')],['ของมาส่งแล้ว','g1','box',()=>go('deliveredPage')],['ข้อมูล','p1','chart',()=>go('summaryPage')]];
-function init(){document.getElementById('mainGrid').innerHTML=menu.map((m,i)=>`<div class="tile ${m[4]||''}" onclick="menu[${i}][3]()"><div class="ico ${m[1]}">${icons[m[2]]}</div><b>${m[0]}</b></div>`).join('');if(!nickname){const t=document.getElementById('nameModalTitle');if(t)t.textContent='ใส่ชื่อเล่นเครื่องนี้';const b=document.getElementById('nameModalSaveBtn');if(b)b.textContent='เริ่มใช้งาน';const c=document.getElementById('nameModalCancelBtn');if(c)c.style.display='none';document.getElementById('nameModal').classList.add('show');} else document.getElementById('syncText').textContent='ผู้ใช้งานเครื่องนี้: '+nickname;bindSearch();listen();setTimeout(checkAppUpdate,800);}
+function init(){document.getElementById('mainGrid').innerHTML=menu.map((m,i)=>`<div class="tile ${m[4]||''}" onclick="menu[${i}][3]()"><div class="ico ${m[1]}">${icons[m[2]]}</div><b>${m[0]}</b></div>`).join('');if(!nickname){const t=document.getElementById('nameModalTitle');if(t)t.textContent='ใส่ชื่อเล่นเครื่องนี้';const b=document.getElementById('nameModalSaveBtn');if(b)b.textContent='เริ่มใช้งาน';const c=document.getElementById('nameModalCancelBtn');if(c)c.style.display='none';document.getElementById('nameModal').classList.add('show');} else document.getElementById('syncText').textContent='ผู้ใช้งานเครื่องนี้: '+nickname;bindSearch();listen();setTimeout(()=>{if(typeof window.checkAppUpdate==='function')window.checkAppUpdate();},800);}
 function listen(){if(online&&db){db.collection(COLLECTION).onSnapshot(s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));renderAll();document.getElementById('syncText').textContent='Sync Firebase พร้อมใช้งาน';},e=>{online=false;loadLocal();});db.collection(ACT).orderBy('time','desc').limit(80).onSnapshot(s=>{activities=s.docs.map(d=>({id:d.id,...d.data()}));renderActivity();});}else loadLocal()}
 function loadLocal(){items=JSON.parse(localStorage.getItem(COLLECTION)||'[]');activities=JSON.parse(localStorage.getItem(ACT)||'[]');document.getElementById('syncText').textContent='โหมดออฟไลน์ / ตัวอย่าง';renderAll();}
 function persist(){localStorage.setItem(COLLECTION,JSON.stringify(items));localStorage.setItem(ACT,JSON.stringify(activities));localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders));localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory));renderAll()}
@@ -1767,8 +1770,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.8';
-  const APP_VERSION_LABEL='V7.8';
+  const APP_VERSION='7.13';
+  const APP_VERSION_LABEL='V7.13';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -1818,7 +1821,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
       if(title) title.textContent='เป็นเวอร์ชันล่าสุดแล้ว';
       if(desc) desc.textContent=info.offline?'ยังตรวจจากเซิร์ฟเวอร์ไม่ได้ แต่เครื่องนี้กำลังใช้ '+APP_VERSION_LABEL:'ไม่พบอัปเดตใหม่';
       if(box) box.innerHTML='เวอร์ชันปัจจุบัน <b>'+APP_VERSION_LABEL+'</b>';
-      if(btns) btns.innerHTML='<button class="btn primary" style="flex:1" onclick="closeModal('updateModal')">ตกลง</button>';
+      if(btns) btns.innerHTML='<button class="btn primary" style="flex:1" onclick="closeModal(\'updateModal\')">ตกลง</button>';
     }
   }
 
@@ -1832,7 +1835,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
     if(title) title.textContent='ตรวจสอบอัปเดต';
     if(desc) desc.textContent='กำลังตรวจสอบเวอร์ชันล่าสุด...';
     if(box) box.innerHTML='เวอร์ชันปัจจุบัน <b>'+APP_VERSION_LABEL+'</b>';
-    if(btns) btns.innerHTML='<button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button>';
+    if(btns) btns.innerHTML='<button class="btn gray" style="flex:1" onclick="closeModal(\'updateModal\')">ภายหลัง</button>';
     const info=await window.checkAppUpdate();
     setUpdateModal(info);
   };
@@ -2235,12 +2238,708 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   window.acceptSimilarV77=function(id){ const it=getItems().find(x=>String(x.id)===String(id)); window._similarOpenV77=false; try{closeModal('similarPromptV77')}catch(e){document.getElementById('similarPromptV77')?.classList.remove('show')}; if(!it)return; window._similarAcceptedV77=it; const nameEl=document.getElementById('nameInput'); if(nameEl) nameEl.value=it.name; if(Number(it.branch)===Number(currentBranch)){ let m=document.getElementById('sameBranchAlreadyV77'); if(!m){m=document.createElement('div');m.id='sameBranchAlreadyV77';m.className='modal';document.body.appendChild(m);} m.innerHTML=`<div class="sheet"><h2>สินค้านี้มีอยู่ในรายการแล้ว</h2><p class="muted">${esc(it.name)} อยู่ในรายการของขาดสาขา ${esc(it.branch)} แล้ว</p><div class="rowBtns"><button class="btn gray" style="flex:1" onclick="closeModal('sameBranchAlreadyV77')">ตกลง</button><button class="btn primary" style="flex:1" onclick="closeModal('sameBranchAlreadyV77');openForm(${Number(it.branch)}, ${JSON.stringify(it).replace(/'/g,'&#39;')})">แก้ไข</button></div></div>`; m.classList.add('show'); } };
   function checkSimilarNow(){const el=document.getElementById('nameInput'); if(!el)return; const name=el.value.trim(); if(name.length<2)return; const eid=editId||null; const best=bestSimilar(name,eid); if(!best)return; if(window._similarAcceptedV77&&String(window._similarAcceptedV77.id)===String(best.item.id))return; if(window._similarRejectedV77[String(best.item.id)])return; showSimilar(best);}
   function bindName(){const el=document.getElementById('nameInput'); if(!el||el.dataset.v77similar==='1')return; el.dataset.v77similar='1'; let timer=null; ['input','keyup','change','compositionend'].forEach(ev=>el.addEventListener(ev,()=>{clearTimeout(timer);timer=setTimeout(checkSimilarNow,250)})); el.addEventListener('blur',()=>setTimeout(checkSimilarNow,120));}
-  try{ const prevOpenForm=window.openForm||openForm; openForm=function(){window._similarAcceptedV77=null;window._similarRejectedV77={};window._similarOpenV77=false;const r=prevOpenForm.apply(this,arguments);setTimeout(bindName,80);return r;}; window.openForm=openForm; const prevSave=window.saveItem||saveItem; saveItem=async function(){ const name=(document.getElementById('nameInput')?.value||'').trim(); if(!editId && name){const best=bestSimilar(name,null); if(best && !(window._similarAcceptedV77&&String(window._similarAcceptedV77.id)===String(best.item.id)) && !window._similarRejectedV77[String(best.item.id)]){showSimilar(best);return;}} return prevSave.apply(this,arguments); }; window.saveItem=saveItem; }catch(e){console.error('V7.8 similar patch failed',e)}
+  try{ const prevOpenForm=window.openForm||openForm; openForm=function(){window._similarAcceptedV77=null;window._similarRejectedV77={};window._similarOpenV77=false;const r=prevOpenForm.apply(this,arguments);if(!document.getElementById('formPage')?.classList.contains('active'))go('formPage');setTimeout(()=>{if(!document.getElementById('formPage')?.classList.contains('active'))go('formPage');bindName();},80);return r;}; window.openForm=openForm; const prevSave=window.saveItem||saveItem; saveItem=async function(){ const name=(document.getElementById('nameInput')?.value||'').trim(); if(!editId && name){const best=bestSimilar(name,null); if(best && !(window._similarAcceptedV77&&String(window._similarAcceptedV77.id)===String(best.item.id)) && !window._similarRejectedV77[String(best.item.id)]){showSimilar(best);return;}} return prevSave.apply(this,arguments); }; window.saveItem=saveItem; }catch(e){console.error('V7.8 similar patch failed',e)}
   const css=`.copyToolsV72,.copyToolsV73,.copyToolsV74,.catCopySmallV74,.copyToolsV75,.copyToolsV76{display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important}.listActionRowV77{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin:8px 0 12px!important}.listActionRowV77 .detailLink{margin:0!important;padding:6px 10px!important;font-size:14px!important}.miniCopyBtnV77{border:0!important;background:#eaf2ff!important;color:#0967f2!important;border-radius:999px!important;padding:6px 10px!important;font-weight:900!important;font-size:13px!important;line-height:1.1!important;width:auto!important;min-width:0!important;min-height:0!important;box-shadow:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}.catCopyRowV77{margin-top:0!important}`;
   const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
   function cleanupBigCopy(){document.querySelectorAll('.copyToolsV72,.copyToolsV73,.copyToolsV74,.copyToolsV75,.copyToolsV76').forEach(n=>n.remove());}
   setInterval(()=>{try{bindName();cleanupBigCopy();}catch(e){}},700); setTimeout(()=>{try{cleanupBigCopy(); if(document.getElementById('listPage')?.classList.contains('active'))renderList(); bindName();}catch(e){}},300);
 })();
 
+</script>
+
+<script>
+/* === Daily Transfer Rounds: Phase 1 === */
+(function(){
+  const ROUND_SCHEMA_VERSION=2;
+  const ROUND_HISTORY_KEY='stockAlertTransferHistory';
+  const SHOP_TIME_ZONE='Asia/Bangkok';
+  let reconcilePromise=null;
+  let roundSavePromise=Promise.resolve();
+  let prepareContext=null;
+
+  const baseUpdateDoc=window.updateDoc||updateDoc;
+  const baseConfirmTransfer=window.confirmTransfer||confirmTransfer;
+  const baseConfirmTransferReceived=window.confirmTransferReceived||confirmTransferReceived;
+  const baseRenderAll=window.renderAll||renderAll;
+  const baseOpenTransfer=window.openTransfer||openTransfer;
+
+  function historyList(){
+    return Array.isArray(transferHistory)?transferHistory:[];
+  }
+  function allItems(){
+    return Array.isArray(items)?items:[];
+  }
+  function shopDateKey(timestamp){
+    const parts=new Intl.DateTimeFormat('en-US',{
+      timeZone:SHOP_TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(new Date(timestamp||Date.now()));
+    const values={}; parts.forEach(p=>{if(p.type!=='literal')values[p.type]=p.value;});
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+  function roundDateKey(round){
+    return round?.dateKey||shopDateKey(round?.createdAt||round?.archivedAt||round?.doneAt||Date.now());
+  }
+  function isNewRound(round){
+    return Number(round?.schemaVersion||0)>=ROUND_SCHEMA_VERSION;
+  }
+  function activeRound(){
+    return historyList().find(round=>isNewRound(round)&&round.status==='active')||null;
+  }
+  function roundDirectionMatches(round,from,to){
+    return !!round&&Number(round.from)===Number(from)&&Number(round.to)===Number(to);
+  }
+  function itemDirection(item){
+    const to=Number(item?.branch);
+    return to===1?{from:2,to:1}:to===2?{from:1,to:2}:null;
+  }
+  function itemBelongsToRound(item,round){
+    return !!item&&!!round&&item.transferPrepared===true&&String(item.transferRoundId||'')===String(round.id);
+  }
+  function preparedItemsForRound(round){
+    return allItems().filter(item=>itemBelongsToRound(item,round));
+  }
+  function nextRoundNumber(dateKey,from,to){
+    return historyList().reduce((max,round)=>{
+      if(roundDateKey(round)!==dateKey||!roundDirectionMatches(round,from,to))return max;
+      return Math.max(max,Number(round.roundNumber||round.round||0)||0);
+    },0)+1;
+  }
+  function roundSnapshot(item,round){
+    return {
+      lineId:`${round.id}:${item.id}`,
+      shortageItemId:item.id,
+      needId:item.id,
+      name:item.name||'',
+      qty:item.transferQty||'',
+      unit:item.transferUnit||'',
+      preparedAt:item.transferAt||Date.now(),
+      preparedBy:item.transferBy||nickname||'ไม่ระบุ',
+      from:round.from,
+      to:round.to,
+      decision:item.transferDecision||'remove',
+      confirmationStatus:'pending',
+      transferBaseQty:item.transferBaseQty||'',
+      transferBaseUnit:item.transferBaseUnit||'',
+      transferConversionRate:item.transferConversionRate||'',
+      conversionNote:item.transferConversionNote||''
+    };
+  }
+  function roundCandidateIds(from,to){
+    try{return transferTasksByDirection(from,to).map(task=>String(task.need.id));}
+    catch(e){return [];}
+  }
+  function persistRoundHistory(){
+    const snapshot=JSON.parse(JSON.stringify(historyList()));
+    roundSavePromise=roundSavePromise.catch(()=>{}).then(async()=>{
+      localStorage.setItem(ROUND_HISTORY_KEY,JSON.stringify(snapshot));
+      if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db&&typeof TRANSFER_HISTORY!=='undefined'){
+        await db.collection(TRANSFER_HISTORY).doc('main').set({items:snapshot,updatedAt:Date.now()},{merge:true});
+      }
+    });
+    return roundSavePromise;
+  }
+  function createRound(from,to,dateKey){
+    const roundNumber=nextRoundNumber(dateKey,from,to);
+    const now=Date.now();
+    const round={
+      id:`trr_${dateKey.replace(/-/g,'')}_${from}to${to}_${roundNumber}_${now}`,
+      schemaVersion:ROUND_SCHEMA_VERSION,
+      dateKey,
+      roundNumber,
+      round:roundNumber,
+      from:Number(from),
+      to:Number(to),
+      receivingBranch:Number(to),
+      status:'active',
+      archiveReason:'',
+      candidateItemIds:roundCandidateIds(from,to),
+      createdAt:now,
+      createdBy:nickname||'ไม่ระบุ',
+      archivedAt:null,
+      archivedBy:'',
+      confirmedAt:null,
+      confirmedBy:'',
+      items:[]
+    };
+    historyList().unshift(round);
+    return round;
+  }
+  function clearTransferFields(){
+    return {
+      transferPrepared:false,
+      transferDone:false,
+      transferQty:'',
+      transferUnit:'',
+      transferBaseQty:'',
+      transferBaseUnit:'',
+      transferConversionRate:'',
+      transferConversionNote:'',
+      transferDecision:'remove',
+      transferBy:'',
+      transferAt:null,
+      transferRoundId:'',
+      transferDateKey:'',
+      transferRoundNumber:''
+    };
+  }
+  async function clearArchivedRoundItems(round,roundItems){
+    const cleared=clearTransferFields();
+    for(const item of roundItems){
+      await baseUpdateDoc(item.id,cleared);
+      Object.assign(item,cleared);
+    }
+  }
+  async function archiveRound(round,reason){
+    if(!round||round.status!=='active')return false;
+    const roundItems=preparedItemsForRound(round);
+    const now=Date.now();
+    const previous={status:round.status,archiveReason:round.archiveReason,archivedAt:round.archivedAt,archivedBy:round.archivedBy,items:round.items};
+    round.status='archived_pending_confirmation';
+    round.archiveReason=reason;
+    round.archivedAt=now;
+    round.archivedBy=nickname||'ไม่ระบุ';
+    round.items=roundItems.map(item=>roundSnapshot(item,round));
+    try{await persistRoundHistory();}
+    catch(error){Object.assign(round,previous);throw error;}
+    try{await clearArchivedRoundItems(round,roundItems);}
+    catch(error){
+      round.cleanupPending=true;
+      round.cleanupErrorAt=Date.now();
+      try{await persistRoundHistory();}catch(e){}
+      console.error('Archived round cleanup will be retried',error);
+    }
+    try{await log('ปิดรอบแบ่งของ',`สาขา ${round.from} → สาขา ${round.to} • รอบที่ ${round.roundNumber}`);}catch(e){}
+    return true;
+  }
+  async function attachItemToRound(item,round){
+    const metadata={
+      transferRoundId:round.id,
+      transferDateKey:round.dateKey,
+      transferRoundNumber:round.roundNumber
+    };
+    await baseUpdateDoc(item.id,metadata);
+    Object.assign(item,metadata);
+  }
+  async function migrateLegacyPreparedItems(){
+    const legacy=allItems().filter(item=>item.transferPrepared===true&&!item.transferRoundId);
+    if(!legacy.length)return false;
+    const groups=new Map();
+    legacy.forEach(item=>{
+      const direction=itemDirection(item); if(!direction)return;
+      const dateKey=shopDateKey(item.transferAt||Date.now());
+      const key=`${dateKey}:${direction.from}:${direction.to}`;
+      if(!groups.has(key))groups.set(key,{dateKey,...direction,items:[],latestAt:0});
+      const group=groups.get(key); group.items.push(item); group.latestAt=Math.max(group.latestAt,Number(item.transferAt||0));
+    });
+    const ordered=[...groups.values()].sort((a,b)=>b.latestAt-a.latestAt);
+    let current=activeRound();
+    for(const group of ordered){
+      let round=null;
+      if(current&&current.dateKey===group.dateKey&&roundDirectionMatches(current,group.from,group.to))round=current;
+      else if(!current&&group.dateKey===shopDateKey()){
+        round=createRound(group.from,group.to,group.dateKey); current=round;
+      }else{
+        round=createRound(group.from,group.to,group.dateKey);
+      }
+      if(round!==current){
+        round.status='archived_pending_confirmation';
+        round.archiveReason=group.dateKey===shopDateKey()?'legacy_multiple_active':'date_rollover';
+        round.archivedAt=Date.now();
+        round.archivedBy=nickname||'ไม่ระบุ';
+      }
+      for(const item of group.items)await attachItemToRound(item,round);
+      round.items=group.items.map(item=>roundSnapshot(item,round));
+      if(round!==current){
+        await persistRoundHistory();
+        await clearArchivedRoundItems(round,group.items);
+      }
+    }
+    await persistRoundHistory();
+    return true;
+  }
+  async function cleanupArchivedItemFlags(){
+    const archivedById=new Map(historyList().filter(round=>isNewRound(round)&&round.status!=='active').map(round=>[String(round.id),round]));
+    const stale=allItems().filter(item=>item.transferPrepared===true&&archivedById.has(String(item.transferRoundId||'')));
+    if(!stale.length)return;
+    const cleared=clearTransferFields();
+    for(const item of stale){
+      try{await baseUpdateDoc(item.id,cleared);Object.assign(item,cleared);}catch(error){console.error('Could not clean archived transfer fields',error);}
+    }
+  }
+  async function reconcileRoundState(){
+    if(reconcilePromise)return reconcilePromise;
+    reconcilePromise=(async()=>{
+      const today=shopDateKey();
+      const activeRounds=historyList().filter(round=>isNewRound(round)&&round.status==='active').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      const keeper=activeRounds.find(round=>roundDateKey(round)===today)||null;
+      for(const round of activeRounds){
+        if(round===keeper)continue;
+        await archiveRound(round,roundDateKey(round)===today?'multiple_active_reconciled':'date_rollover');
+      }
+      await cleanupArchivedItemFlags();
+      await migrateLegacyPreparedItems();
+      return activeRound();
+    })().catch(error=>{console.error('Transfer round reconciliation failed',error);return activeRound();}).finally(()=>{reconcilePromise=null;});
+    return reconcilePromise;
+  }
+  async function getOrCreateRound(from,to){
+    await reconcileRoundState();
+    let round=activeRound();
+    if(round){
+      if(!roundDirectionMatches(round,from,to))return null;
+      return round;
+    }
+    round=createRound(from,to,shopDateKey());
+    await persistRoundHistory();
+    return round;
+  }
+  function roundSummary(from,to){
+    const round=activeRound();
+    if(!round||roundDateKey(round)!==shopDateKey()||!roundDirectionMatches(round,from,to)){
+      return {from:Number(from),to:Number(to),round:null,total:0,done:0,remain:0,complete:false,started:false};
+    }
+    let tasks=[]; try{tasks=transferTasksByDirection(from,to);}catch(e){}
+    const done=tasks.filter(task=>itemBelongsToRound(task.need,round)).length;
+    const total=tasks.length;
+    return {from:Number(from),to:Number(to),round,total,done,remain:Math.max(0,total-done),complete:total>0&&done===total,started:done>0};
+  }
+  function scheduleReconcile(){
+    Promise.resolve().then(()=>reconcileRoundState()).then(()=>{
+      try{renderTransferAlerts();}catch(e){}
+      const page=document.getElementById('transferStatusDetailPage');
+      if(page?.classList.contains('active'))try{renderTransferStatusDetail();}catch(e){}
+    });
+  }
+
+  window.updateDoc=updateDoc=async function(id,data){
+    let payload=data;
+    if(data&&data.transferPrepared===true&&prepareContext){
+      const round=await getOrCreateRound(prepareContext.from,prepareContext.to);
+      if(!round)throw new Error('ANOTHER_TRANSFER_ROUND_IS_ACTIVE');
+      payload={...data,transferRoundId:round.id,transferDateKey:round.dateKey,transferRoundNumber:round.roundNumber};
+      const result=await baseUpdateDoc(id,payload);
+      const item=allItems().find(entry=>String(entry.id)===String(id));
+      if(item)Object.assign(item,payload);
+      round.items=preparedItemsForRound(round).map(entry=>roundSnapshot(entry,round));
+      await persistRoundHistory();
+      return result;
+    }
+    return baseUpdateDoc(id,payload);
+  };
+
+  window.confirmTransfer=confirmTransfer=async function(){
+    if(!transferTarget)return;
+    await reconcileRoundState();
+    const current=activeRound();
+    if(current&&!roundDirectionMatches(current,transferTarget.from,transferTarget.to)){
+      toast(`มีรอบที่ ${current.roundNumber} สาขา ${current.from} → สาขา ${current.to} กำลังทำอยู่ กรุณาปิดรอบเดิมก่อน`);
+      return;
+    }
+    prepareContext={from:Number(transferTarget.from),to:Number(transferTarget.to)};
+    try{
+      await baseConfirmTransfer();
+    }catch(error){
+      if(error?.message==='ANOTHER_TRANSFER_ROUND_IS_ACTIVE')toast('มีรอบแบ่งของอื่นกำลังทำอยู่ กรุณาปิดรอบเดิมก่อน');
+      else throw error;
+    }finally{
+      prepareContext=null;
+      try{renderAll();}catch(e){}
+    }
+  };
+
+  window.transferSummary=transferSummary=function(from,to){return roundSummary(from,to);};
+
+  window.renderTransferAlerts=renderTransferAlerts=function(){
+    const box=document.getElementById('transferAlerts'); if(!box)return;
+    const round=activeRound();
+    if(!round||roundDateKey(round)!==shopDateKey()){box.innerHTML='';return;}
+    const summary=roundSummary(round.from,round.to);
+    if(!summary.started){box.innerHTML='';return;}
+    box.innerHTML=`<div class="alertCard ${summary.complete?'done':''}" onclick="openStatusDirection(${round.from},${round.to})"><h3>สาขา ${round.from} ${summary.complete?'แบ่งของครบทุกรายการแล้ว':'เริ่มแบ่งของบางส่วนแล้ว'}</h3><p>กดดูสถานะการแบ่งของ</p><div class="transferRound">รอบที่ ${round.roundNumber}</div></div>`;
+  };
+
+  window.renderTransfers=renderTransfers=function(){
+    const from=Number(transferFrom||1),to=Number(transferTo||2);
+    const round=activeRound();
+    const current=round&&roundDateKey(round)===shopDateKey()&&roundDirectionMatches(round,from,to)?round:null;
+    const tasks=transferTasksByDirection(from,to);
+    const html=tasks.map(task=>{
+      const item=task.need,prepared=itemBelongsToRound(item,current);
+      return `<div class="item"><div class="itemTop"><div><b>${escapeHtml(item.name)}</b><div class="muted">สาขา ${task.from} → สาขา ${task.to}</div><div class="muted">สถานะของสาขา ${task.to}: ${branchText(item)}</div>${prepared?`<div class="muted">แบ่งแล้ว: ${item.transferQty||'-'} ${item.transferUnit||''} โดย ${item.transferBy||'-'} เวลา ${fmt(item.transferAt)}</div>`:''}</div>${prepared?'<span class="pill green">แบ่งแล้ว</span>':'<span class="pill blue">รอแบ่ง</span>'}</div><div class="rowBtns"><button class="btn ok" onclick="openTransfer('${item.id}',${task.from},${task.to})">${prepared?'แก้ไขจำนวน':'แบ่งแล้ว'}</button><button class="btn gray" onclick="openSameShortage('${item.id}',${task.from},${task.to})">หมดเหมือนกัน</button></div></div>`;
+    }).join('');
+    transferBox.innerHTML=html||'<div class="empty">ยังไม่มีรายการที่ต้องแบ่งในทิศทางนี้</div>';
+  };
+
+  window.openTransfer=openTransfer=function(id,from,to){
+    const result=baseOpenTransfer(id,from,to);
+    const item=allItems().find(entry=>String(entry.id)===String(id));
+    const round=activeRound();
+    if(!itemBelongsToRound(item,round)){
+      const qty=document.getElementById('tmQty'),unit=document.getElementById('tmUnit');
+      if(qty)qty.value=''; if(unit)unit.value='';
+      try{setTransferDecision('remove');}catch(e){}
+    }
+    return result;
+  };
+
+  window.renderTransferStatusDetail=renderTransferStatusDetail=function(){
+    const from=Number(statusFrom||1),to=Number(statusTo||2);
+    const summary=roundSummary(from,to),box=document.getElementById('transferStatusDetailBox'); if(!box)return;
+    if(!summary.round||!summary.started){
+      box.innerHTML='<div class="empty">ยังไม่มีรอบการแบ่งที่กำลังทำอยู่</div>';
+      return;
+    }
+    const pct=summary.total?Math.round((summary.done/summary.total)*100):0;
+    const color=statusColor(pct,summary.complete);
+    const tasks=transferTasksByDirection(from,to).slice().sort((a,b)=>Number(itemBelongsToRound(b.need,summary.round))-Number(itemBelongsToRound(a.need,summary.round)));
+    const details=tasks.map(task=>{
+      const item=task.need,prepared=itemBelongsToRound(item,summary.round);
+      return `<div class="item"><div class="itemTop"><div><b>${escapeHtml(item.name)}</b><div class="muted">${prepared?`แบ่งแล้ว ${item.transferQty||'-'} ${item.transferUnit||''} โดย ${item.transferBy||'-'} เวลา ${fmt(item.transferAt)}`:'ยังไม่ได้แบ่ง'}</div></div>${prepared?'<span class="pill green">แบ่งแล้ว</span>':'<span class="pill blue">ยังไม่แบ่ง</span>'}</div></div>`;
+    }).join('');
+    const archiveButton=!summary.complete?'<button class="btn primary" style="width:100%;margin-top:10px" onclick="archiveCurrentTransferRound()">รับหรือส่งส่วนที่แบ่งก่อน</button>':'';
+    const receiveButton=summary.complete?`<button class="btn confirmDone" onclick="confirmTransferReceived(${from},${to})">ยืนยันรับ/ส่งของแล้ว</button>`:'';
+    box.innerHTML=`<div class="statusHero"><div class="statusIcon ${color}">↔</div><div class="smallTitle">สาขา ${from} → สาขา ${to} • รอบที่ ${summary.round.roundNumber}</div><h2 style="margin:8px 0 6px">${summary.complete?'แบ่งของครบทุกรายการแล้ว':'เริ่มแบ่งแล้วบางส่วน'}</h2><div class="progressOuter"><div class="progressBar ${color}" style="width:${pct}%"></div></div><div class="bigPercent">${pct}%</div><div class="statusRows"><div class="statusRow"><span>ทั้งหมด</span><span>${summary.total} รายการ</span></div><div class="statusRow"><span>แบ่งแล้ว</span><span>${summary.done} รายการ</span></div><div class="statusRow"><span>ยังไม่แบ่ง</span><span>${summary.remain} รายการ</span></div></div><button class="btn cleanListBtn" onclick="document.getElementById('statusDetailList').style.display=document.getElementById('statusDetailList').style.display==='none'?'block':'none'">ดูรายการทั้งหมด</button>${archiveButton}${receiveButton}</div><div id="statusDetailList" style="display:none;margin-top:12px">${details||'<div class="empty">ยังไม่มีรายการ</div>'}</div>`;
+  };
+
+  window.archiveCurrentTransferRound=async function(){
+    await reconcileRoundState();
+    const round=activeRound();
+    if(!round)return toast('ไม่มีรอบแบ่งของที่กำลังทำอยู่');
+    const count=preparedItemsForRound(round).length;
+    if(!count)return toast('ยังไม่มีรายการที่แบ่งในรอบนี้');
+    if(!confirm(`ยืนยันรับ/ส่ง ${count} รายการในรอบที่ ${round.roundNumber} ตอนนี้ใช่ไหม?`))return;
+    try{
+      if(typeof window.completeManualPartialTransferRound!=='function')throw new Error('MANUAL_PARTIAL_COMPLETION_UNAVAILABLE');
+      await window.completeManualPartialTransferRound(round.id);
+      if(typeof renderAll==='function')renderAll();
+      go('home');
+      toast(`รับ/ส่งรอบที่ ${round.roundNumber} แล้ว`);
+    }catch(error){
+      console.error('Could not archive transfer round',error);
+      toast('ปิดรอบไม่สำเร็จ กรุณาลองใหม่');
+    }
+  };
+
+  window.confirmTransferReceived=confirmTransferReceived=async function(from,to){
+    await reconcileRoundState();
+    const round=activeRound();
+    if(!round||!roundDirectionMatches(round,from,to))return baseConfirmTransferReceived(from,to);
+    const beforeIds=new Set(historyList().map(entry=>String(entry.id)));
+    await baseConfirmTransferReceived(from,to);
+    const confirmed=historyList().find(entry=>String(entry.id)!==String(round.id)&&!beforeIds.has(String(entry.id)));
+    if(!confirmed)return;
+    confirmed.schemaVersion=ROUND_SCHEMA_VERSION;
+    confirmed.dateKey=round.dateKey;
+    confirmed.roundNumber=round.roundNumber;
+    confirmed.round=round.roundNumber;
+    confirmed.status='confirmed';
+    confirmed.archiveReason='completed';
+    confirmed.createdAt=round.createdAt;
+    confirmed.createdBy=round.createdBy;
+    confirmed.archivedAt=confirmed.doneAt||Date.now();
+    confirmed.archivedBy=nickname||'ไม่ระบุ';
+    confirmed.confirmedAt=confirmed.doneAt||Date.now();
+    confirmed.confirmedBy=nickname||'ไม่ระบุ';
+    const index=historyList().findIndex(entry=>String(entry.id)===String(round.id));
+    if(index>=0)historyList().splice(index,1);
+    await persistRoundHistory();
+    try{renderAll();}catch(e){}
+  };
+
+  window.renderTransferHistory=renderTransferHistory=function(){
+    const box=document.getElementById('transferHistoryBox'); if(!box)return;
+    const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const visible=historyList().filter(entry=>!isNewRound(entry)||entry.status==='confirmed'||entry.archiveReason==='completed'||entry.archiveReason==='take_partial_now').sort((a,b)=>(b.doneAt||b.confirmedAt||b.archivedAt||0)-(a.doneAt||a.confirmedAt||a.archivedAt||0));
+    box.innerHTML=visible.length?visible.map(entry=>`<button class="historyRow" onclick="openTransferHistoryDetail('${esc(entry.id)}')"><b>สาขา ${esc(entry.from)} → สาขา ${esc(entry.to)} • รอบที่ ${esc(entry.roundNumber||entry.round||'-')}</b><div class="meta">รับ/ส่งแล้ว ${typeof fmt==='function'?fmt(entry.doneAt):new Date(entry.doneAt).toLocaleString('th-TH')} • ${(entry.items||[]).length} รายการ</div></button>`).join(''):'<div class="empty">ยังไม่มีประวัติการแบ่งของ</div>';
+  };
+
+  window.renderAll=renderAll=function(){
+    const result=baseRenderAll();
+    scheduleReconcile();
+    return result;
+  };
+
+  window.StockAlertTransferRounds={
+    schemaVersion:ROUND_SCHEMA_VERSION,
+    shopDateKey,
+    getActiveRound:activeRound,
+    getSummary:roundSummary,
+    reconcile:reconcileRoundState,
+    archiveActive:()=>window.archiveCurrentTransferRound()
+  };
+
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleReconcile();});
+  window.addEventListener('focus',scheduleReconcile);
+  setInterval(scheduleReconcile,60000);
+  setTimeout(scheduleReconcile,250);
+})();
+</script>
+
+<script>
+/* === Daily Transfer Rounds: Phase 2 archived-round browser === */
+(function(){
+  let selectedArchivedBranch=1;
+  let archivedConfirmationInFlight='';
+
+  function escapeArchiveHtml(value){
+    return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  }
+  function archiveDateKey(round){
+    if(round?.dateKey)return String(round.dateKey);
+    const timestamp=round?.archivedAt||round?.doneAt||round?.createdAt||Date.now();
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
+    const values={}; parts.forEach(part=>{if(part.type!=='literal')values[part.type]=part.value;});
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+  function displayArchiveDate(dateKey){
+    const parts=String(dateKey||'').split('-');
+    return parts.length===3?`${parts[2]}/${parts[1]}/${parts[0]}`:String(dateKey||'-');
+  }
+  function archiveRoundNumber(round){
+    return Number(round?.roundNumber||round?.round||1)||1;
+  }
+  function archivedRounds(){
+    const source=Array.isArray(transferHistory)?transferHistory:[];
+    return source.filter(round=>round&&round.archiveReason==='date_rollover'&&round.status==='archived_pending_confirmation');
+  }
+  function branchArchivedRounds(branch){
+    return archivedRounds().filter(round=>Number(round.to||round.receivingBranch)===Number(branch));
+  }
+  function findArchivedRound(id){
+    return archivedRounds().find(round=>String(round.id)===String(id))||null;
+  }
+  function roundItemWho(item,round){
+    return item?.preparedBy||item?.transferBy||item?.by||round?.archivedBy||round?.createdBy||'ไม่ระบุ';
+  }
+  function parseArchiveQty(value){
+    const text=String(value??'').replace(/,/g,'').trim();
+    if(!text)return null;
+    const number=Number(text);
+    return Number.isFinite(number)&&number>=0?number:null;
+  }
+  function formatArchiveQty(value){
+    return String(Math.round(Number(value)*1000)/1000).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+  }
+  function sameArchiveUnit(a,b){
+    return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
+  }
+  function transferQtyForShortage(item,line){
+    const shortageUnit=String(item?.unit||'').trim();
+    const baseQty=parseArchiveQty(line?.transferBaseQty??line?.addedQty);
+    const baseUnit=String(line?.transferBaseUnit||line?.baseUnit||'').trim();
+    if(baseQty!==null&&(!shortageUnit||!baseUnit||sameArchiveUnit(shortageUnit,baseUnit)))return baseQty;
+    const directQty=parseArchiveQty(line?.qty);
+    const directUnit=String(line?.unit||'').trim();
+    if(directQty!==null&&(!shortageUnit||!directUnit||sameArchiveUnit(shortageUnit,directUnit)))return directQty;
+    return null;
+  }
+  function confirmationPlan(item,line){
+    if(!item)return {operation:'none',result:'already_absent'};
+    const shortageQty=parseArchiveQty(item.qty);
+    const transferredQty=transferQtyForShortage(item,line);
+    if(shortageQty!==null&&shortageQty>0&&transferredQty!==null){
+      const remaining=Math.max(0,shortageQty-transferredQty);
+      if(remaining<=0)return {operation:'remove',result:'fully_covered',beforeQty:formatArchiveQty(shortageQty),transferredQty:formatArchiveQty(transferredQty),remainingQty:'0',unit:item.unit||line.transferBaseUnit||line.unit||''};
+      return {operation:'reduce',result:'partially_covered',beforeQty:formatArchiveQty(shortageQty),transferredQty:formatArchiveQty(transferredQty),remainingQty:formatArchiveQty(remaining),unit:item.unit||line.transferBaseUnit||line.unit||''};
+    }
+    if((line?.decision||'remove')==='remove')return {operation:'remove',result:'covered_by_saved_decision'};
+    return {operation:'keep',result:transferredQty===null?'kept_unit_or_quantity_unknown':'kept_by_saved_decision'};
+  }
+  function lineShortageId(line){
+    return String(line?.shortageItemId||line?.needId||'');
+  }
+  function findShortageItem(id){
+    return (Array.isArray(items)?items:[]).find(item=>String(item.id)===String(id))||null;
+  }
+  async function persistArchivedRoundState(){
+    const snapshot=JSON.parse(JSON.stringify(Array.isArray(transferHistory)?transferHistory:[]));
+    localStorage.setItem('stockAlertTransferHistory',JSON.stringify(snapshot));
+    if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db&&typeof TRANSFER_HISTORY!=='undefined'){
+      await db.collection(TRANSFER_HISTORY).doc('main').set({items:snapshot,updatedAt:Date.now()},{merge:true});
+    }
+  }
+  async function removeConfirmedShortage(id){
+    if(!id)return;
+    if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db)await db.collection(COLLECTION).doc(id).delete();
+    items=items.filter(item=>String(item.id)!==String(id));
+    localStorage.setItem(COLLECTION,JSON.stringify(items));
+  }
+  async function applyConfirmationPlan(line,plan){
+    const id=lineShortageId(line);
+    let current=findShortageItem(id);
+    if(plan.operation==='none'||plan.operation==='keep')return;
+    if(plan.operation==='remove'){
+      if(current)await removeConfirmedShortage(id);
+      return;
+    }
+    if(plan.operation==='reduce'){
+      if(!current)return;
+      const currentQty=parseArchiveQty(current.qty);
+      const beforeQty=parseArchiveQty(plan.beforeQty);
+      const targetQty=parseArchiveQty(plan.remainingQty);
+      if(targetQty===null)throw new Error('INVALID_REMAINING_QUANTITY');
+      if(currentQty===targetQty)return;
+      if(currentQty!==beforeQty)throw new Error('SHORTAGE_CHANGED_DURING_CONFIRMATION');
+      const data={qty:formatArchiveQty(targetQty),unit:plan.unit||current.unit||'',status:'low',transferPrepared:false,transferDone:false,transferQty:'',transferUnit:'',transferBaseQty:'',transferBaseUnit:'',transferConversionRate:'',transferConversionNote:'',transferDecision:'remove',transferBy:'',transferAt:null,transferRoundId:'',transferDateKey:'',transferRoundNumber:'',updatedAt:Date.now(),updatedBy:nickname||'ไม่ระบุ'};
+      await updateDoc(id,data);
+      current=findShortageItem(id); if(current)Object.assign(current,data);
+    }
+  }
+  async function clearConfirmedTransferState(line){
+    const id=lineShortageId(line),current=findShortageItem(id);
+    if(!current||current.transferPrepared!==true)return;
+    const data={transferPrepared:false,transferDone:false,transferQty:'',transferUnit:'',transferBaseQty:'',transferBaseUnit:'',transferConversionRate:'',transferConversionNote:'',transferDecision:'remove',transferBy:'',transferAt:null,transferRoundId:'',transferDateKey:'',transferRoundNumber:''};
+    await updateDoc(id,data);
+    const refreshed=findShortageItem(id); if(refreshed)Object.assign(refreshed,data);
+  }
+  async function applyRoundConfirmation(round,options={}){
+    if(!round)throw new Error('TRANSFER_ROUND_NOT_FOUND');
+    if(round.status==='confirmed')return round;
+    const confirmer=nickname||'ไม่ระบุ',startedAt=Date.now();
+    if(options.archiveReason)round.archiveReason=options.archiveReason;
+    round.status='confirming';
+    round.archivedAt=round.archivedAt||startedAt;
+    round.archivedBy=round.archivedBy||confirmer;
+    round.confirmationStartedAt=round.confirmationStartedAt||startedAt;
+    round.confirmationStartedBy=round.confirmationStartedBy||confirmer;
+    await persistArchivedRoundState();
+    const lines=Array.isArray(round.items)?round.items:[];
+    for(let index=0;index<lines.length;index++){
+      const line=lines[index];
+      if(line.confirmationStatus==='confirmed')continue;
+      const shortageId=lineShortageId(line);
+      const plan=line.confirmationPlan||confirmationPlan(findShortageItem(shortageId),line);
+      line.lineId=line.lineId||`${round.id}:${shortageId||index}`;
+      line.confirmationPlan=plan;
+      line.confirmationStatus='applying';
+      line.applyingAt=line.applyingAt||Date.now();
+      line.applyingBy=line.applyingBy||confirmer;
+      await persistArchivedRoundState();
+      await applyConfirmationPlan(line,plan);
+      await clearConfirmedTransferState(line);
+      line.confirmationStatus='confirmed';
+      line.confirmationResult=plan.result;
+      line.appliedAt=Date.now();
+      line.appliedBy=confirmer;
+      await persistArchivedRoundState();
+    }
+    round.status='confirmed';
+    round.doneAt=round.doneAt||Date.now();
+    round.confirmedAt=Date.now();
+    round.confirmedBy=confirmer;
+    round.confirmationError='';
+    await persistArchivedRoundState();
+    return round;
+  }
+  function confirmationStatusHtml(round){
+    if(round.status==='confirmed')return `<div class="archivedConfirmStatus confirmed"><b>ยืนยันรับ/ส่งแล้ว</b><span>โดย ${escapeArchiveHtml(round.confirmedBy||'ไม่ระบุ')} • ${new Date(round.confirmedAt||Date.now()).toLocaleString('th-TH')}</span></div>`;
+    if(round.status==='confirming')return '<div class="archivedConfirmStatus"><b>กำลังยืนยันรับ/ส่งสินค้า...</b></div>';
+    return '';
+  }
+
+  window.openArchivedTransferRounds=function(){
+    go('archivedTransferBranchPage');
+  };
+
+  window.openArchivedTransferBranch=function(branch){
+    selectedArchivedBranch=Number(branch)===2?2:1;
+    const title=document.getElementById('archivedTransferListTitle');
+    if(title)title.textContent=`ของขาดสาขา ${selectedArchivedBranch}`;
+    go('archivedTransferListPage');
+    renderArchivedTransferList();
+  };
+
+  window.backToArchivedTransferList=function(){
+    openArchivedTransferBranch(selectedArchivedBranch);
+  };
+
+  window.renderArchivedTransferList=function(){
+    const box=document.getElementById('archivedTransferListBox'); if(!box)return;
+    const rounds=branchArchivedRounds(selectedArchivedBranch);
+    if(!rounds.length){box.innerHTML='<div class="empty">ยังไม่มีของที่แบ่งไว้สำหรับสาขานี้</div>';return;}
+    const byDate={};
+    rounds.forEach(round=>{const key=archiveDateKey(round);(byDate[key]=byDate[key]||[]).push(round);});
+    box.innerHTML=Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).map(dateKey=>{
+      const dateRounds=byDate[dateKey].sort((a,b)=>archiveRoundNumber(a)-archiveRoundNumber(b)||(a.archivedAt||a.doneAt||0)-(b.archivedAt||b.doneAt||0));
+      const buttons=dateRounds.map(round=>{
+        const id=encodeURIComponent(String(round.id||''));
+        const count=Array.isArray(round.items)?round.items.length:0;
+        return `<button class="archivedRoundRow" onclick="openArchivedTransferRound('${id}')"><span><b>รอบที่ ${archiveRoundNumber(round)}</b><small>สาขา ${escapeArchiveHtml(round.from||'-')} → สาขา ${escapeArchiveHtml(round.to||selectedArchivedBranch)}</small></span><span class="archivedRoundCount">${count} รายการ</span></button>`;
+      }).join('');
+      return `<div class="archivedDateGroup"><h3>${displayArchiveDate(dateKey)}</h3><div class="archivedRoundStack">${buttons}</div></div>`;
+    }).join('');
+  };
+
+  window.openArchivedTransferRound=function(encodedId){
+    const id=decodeURIComponent(String(encodedId||''));
+    const round=findArchivedRound(id);
+    if(!round){toast('ไม่พบรอบแบ่งของนี้');return;}
+    selectedArchivedBranch=Number(round.to||round.receivingBranch)===2?2:1;
+    const number=archiveRoundNumber(round),date=displayArchiveDate(archiveDateKey(round));
+    const title=document.getElementById('archivedTransferDetailTitle');
+    const sub=document.getElementById('archivedTransferDetailSub');
+    if(title)title.textContent=`รอบที่ ${number}`;
+    if(sub)sub.textContent=`${date} • สาขา ${round.from||'-'} → สาขา ${round.to||selectedArchivedBranch}`;
+    const box=document.getElementById('archivedTransferDetailBox'); if(!box)return;
+    const rows=(Array.isArray(round.items)?round.items:[]).map((item,index)=>{
+      const from=item.from||round.from||'-',to=item.to||round.to||selectedArchivedBranch;
+      return `<div class="archivedItem"><div class="archivedItemNumber">${index+1}</div><div class="archivedItemBody"><b>${escapeArchiveHtml(item.name||'-')}</b><div class="muted">จำนวน ${escapeArchiveHtml(item.qty||'-')} ${escapeArchiveHtml(item.unit||'')}</div><div class="muted">ผู้แบ่ง: ${escapeArchiveHtml(roundItemWho(item,round))}</div><div class="muted">สาขา ${escapeArchiveHtml(from)} → สาขา ${escapeArchiveHtml(to)}</div></div></div>`;
+    }).join('');
+    const encodedRoundId=encodeURIComponent(String(round.id||''));
+    const confirmed=round.status==='confirmed';
+    const confirmButton=confirmed?'<button class="btn gray archivedConfirmBtn" type="button" disabled>ยืนยันรับ/ส่งแล้ว</button>':`<button class="btn primary archivedConfirmBtn" type="button" onclick="confirmArchivedTransferRound('${encodedRoundId}')">ยืนยันรับ/ส่งสินค้า</button>`;
+    box.innerHTML=confirmationStatusHtml(round)+(rows||'<div class="empty">ไม่มีรายการสินค้าในรอบนี้</div>')+confirmButton;
+    go('archivedTransferDetailPage');
+  };
+
+  window.completeManualPartialTransferRound=async function(roundId){
+    const round=(Array.isArray(transferHistory)?transferHistory:[]).find(entry=>String(entry?.id)===String(roundId));
+    if(!round||round.status!=='active')throw new Error('ACTIVE_TRANSFER_ROUND_NOT_FOUND');
+    if(!Array.isArray(round.items)||!round.items.length)throw new Error('TRANSFER_ROUND_HAS_NO_ITEMS');
+    try{
+      return await applyRoundConfirmation(round,{archiveReason:'take_partial_now'});
+    }catch(error){
+      const applied=round.items.some(line=>line.confirmationStatus==='confirmed');
+      round.status=applied?'confirmation_failed':'active';
+      if(!applied){round.archiveReason='';round.archivedAt=null;round.archivedBy='';}
+      round.confirmationError=String(error?.message||error||'unknown');
+      try{await persistArchivedRoundState();}catch(e){}
+      throw error;
+    }
+  };
+
+  window.confirmArchivedTransferRound=async function(encodedId){
+    const id=decodeURIComponent(String(encodedId||''));
+    const round=findArchivedRound(id);
+    if(!round){toast('ไม่พบรอบแบ่งของนี้');return;}
+    if(round.status==='confirmed'){toast('รอบนี้ยืนยันรับ/ส่งแล้ว');openArchivedTransferRound(encodedId);return;}
+    if(archivedConfirmationInFlight){toast('กำลังยืนยันรอบแบ่งของ');return;}
+    if(!confirm(`ยืนยันรับ/ส่งสินค้า รอบที่ ${archiveRoundNumber(round)} ใช่ไหม?`))return;
+    archivedConfirmationInFlight=id;
+    try{
+      await applyRoundConfirmation(round);
+      try{await log('ยืนยันรับ/ส่งสินค้ารอบแบ่ง',`สาขา ${round.from} → สาขา ${round.to} • รอบที่ ${archiveRoundNumber(round)}`);}catch(e){}
+      try{renderAll();}catch(e){}
+      try{renderArchivedTransferList();}catch(e){}
+      openArchivedTransferBranch(selectedArchivedBranch);
+      toast('ยืนยันรับ/ส่งสินค้าแล้ว');
+    }catch(error){
+      console.error('Archived transfer confirmation failed',error);
+      round.status='archived_pending_confirmation';
+      round.confirmationError=String(error?.message||error||'unknown');
+      try{await persistArchivedRoundState();}catch(e){}
+      openArchivedTransferRound(encodedId);
+      toast(error?.message==='SHORTAGE_CHANGED_DURING_CONFIRMATION'?'ข้อมูลของขาดมีการเปลี่ยนแปลง กรุณาตรวจสอบก่อนยืนยันอีกครั้ง':'ยืนยันไม่สำเร็จ กรุณาลองใหม่');
+    }finally{
+      archivedConfirmationInFlight='';
+    }
+  };
+
+  const style=document.createElement('style');
+  style.textContent=`
+    .archivedTransferSection{margin-top:20px}.archivedTransferSection>h3{margin:0 0 10px;font-size:18px}.archivedTransferCard{width:100%;border:1px solid #dbe5f0;background:#fff;border-radius:18px;padding:14px;display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;text-align:left;color:#0f172a;box-shadow:0 8px 22px rgba(15,23,42,.06)}.archivedTransferCard b{display:block;font-size:16px}.archivedTransferCard small{display:block;color:#64748b;font-weight:700;margin-top:3px}.archivedTransferIcon{width:42px;height:42px;border-radius:13px;background:#eef5ff;color:#0967f2;display:grid;place-items:center;font-size:23px;font-weight:900}.archivedTransferArrow{font-size:30px;color:#94a3b8}.archivedDateGroup{margin-bottom:18px}.archivedDateGroup>h3{margin:0 0 8px;font-size:17px;color:#334155}.archivedRoundStack{display:grid;gap:8px}.archivedRoundRow{width:100%;border:1px solid #dbe5f0;background:#fff;border-radius:16px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#0f172a}.archivedRoundRow b{display:block;font-size:16px}.archivedRoundRow small{display:block;color:#64748b;font-weight:700;margin-top:3px}.archivedRoundCount{white-space:nowrap;background:#eef5ff;color:#0967f2;border-radius:999px;padding:5px 9px;font-weight:900;font-size:12px}.archivedItem{display:grid;grid-template-columns:30px 1fr;gap:10px;background:#fff;border:1px solid #dbe5f0;border-radius:16px;padding:13px;margin-bottom:9px}.archivedItemNumber{width:28px;height:28px;border-radius:9px;background:#eef5ff;color:#0967f2;display:grid;place-items:center;font-weight:900}.archivedItemBody b{display:block;margin-bottom:5px}.archivedConfirmBtn{width:100%;margin-top:12px}.archivedConfirmBtn:disabled{opacity:.7}.archivedConfirmStatus{display:flex;flex-direction:column;gap:3px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:14px;padding:11px 12px;margin-bottom:10px}.archivedConfirmStatus.confirmed{background:#ecfdf5;color:#047857;border-color:#a7f3d0}.archivedConfirmStatus span{font-size:12px;font-weight:800}
+  `;
+  document.head.appendChild(style);
+})();
 </script>
 </body></html>
