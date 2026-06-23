@@ -1,1 +1,1 @@
-Stock Alert V7.14 - Shortage lists grouped by original recorded date.
+Stock Alert V7.15 - Natural spacing between shortage date groups.

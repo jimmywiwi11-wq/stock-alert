@@ -4,6 +4,12 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.15 — 2026-06-23
+
+### Fixed
+
+- Removed the repeated compact-list minimum height and excess bottom padding inside shortage date groups, so consecutive dates now follow the wrapped item pills naturally.
+
 ## 7.14 — 2026-06-23
 
 ### Added
