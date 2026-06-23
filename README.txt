@@ -1,1 +1,1 @@
-Stock Alert V7.13 - Rollover-only pending transfers and immediate manual partial completion.
+Stock Alert V7.14 - Shortage lists grouped by original recorded date.

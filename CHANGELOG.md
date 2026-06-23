@@ -4,6 +4,17 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.14 — 2026-06-23
+
+### Added
+
+- Grouped all, Branch 1, and Branch 2 shortage lists by their original recorded date, newest date first.
+
+### Compatibility
+
+- Preserved existing item cards, ordering within each date, Firebase fields, search, copy, editing, and deleting behavior.
+- Existing records without `createdAt` use `updatedAt` as a backward-compatible date fallback.
+
 ## 7.13 — 2026-06-23
 
 ### Changed
