@@ -4,6 +4,51 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.23 — 2026-06-24
+
+### Fixed
+
+- Deduplicated legacy supplier order cards by the displayed confirmation minute, status, product names, quantities, and units across ordered, receiving, delivered, and history views.
+- Added a stable confirmation key to new order batches so retry copies collapse while genuine new orders remain distinct, including orders created within the same minute.
+- Prefer the most progressed duplicate representative so submitted receive state is preserved when legacy copies disagree only in receive metadata.
+- Kept Firebase records untouched; all legacy cleanup remains display-level and receive-state synchronization remains non-destructive.
+
+## 7.22 — 2026-06-24
+
+### Added
+
+- Added a company-selection page and a manual purchase-order mode that reuses the existing PO editor, preview, export, and confirmation workflow.
+- Added instant product-name and supported barcode-field search across shortage, order, and delivery history data.
+- Added Firebase-backed company details with optional phone, contact, and notes, plus long-press edit and delete actions.
+
+### Changed
+
+- Confirmed shortage orders now mark their source records as ordered and hide them from all three shortage list pages immediately without deleting Firebase documents.
+- Receiving goods marks linked shortage records completed instead of controlling shortage visibility or deleting their audit records.
+- Supplier renaming changes only the active company directory; historical purchase orders retain their stored supplier names.
+
+## 7.21 — 2026-06-24
+
+### Fixed
+
+- Bundled html2canvas 1.4.1 locally and capture the exact shortage preview paper for PNG save and share.
+- Made desktop sharing fall back to downloading the already-generated PNG without reporting an unsupported-share error.
+- Preserved the full paper height so long shortage exports are not clipped or re-laid out.
+
+### Changed
+
+- Restyled all, Branch 1, and Branch 2 shortage exports as compact warm-yellow notebook paper with close horizontal lines.
+- Flowed numbered product names naturally across each line and aligned small red, yellow, and green quantity badges above the product text.
+
+## 7.20 — 2026-06-24
+
+### Fixed
+
+- Prevented repeated supplier-order confirmation from creating duplicate batches, including rapid taps and reload retries.
+- Added an atomic Firebase duplicate check using supplier, confirmed time, status, item names, quantities, and units.
+- Deduplicated ordered, receiving, delivered, and supplier-history cards and counts without deleting existing Firebase records.
+- Kept distinct orders visible when their confirmed time, items, quantities, or units differ.
+
 ## 7.16 — 2026-06-24
 
 ### Added

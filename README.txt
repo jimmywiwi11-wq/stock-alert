@@ -1,1 +1,1 @@
-Stock Alert V7.16 - Paper-style shortage list image export.
+Stock Alert V7.23 - App-wide supplier order batch deduplication.
