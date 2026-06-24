@@ -1,4 +1,4 @@
-const CACHE_NAME='stock-alert-v7_15-controlled-update';
+const CACHE_NAME='stock-alert-v7_18-controlled-update';
 const APP_SHELL=['./','./index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./app.js'];
 
 // Do NOT call skipWaiting here. This keeps future versions from replacing the current app
@@ -23,7 +23,7 @@ self.addEventListener('fetch', event => {
   if (url.pathname.endsWith('/version.json')) {
     event.respondWith(
       fetch(req, { cache: 'no-store' }).catch(() =>
-        new Response(JSON.stringify({ version:'7.15', label:'V7.15', offline:true }), {
+        new Response(JSON.stringify({ version:'7.18', label:'V7.18', offline:true }), {
           headers: { 'Content-Type':'application/json' }
         })
       )

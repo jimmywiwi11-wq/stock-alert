@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.15</title>
+<title>Stock Alert V7.18</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -105,7 +105,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.15</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.16</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">🔥</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">‹</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">‹</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -143,7 +143,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.15</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.16</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1770,8 +1770,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.15';
-  const APP_VERSION_LABEL='V7.15';
+  const APP_VERSION='7.18';
+  const APP_VERSION_LABEL='V7.18';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -2213,7 +2213,21 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   window.copyShortageNamesV77=function(kind,arg){ let list=[]; if(kind==='branch1') list=getItems().filter(x=>Number(x.branch)===1); else if(kind==='branch2') list=getItems().filter(x=>Number(x.branch)===2); else if(kind==='category') list=getItems().filter(x=>(x.category||'เบ็ดเตล็ด')===(arg||selectedCategory||'')); else list=getItems().map(x=>({name:x.name})); return writeClipboard(uniqueNames(list).join('\n')); };
   function miniCopy(kind,arg){const a=arg?`, ${JSON.stringify(arg)}`:'';return `<button class="miniCopyBtnV77" type="button" onclick="event.stopPropagation();copyShortageNamesV77('${kind}'${a})">📋 คัดลอก</button>`;}
   function currentKind(){return listMode==='branch1'?'branch1':listMode==='branch2'?'branch2':'all';}
-  function compact(names){try{return chipNamesHtml(uniqueNames(names))}catch(e){return uniqueNames(names).map(n=>`<span class="compactNameChip">${esc(n)}</span>`).join('')}}
+  function shortageBadgeInfo(entries){
+    const list=(entries||[]).filter(Boolean),low=list.filter(item=>item.status!=='out');
+    const numeric=low.map(item=>Number(String(item.qty??'').replace(/,/g,''))).filter(Number.isFinite);
+    const total=numeric.reduce((sum,value)=>sum+value,0),unit=(low.find(item=>String(item.unit||'').trim())||{}).unit||'';
+    if(!low.length||(numeric.length&&total<=0))return {text:'หมดเกลี้ยง',tone:'red'};
+    if(!numeric.length)return {text:'เหลือน้อย',tone:'yellow'};
+    const value=typeof formatNumber==='function'?formatNumber(total):total;
+    return {text:`เหลือ ${value}${unit?' '+unit:''}`,tone:total<=3?'yellow':'green'};
+  }
+  function compact(entries,mode){
+    const seen=new Set(),rows=[];
+    (entries||[]).forEach(entry=>{const name=String(entry?.name||'').trim(),key=cleanName(name);if(!name||seen.has(key))return;seen.add(key);const sources=mode==='all'?[entry.b1,entry.b2]:[entry];rows.push({name,badge:shortageBadgeInfo(sources)});});
+    if(!rows.length)return '<div class="empty">ยังไม่มีรายการ</div>';
+    return `<div class="nameChipWrap">${rows.map(row=>`<span class="nameChip shortageLiveChip"><span class="shortageLiveName">${esc(row.name)}</span><span class="shortageLiveBadge ${row.badge.tone}">${esc(row.badge.text)}</span></span>`).join('')}</div>`;
+  }
   function shortageTime(value){if(value&&typeof value.toMillis==='function')return value.toMillis();if(value&&Number.isFinite(value.seconds))return value.seconds*1000;const time=Number(value);return Number.isFinite(time)?time:0;}
   function itemRecordedAt(item){return shortageTime(item?.createdAt)||shortageTime(item?.updatedAt);}
   function groupRecordedAt(group){return Math.max(itemRecordedAt(group?.b1),itemRecordedAt(group?.b2));}
@@ -2229,8 +2243,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
       const act=document.getElementById('listTopActions');
       if(act){ const cat=listMode==='all'?`<div class="categoryShortcut" onclick="go('categoryPage')"><div class="ico cat1">${icons.category}</div><div><b>หมวดหมู่</b><div class="muted">แยกดูสินค้าของขาดตามหมวดหมู่</div></div></div>`:''; const detail=`<button class="detailLink" onclick="listDetailed=!listDetailed; if(listDetailed&&listSearch)listSearch.value=''; renderList()">${listDetailed?'แบบย่อ':'รายละเอียด'}</button>`; act.innerHTML=cat+`<div class="listActionRowV77">${detail}${miniCopy(currentKind())}</div>`; }
       const box=document.getElementById('listBox'); if(!box)return;
-      if(listMode==='all'){ let gs=typeof groups==='function'?groups():[]; if(q) gs=gs.filter(g=>(typeof norm==='function'?norm(g.name):cleanName(g.name)).includes(q)); gs=gs.sort((a,b)=>String(a.name).localeCompare(String(b.name),'th')); box.innerHTML=gs.length?renderShortageDateGroups(gs,groupRecordedAt,dateItems=>listDetailed?dateItems.map(g=>groupItemHtml(g)).join(''):compact(dateItems.map(g=>g.name))):'<div class="empty">ยังไม่มีรายการ</div>'; return; }
-      const br=listMode==='branch1'?1:2; let arr=getItems().filter(x=>Number(x.branch)===br); if(q) arr=arr.filter(x=>(typeof norm==='function'?norm(x.name):cleanName(x.name)).includes(q)); arr=arr.sort((a,b)=>listDetailed?((shortageTime(b.updatedAt)||itemRecordedAt(b))-(shortageTime(a.updatedAt)||itemRecordedAt(a))):String(a.name).localeCompare(String(b.name),'th')); box.innerHTML=arr.length?renderShortageDateGroups(arr,itemRecordedAt,dateItems=>listDetailed?dateItems.map(x=>itemHtml(x)).join(''):compact(dateItems.map(x=>x.name))):'<div class="empty">ยังไม่มีรายการ</div>';
+      if(listMode==='all'){ let gs=typeof groups==='function'?groups():[]; if(q) gs=gs.filter(g=>(typeof norm==='function'?norm(g.name):cleanName(g.name)).includes(q)); gs=gs.sort((a,b)=>String(a.name).localeCompare(String(b.name),'th')); box.innerHTML=gs.length?renderShortageDateGroups(gs,groupRecordedAt,dateItems=>listDetailed?dateItems.map(g=>groupItemHtml(g)).join(''):compact(dateItems,'all')):'<div class="empty">ยังไม่มีรายการ</div>'; return; }
+      const br=listMode==='branch1'?1:2; let arr=getItems().filter(x=>Number(x.branch)===br); if(q) arr=arr.filter(x=>(typeof norm==='function'?norm(x.name):cleanName(x.name)).includes(q)); arr=arr.sort((a,b)=>listDetailed?((shortageTime(b.updatedAt)||itemRecordedAt(b))-(shortageTime(a.updatedAt)||itemRecordedAt(a))):String(a.name).localeCompare(String(b.name),'th')); box.innerHTML=arr.length?renderShortageDateGroups(arr,itemRecordedAt,dateItems=>listDetailed?dateItems.map(x=>itemHtml(x)).join(''):compact(dateItems,'branch')):'<div class="empty">ยังไม่มีรายการ</div>';
     }; window.renderList=renderList;
     openList=function(mode,detailed=false){listMode=mode;listDetailed=!!detailed;go('listPage');document.getElementById('listTitle').textContent=mode==='branch1'?'รายการของขาด สาขา 1':mode==='branch2'?'รายการของขาด สาขา 2':'ของขาดทั้งหมด';document.getElementById('listSub').textContent=mode==='all'?'รวมรายการจากสาขา 1 และสาขา 2':'ดูรายชื่อสินค้าแบบย่อ';renderList();}; window.openList=openList;
   }catch(e){console.error('V7.8 renderList patch failed',e)}
@@ -2245,7 +2259,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   function checkSimilarNow(){const el=document.getElementById('nameInput'); if(!el)return; const name=el.value.trim(); if(name.length<2)return; const eid=editId||null; const best=bestSimilar(name,eid); if(!best)return; if(window._similarAcceptedV77&&String(window._similarAcceptedV77.id)===String(best.item.id))return; if(window._similarRejectedV77[String(best.item.id)])return; showSimilar(best);}
   function bindName(){const el=document.getElementById('nameInput'); if(!el||el.dataset.v77similar==='1')return; el.dataset.v77similar='1'; let timer=null; ['input','keyup','change','compositionend'].forEach(ev=>el.addEventListener(ev,()=>{clearTimeout(timer);timer=setTimeout(checkSimilarNow,250)})); el.addEventListener('blur',()=>setTimeout(checkSimilarNow,120));}
   try{ const prevOpenForm=window.openForm||openForm; openForm=function(){window._similarAcceptedV77=null;window._similarRejectedV77={};window._similarOpenV77=false;const r=prevOpenForm.apply(this,arguments);if(!document.getElementById('formPage')?.classList.contains('active'))go('formPage');setTimeout(()=>{if(!document.getElementById('formPage')?.classList.contains('active'))go('formPage');bindName();},80);return r;}; window.openForm=openForm; const prevSave=window.saveItem||saveItem; saveItem=async function(){ const name=(document.getElementById('nameInput')?.value||'').trim(); if(!editId && name){const best=bestSimilar(name,null); if(best && !(window._similarAcceptedV77&&String(window._similarAcceptedV77.id)===String(best.item.id)) && !window._similarRejectedV77[String(best.item.id)]){showSimilar(best);return;}} return prevSave.apply(this,arguments); }; window.saveItem=saveItem; }catch(e){console.error('V7.8 similar patch failed',e)}
-  const css=`.copyToolsV72,.copyToolsV73,.copyToolsV74,.catCopySmallV74,.copyToolsV75,.copyToolsV76{display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important}.listActionRowV77{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin:8px 0 12px!important}.listActionRowV77 .detailLink{margin:0!important;padding:6px 10px!important;font-size:14px!important}.miniCopyBtnV77{border:0!important;background:#eaf2ff!important;color:#0967f2!important;border-radius:999px!important;padding:6px 10px!important;font-weight:900!important;font-size:13px!important;line-height:1.1!important;width:auto!important;min-width:0!important;min-height:0!important;box-shadow:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}.catCopyRowV77{margin-top:0!important}.shortageDateGroup+.shortageDateGroup{margin-top:14px}.shortageDateGroup .nameChipWrap{min-height:0!important;padding-bottom:0!important}.shortageDateHeader{margin:0 0 6px;color:#52627a;font-size:14px;font-weight:600;line-height:1.3}`;
+  const css=`.copyToolsV72,.copyToolsV73,.copyToolsV74,.catCopySmallV74,.copyToolsV75,.copyToolsV76{display:none!important;height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;visibility:hidden!important}.listActionRowV77{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin:8px 0 12px!important}.listActionRowV77 .detailLink{margin:0!important;padding:6px 10px!important;font-size:14px!important}.miniCopyBtnV77{border:0!important;background:#eaf2ff!important;color:#0967f2!important;border-radius:999px!important;padding:6px 10px!important;font-weight:900!important;font-size:13px!important;line-height:1.1!important;width:auto!important;min-width:0!important;min-height:0!important;box-shadow:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}.catCopyRowV77{margin-top:0!important}.shortageDateGroup+.shortageDateGroup{margin-top:14px}.shortageDateGroup .nameChipWrap{min-height:0!important;padding-bottom:0!important}.shortageDateHeader{margin:0 0 6px;color:#52627a;font-size:14px;font-weight:600;line-height:1.3}.shortageLiveChip{position:relative!important;padding:20px 11px 8px!important;overflow:visible!important;white-space:normal!important;min-width:105px!important;max-width:100%!important}.shortageLiveName{display:block;overflow-wrap:anywhere;word-break:break-word}.shortageLiveBadge{position:absolute;right:6px;top:4px;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;border-radius:999px;padding:2px 6px;font-size:9px;line-height:1.25;font-weight:900;white-space:nowrap}.shortageLiveBadge.red{background:#fee2e2;color:#b91c1c}.shortageLiveBadge.yellow{background:#fef3c7;color:#92400e}.shortageLiveBadge.green{background:#dcfce7;color:#166534}`;
   const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
   function cleanupBigCopy(){document.querySelectorAll('.copyToolsV72,.copyToolsV73,.copyToolsV74,.copyToolsV75,.copyToolsV76').forEach(n=>n.remove());}
   setInterval(()=>{try{bindName();cleanupBigCopy();}catch(e){}},700); setTimeout(()=>{try{cleanupBigCopy(); if(document.getElementById('listPage')?.classList.contains('active'))renderList(); bindName();}catch(e){}},300);
@@ -2946,6 +2960,243 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
     .archivedTransferSection{margin-top:20px}.archivedTransferSection>h3{margin:0 0 10px;font-size:18px}.archivedTransferCard{width:100%;border:1px solid #dbe5f0;background:#fff;border-radius:18px;padding:14px;display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;text-align:left;color:#0f172a;box-shadow:0 8px 22px rgba(15,23,42,.06)}.archivedTransferCard b{display:block;font-size:16px}.archivedTransferCard small{display:block;color:#64748b;font-weight:700;margin-top:3px}.archivedTransferIcon{width:42px;height:42px;border-radius:13px;background:#eef5ff;color:#0967f2;display:grid;place-items:center;font-size:23px;font-weight:900}.archivedTransferArrow{font-size:30px;color:#94a3b8}.archivedDateGroup{margin-bottom:18px}.archivedDateGroup>h3{margin:0 0 8px;font-size:17px;color:#334155}.archivedRoundStack{display:grid;gap:8px}.archivedRoundRow{width:100%;border:1px solid #dbe5f0;background:#fff;border-radius:16px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#0f172a}.archivedRoundRow b{display:block;font-size:16px}.archivedRoundRow small{display:block;color:#64748b;font-weight:700;margin-top:3px}.archivedRoundCount{white-space:nowrap;background:#eef5ff;color:#0967f2;border-radius:999px;padding:5px 9px;font-weight:900;font-size:12px}.archivedItem{display:grid;grid-template-columns:30px 1fr;gap:10px;background:#fff;border:1px solid #dbe5f0;border-radius:16px;padding:13px;margin-bottom:9px}.archivedItemNumber{width:28px;height:28px;border-radius:9px;background:#eef5ff;color:#0967f2;display:grid;place-items:center;font-weight:900}.archivedItemBody b{display:block;margin-bottom:5px}.archivedConfirmBtn{width:100%;margin-top:12px}.archivedConfirmBtn:disabled{opacity:.7}.archivedConfirmStatus{display:flex;flex-direction:column;gap:3px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:14px;padding:11px 12px;margin-bottom:10px}.archivedConfirmStatus.confirmed{background:#ecfdf5;color:#047857;border-color:#a7f3d0}.archivedConfirmStatus span{font-size:12px;font-weight:800}
   `;
   document.head.appendChild(style);
+})();
+</script>
+
+<script>
+/* === V7.18 Shortage paper image export === */
+(function(){
+  const TZ='Asia/Bangkok';
+  let exportState={scope:'all',quantity:true,dateKey:'',mode:'all'};
+
+  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  function itemTime(value){if(value&&typeof value.toMillis==='function')return value.toMillis();if(value&&Number.isFinite(value.seconds))return value.seconds*1000;const n=Number(value);return Number.isFinite(n)?n:0;}
+  function recordedAt(item){return itemTime(item&&item.createdAt)||itemTime(item&&item.updatedAt);}
+  function dateKey(time){
+    if(!time)return 'undated';
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(time));
+    const get=type=>(parts.find(part=>part.type===type)||{}).value||'';
+    return `${get('year')}-${get('month')}-${get('day')}`;
+  }
+  function dateLabel(time){return time?new Intl.DateTimeFormat('th-TH',{timeZone:TZ,day:'numeric',month:'long',year:'numeric'}).format(new Date(time)):'ไม่ระบุวันที่';}
+  function pageTitle(){return exportState.mode==='branch1'?'ของขาดสาขา 1':exportState.mode==='branch2'?'ของขาดสาขา 2':'ของขาดทั้งหมด';}
+  function sourceRows(){
+    const source=Array.isArray(window.items)?window.items:(typeof items!=='undefined'&&Array.isArray(items)?items:[]);
+    if(exportState.mode==='all'&&typeof groups==='function'){
+      return groups().map(group=>({name:group.name,b1:group.b1,b2:group.b2,time:Math.max(recordedAt(group.b1),recordedAt(group.b2))}));
+    }
+    const branch=exportState.mode==='branch1'?1:2;
+    return source.filter(item=>Number(item.branch)===branch).map(item=>({name:item.name,item,time:recordedAt(item)}));
+  }
+  function quantityMeta(row){
+    const entries=exportState.mode==='all'?[row.b1,row.b2]:[row.item];
+    const totals=new Map(); let hasLow=false,hasNumeric=false;
+    entries.filter(Boolean).forEach(item=>{
+      if(item.status!=='low')return;
+      hasLow=true;
+      const value=Number(String(item.qty==null?'':item.qty).replace(/,/g,''));
+      if(!Number.isFinite(value))return;
+      hasNumeric=true; const unit=String(item.unit||'').trim(); totals.set(unit,(totals.get(unit)||0)+value);
+    });
+    if(!hasLow)return {text:'หมดเกลี้ยง',tone:'red'};
+    if(!hasNumeric)return {text:'เหลือน้อย',tone:'yellow'};
+    const total=[...totals.values()].reduce((sum,value)=>sum+value,0);
+    if(total<=0)return {text:'หมดเกลี้ยง',tone:'red'};
+    const text=[...totals.entries()].map(([unit,value])=>`${typeof formatNumber==='function'?formatNumber(value):value}${unit?' '+unit:''}`).join(' + ');
+    return {text:`เหลือ ${text}`,tone:total<=3?'yellow':'green'};
+  }
+  function exportGroups(){
+    const buckets=new Map();
+    sourceRows().forEach(row=>{const key=dateKey(row.time);if(!buckets.has(key))buckets.set(key,{key,time:row.time,rows:[]});buckets.get(key).rows.push({...row,badge:quantityMeta(row)});});
+    let result=[...buckets.values()].sort((a,b)=>b.time-a.time);
+    if(exportState.scope==='date')result=result.filter(group=>group.key===exportState.dateKey);
+    result.forEach(group=>group.rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'th')));
+    return result;
+  }
+  function rangeLabel(groupsList){
+    if(!groupsList.length)return '';
+    if(groupsList.length===1)return dateLabel(groupsList[0].time);
+    return `${dateLabel(groupsList[groupsList.length-1].time)} – ${dateLabel(groupsList[0].time)}`;
+  }
+  function ensureModal(id,className){let modal=document.getElementById(id);if(!modal){modal=document.createElement('div');modal.id=id;modal.className=`modal ${className||''}`;document.body.appendChild(modal);}return modal;}
+  function optionCard(name,value,label,checked){return `<label class="shortageExportChoice"><input type="radio" name="${name}" value="${value}" ${checked?'checked':''}><span>${label}</span></label>`;}
+
+  window.openShortageImageExport=function(){
+    exportState={scope:'all',quantity:true,dateKey:'',mode:(typeof listMode!=='undefined'?listMode:'all')};
+    const available=(()=>{const seen=new Map();sourceRows().forEach(row=>{const key=dateKey(row.time);if(!seen.has(key))seen.set(key,row.time)});return [...seen].sort((a,b)=>b[1]-a[1]);})();
+    if(!available.length)return typeof toast==='function'?toast('ไม่มีรายการให้ส่งออก'):undefined;
+    exportState.dateKey=available[0][0];
+    const modal=ensureModal('shortageExportOptionsModal','shortageExportModal');
+    modal.innerHTML=`<div class="sheet"><div class="shortageExportTop"><h2>ส่งออกเป็นรูปภาพ</h2><button class="btn gray" onclick="closeModal('shortageExportOptionsModal')">ปิด</button></div>
+      <p class="muted">เลือกข้อมูลที่ต้องการใส่ในรูป</p>
+      <div class="shortageOptionGrid">${optionCard('shortageExportScope','all','ส่งออกทั้งหมด',true)}${optionCard('shortageExportScope','date','ส่งออกเฉพาะวันที่นี้',false)}</div>
+      <div id="shortageDateSelectWrap" class="shortageDateSelectWrap" hidden><label for="shortageExportDate">เลือกวันที่</label><select id="shortageExportDate" class="input">${available.map(([key,time])=>`<option value="${key}">${dateLabel(time)}</option>`).join('')}</select></div>
+      <div class="shortageOptionGrid shortageQtyOptions">${optionCard('shortageExportQty','yes','ระบุจำนวน',true)}${optionCard('shortageExportQty','no','ไม่ระบุจำนวน',false)}</div>
+      <button class="btn primary shortagePreviewBtn" onclick="showShortageExportPreview()">ดูตัวอย่าง</button></div>`;
+    modal.querySelectorAll('input[name="shortageExportScope"]').forEach(input=>input.addEventListener('change',()=>{modal.querySelector('#shortageDateSelectWrap').hidden=input.value!=='date'||!input.checked;}));
+    modal.classList.add('show');
+  };
+  window.showShortageExportPreview=function(){
+    const options=document.getElementById('shortageExportOptionsModal');
+    exportState.scope=options.querySelector('input[name="shortageExportScope"]:checked').value;
+    exportState.quantity=options.querySelector('input[name="shortageExportQty"]:checked').value==='yes';
+    exportState.dateKey=options.querySelector('#shortageExportDate').value;
+    const groupsList=exportGroups(); if(!groupsList.length)return toast('ไม่มีรายการในวันที่เลือก');
+    const total=groupsList.reduce((sum,group)=>sum+group.rows.length,0);
+    const paper=groupsList.map(group=>`<section class="shortagePaperGroup"><h3>${esc(dateLabel(group.time))}</h3><div class="shortagePaperFlow">${group.rows.map((row,index)=>`<span class="shortagePaperEntry ${exportState.quantity?'hasQty':''}"><span class="shortagePaperNumber">${index+1}.</span><b>${esc(row.name)}</b>${exportState.quantity?`<span class="shortagePaperQty ${row.badge.tone}">${esc(row.badge.text)}</span>`:''}</span>`).join('')}</div></section>`).join('');
+    const modal=ensureModal('shortageExportPreviewModal','shortageExportModal shortagePreviewModal');
+    modal.innerHTML=`<div class="sheet shortagePreviewSheet"><div class="shortageExportTop"><h2>ตัวอย่างก่อนส่งออก</h2><button class="btn gray" onclick="closeModal('shortageExportPreviewModal')">ปิด</button></div>
+      <div class="shortagePaperStage"><article class="shortageClassicPaper"><header><h1>${esc(pageTitle())}</h1><p>${esc(rangeLabel(groupsList))}</p></header>${paper}<footer><span>รวม ${total} รายการ</span><span>Stock Alert</span></footer></article></div>
+      <div class="shortagePreviewActions"><button class="btn gray" onclick="closeModal('shortageExportPreviewModal')">กลับไปเลือกใหม่</button><button class="btn primary" onclick="saveShortageImage()">บันทึกรูป</button><button class="btn ok" onclick="shareShortageImage()">แชร์</button></div></div>`;
+    closeModal('shortageExportOptionsModal'); modal.classList.add('show');
+  };
+
+  function wrappedLines(ctx,text,maxWidth){
+    const chars=Array.from(String(text||'')), lines=[];let current='';
+    chars.forEach(char=>{const test=current+char;if(current&&ctx.measureText(test).width>maxWidth){lines.push(current);current=char;}else current=test;});
+    if(current)lines.push(current);return lines.length?lines:[''];
+  }
+  function flowLayout(ctx,rows,startY,width,left,right){
+    const gap=24,maxWidth=390,available=width-left-right,lineHeight=36;let x=left,y=startY,rowHeight=lineHeight;
+    ctx.font='bold 27px Tahoma, sans-serif';
+    rows.forEach((row,index)=>{
+      const numberWidth=ctx.measureText(`${index+1}. `).width,wanted=Math.min(maxWidth,Math.max(135,numberWidth+ctx.measureText(row.name).width+20));
+      const entryWidth=Math.min(wanted,available);
+      if(x>left&&x+entryWidth>width-right){x=left;y+=rowHeight;rowHeight=lineHeight;}
+      const lines=wrappedLines(ctx,row.name,entryWidth-numberWidth-10),height=Math.max(lineHeight,lines.length*lineHeight);
+      row._flow={x,y,width:entryWidth,height,lines,numberWidth,index};
+      x+=entryWidth+gap;rowHeight=Math.max(rowHeight,height);
+    });
+    return y+rowHeight;
+  }
+  function canvasPlan(){
+    const groupsList=exportGroups(),width=1080,left=88,right=88;
+    const measure=document.createElement('canvas').getContext('2d');let y=190;
+    groupsList.forEach(group=>{y+=42;y=flowLayout(measure,group.rows,y,width,left,right)+12;});
+    return {groupsList,width,height:Math.max(600,y+92),left,right};
+  }
+  window.drawShortageExportCanvas=function(){
+    const plan=canvasPlan(), canvas=document.createElement('canvas');canvas.width=plan.width;canvas.height=plan.height;const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#fff8cf';ctx.fillRect(0,0,plan.width,plan.height);
+    ctx.fillStyle='rgba(125,96,28,.035)';for(let y=17;y<plan.height;y+=37)for(let x=(y%74?19:41);x<plan.width;x+=73)ctx.fillRect(x,y,2,2);
+    ctx.strokeStyle='rgba(91,138,180,.24)';ctx.lineWidth=1;for(let y=190;y<plan.height-65;y+=36){ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(plan.width-42,y);ctx.stroke();}
+    ctx.fillStyle='#3b321f';ctx.textAlign='center';ctx.font='bold 43px Tahoma, sans-serif';ctx.fillText(pageTitle(),plan.width/2,70);
+    ctx.fillStyle='#73674b';ctx.font='24px Tahoma, sans-serif';ctx.fillText(rangeLabel(plan.groupsList),plan.width/2,112);
+    ctx.strokeStyle='#ccb86c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(plan.left,145);ctx.lineTo(plan.width-plan.right,145);ctx.stroke();
+    let y=190;
+    plan.groupsList.forEach(group=>{
+      ctx.textAlign='left';ctx.fillStyle='#6f571d';ctx.font='bold 23px Tahoma, sans-serif';ctx.fillText(dateLabel(group.time),plan.left,y+27);y+=42;
+      flowLayout(ctx,group.rows,y,plan.width,plan.left,plan.right);
+      group.rows.forEach(row=>{
+        const entry=row._flow;
+        if(exportState.quantity){
+          ctx.font='bold 15px Tahoma, sans-serif';const label=row.badge.text,badgeWidth=Math.min(entry.width-16,Math.max(62,ctx.measureText(label).width+18)),badgeX=entry.x+entry.width-badgeWidth,badgeY=entry.y-12;
+          ctx.fillStyle=row.badge.tone==='red'?'#ef4444':row.badge.tone==='green'?'#22a447':'#e7b92f';ctx.beginPath();ctx.roundRect(badgeX,badgeY,badgeWidth,23,11);ctx.fill();ctx.fillStyle=row.badge.tone==='yellow'?'#5f4808':'#fff';ctx.textAlign='center';ctx.fillText(label,badgeX+badgeWidth/2,badgeY+17);
+        }
+        ctx.fillStyle='#8b7b57';ctx.font='18px Tahoma, sans-serif';ctx.textAlign='left';ctx.fillText(`${entry.index+1}.`,entry.x,entry.y+30);
+        ctx.fillStyle='#403824';ctx.font='bold 27px Tahoma, sans-serif';entry.lines.forEach((line,lineIndex)=>ctx.fillText(line,entry.x+entry.numberWidth,entry.y+30+lineIndex*36));
+      });
+      y=Math.max(...group.rows.map(row=>row._flow.y+row._flow.height),y)+12;
+    });
+    ctx.fillStyle='#766a4f';ctx.font='bold 20px Tahoma, sans-serif';ctx.textAlign='left';ctx.fillText(`รวม ${plan.groupsList.reduce((sum,group)=>sum+group.rows.length,0)} รายการ`,plan.left,plan.height-38);ctx.textAlign='right';ctx.fillText('Stock Alert',plan.width-plan.right,plan.height-38);
+    return canvas;
+  };
+  async function imageBlob(){const canvas=drawShortageExportCanvas();return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('canvas export failed')),'image/png',0.96));}
+  function fileName(){const scope=exportState.scope==='date'?exportState.dateKey:'ทั้งหมด';return `${pageTitle().replace(/\s/g,'_')}_${scope}_${Date.now()}.png`;}
+  window.saveShortageImage=async function(){try{const blob=await imageBlob(),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=fileName();link.click();setTimeout(()=>URL.revokeObjectURL(url),2500);toast('บันทึกรูปภาพแล้ว');}catch(error){console.error(error);toast('สร้างรูปภาพไม่สำเร็จ');}};
+  window.shareShortageImage=async function(){try{const blob=await imageBlob(),file=new File([blob],fileName(),{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:pageTitle()});toast('แชร์รูปภาพแล้ว');}else await saveShortageImage();}catch(error){if(error&&error.name!=='AbortError'){console.error(error);toast('แชร์รูปภาพไม่สำเร็จ');}}};
+
+  function injectButton(){const row=document.querySelector('#listTopActions .listActionRowV77');if(row&&!row.querySelector('.shortageExportBtn'))row.insertAdjacentHTML('beforeend','<button class="shortageExportBtn" type="button" onclick="event.stopPropagation();openShortageImageExport()">ส่งออกเป็นรูปภาพ</button>');}
+  const previousRender=window.renderList;
+  if(typeof previousRender==='function'){window.renderList=renderList=function(){const result=previousRender.apply(this,arguments);injectButton();return result;};}
+  const style=document.createElement('style');style.textContent=`
+    .shortageExportBtn{border:0;background:#e8f8ed;color:#15803d;border-radius:999px;padding:6px 10px;font-weight:900;font-size:13px;line-height:1.1;white-space:nowrap}.shortageExportTop{display:flex;align-items:center;justify-content:space-between;gap:10px}.shortageExportTop h2{margin:0}.shortageOptionGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.shortageExportChoice{margin:0;cursor:pointer}.shortageExportChoice input{position:absolute;opacity:0;pointer-events:none}.shortageExportChoice span{display:flex;align-items:center;justify-content:center;min-height:48px;padding:9px;border:1px solid #dbe5f0;background:#fff;border-radius:14px;text-align:center;color:#334155;font-size:14px}.shortageExportChoice input:checked+span{background:#eaf3ff;border-color:#0967f2;color:#0967f2;box-shadow:inset 0 0 0 1px #0967f2}.shortageDateSelectWrap{margin-top:12px}.shortageDateSelectWrap label{font-size:14px}.shortageQtyOptions{margin-top:10px}.shortagePreviewBtn{width:100%;margin-top:16px}.shortagePreviewSheet{height:94vh;max-height:94vh;display:flex;flex-direction:column;overflow:hidden}.shortagePaperStage{flex:1;overflow:auto;background:#e5e7eb;border-radius:16px;padding:14px;margin-top:12px}.shortageClassicPaper{width:100%;min-height:100%;padding:28px 22px 20px;color:#403824;background-color:#fff8cf;background-image:radial-gradient(rgba(105,79,26,.06) .7px,transparent .8px),repeating-linear-gradient(to bottom,transparent 0,transparent 33px,rgba(74,128,174,.17) 34px,transparent 35px);background-size:11px 11px,100% 35px;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:Tahoma,"Noto Sans Thai",sans-serif}.shortageClassicPaper header{text-align:center;border-bottom:1px solid #ccb86c;padding-bottom:13px;margin-bottom:14px}.shortageClassicPaper h1{font-size:25px;margin:0}.shortageClassicPaper header p{font-size:13px;color:#73674b;margin:5px 0 0}.shortagePaperGroup h3{font-size:15px;color:#7a5b12;margin:16px 0 7px}.shortagePaperChips{display:flex;flex-wrap:wrap;gap:8px}.shortagePaperChip{position:relative;flex:1 1 29%;max-width:calc(50% - 4px);min-width:0;border:1px solid rgba(145,112,35,.30);background:rgba(255,255,255,.72);border-radius:14px;padding:10px 11px;font-size:14px;overflow:hidden}.shortagePaperChip.hasQty{padding-top:36px}.shortagePaperChip b{display:block;overflow-wrap:anywhere;word-break:break-word;line-height:1.35}.shortagePaperQty{position:absolute;right:7px;top:7px;max-width:calc(100% - 14px);overflow:hidden;text-overflow:ellipsis;background:#f4d35e;color:#5f4808;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;white-space:nowrap}.shortageClassicPaper footer{display:flex;justify-content:space-between;gap:10px;color:#766a4f;font-size:12px;font-weight:800;border-top:1px solid #ccb86c;padding-top:12px;margin-top:16px}.shortagePreviewActions{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;margin-top:12px}.shortagePreviewActions .btn{padding:10px 8px;font-size:13px}@media(max-width:370px){.listActionRowV77{gap:5px!important}.listActionRowV77 .detailLink,.miniCopyBtnV77,.shortageExportBtn{padding:6px 7px!important;font-size:12px!important}}
+  `;document.head.appendChild(style);
+  const paperV2Style=document.createElement('style');paperV2Style.textContent=`
+    .shortageClassicPaper{background-image:radial-gradient(rgba(105,79,26,.045) .6px,transparent .7px),repeating-linear-gradient(to bottom,transparent 0,transparent 29px,rgba(74,128,174,.24) 30px,transparent 31px)!important;background-size:11px 11px,100% 31px!important;padding:24px 18px 18px!important}
+    .shortagePaperGroup h3{font-size:14px!important;font-weight:900!important;margin:9px 0 2px!important;color:#6f571d!important}
+    .shortagePaperFlow{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0 12px;line-height:31px}
+    .shortagePaperEntry{position:relative;display:inline-flex;align-items:baseline;max-width:100%;min-width:0;line-height:31px;padding:0 2px 0 0;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+    .shortagePaperEntry b{font-size:13px;line-height:31px;overflow-wrap:anywhere;word-break:break-word;white-space:normal}
+    .shortagePaperNumber{font-size:9px;color:#8b7b57;margin-right:3px;flex:0 0 auto}
+    .shortagePaperQty{position:absolute!important;right:0!important;top:-7px!important;max-width:100%;padding:1px 5px!important;font-size:7px!important;line-height:1.35!important;color:#fff!important}
+    .shortagePaperQty.red{background:#ef4444!important}.shortagePaperQty.yellow{background:#e7b92f!important;color:#5f4808!important}.shortagePaperQty.green{background:#22a447!important}
+    .shortagePaperEntry.hasQty{padding-top:5px}
+    .shortagePaperChips,.shortagePaperChip{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  `;document.head.appendChild(paperV2Style);setTimeout(injectButton,350);
+})();
+</script>
+<script>
+/* === V7.18 Transfer round paper image export === */
+(function(){
+  const TZ='Asia/Bangkok';
+  let transferExportState={roundId:'',scope:'round',quantity:true};
+  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const history=()=>Array.isArray(transferHistory)?transferHistory:[];
+  function roundById(id){return history().find(round=>String(round?.id)===String(id))||null;}
+  function roundNumber(round){return Number(round?.roundNumber||round?.round||1)||1;}
+  function dateKey(round){
+    if(round?.dateKey)return String(round.dateKey);
+    const time=round?.doneAt||round?.confirmedAt||round?.archivedAt||round?.createdAt||Date.now();
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(time));
+    const get=type=>(parts.find(part=>part.type===type)||{}).value||'';
+    return `${get('year')}-${get('month')}-${get('day')}`;
+  }
+  function displayDate(key){const p=String(key||'').split('-');return p.length===3?new Intl.DateTimeFormat('th-TH',{timeZone:TZ,day:'numeric',month:'long',year:'numeric'}).format(new Date(`${key}T12:00:00+07:00`)):String(key||'-');}
+  function itemRows(round){return (Array.isArray(round?.items)?round.items:[]).map(item=>({name:String(item?.name||'-'),qty:String(item?.qty??item?.transferQty??''),unit:String(item?.unit??item?.transferUnit??'')}));}
+  function selectedRounds(){
+    const current=roundById(transferExportState.roundId);if(!current)return [];
+    if(transferExportState.scope==='round')return [current];
+    const key=dateKey(current),from=Number(current.from),to=Number(current.to);
+    return history().filter(round=>round&&dateKey(round)===key&&Number(round.from)===from&&Number(round.to)===to&&itemRows(round).length).sort((a,b)=>roundNumber(a)-roundNumber(b)||(a.createdAt||a.doneAt||0)-(b.createdAt||b.doneAt||0));
+  }
+  function qtyText(item){const value=item.qty.trim()||'-';return `${value}${item.unit.trim()?' '+item.unit.trim():''}`;}
+  function qtyTone(item){const value=Number(String(item.qty||'').replace(/,/g,''));return Number.isFinite(value)?(value<=0?'red':value<=3?'yellow':'green'):'yellow';}
+  function ensureModal(id,className){let modal=document.getElementById(id);if(!modal){modal=document.createElement('div');modal.id=id;modal.className=`modal ${className||''}`;document.body.appendChild(modal);}return modal;}
+  function choice(name,value,label,checked){return `<label class="shortageExportChoice"><input type="radio" name="${name}" value="${value}" ${checked?'checked':''}><span>${label}</span></label>`;}
+  window.openTransferImageExport=function(encodedId){
+    const id=decodeURIComponent(String(encodedId||'')),round=roundById(id);if(!round)return toast('ไม่พบข้อมูลรอบแบ่งของ');
+    transferExportState={roundId:id,scope:'round',quantity:true};
+    const modal=ensureModal('transferExportOptionsModal','shortageExportModal');
+    modal.innerHTML=`<div class="sheet"><div class="shortageExportTop"><h2>ส่งออกเป็นรูปภาพ</h2><button class="btn gray" onclick="closeModal('transferExportOptionsModal')">ปิด</button></div><p class="muted">เลือกข้อมูลที่ต้องการใส่ในรูป</p><div class="shortageOptionGrid">${choice('transferExportScope','round','ส่งออกเฉพาะรอบนี้',true)}${choice('transferExportScope','day','ส่งออกของวันนี้ทั้งหมด',false)}</div><div class="shortageOptionGrid shortageQtyOptions">${choice('transferExportQty','yes','ระบุจำนวน',true)}${choice('transferExportQty','no','ไม่ระบุจำนวน',false)}</div><button class="btn primary shortagePreviewBtn" onclick="showTransferExportPreview()">ดูตัวอย่าง</button></div>`;
+    modal.classList.add('show');
+  };
+  function paperHtml(rounds){return rounds.map(round=>`<section class="shortagePaperGroup"><h3>รอบที่ ${roundNumber(round)}</h3><div class="shortagePaperFlow">${itemRows(round).map((item,index)=>`<span class="shortagePaperEntry ${transferExportState.quantity?'hasQty':''}"><span class="shortagePaperNumber">${index+1}.</span><b>${esc(item.name)}</b>${transferExportState.quantity?`<span class="shortagePaperQty ${qtyTone(item)}">${esc(qtyText(item))}</span>`:''}</span>`).join('')}</div></section>`).join('');}
+  window.showTransferExportPreview=function(){
+    const options=document.getElementById('transferExportOptionsModal');
+    transferExportState.scope=options.querySelector('input[name="transferExportScope"]:checked').value;
+    transferExportState.quantity=options.querySelector('input[name="transferExportQty"]:checked').value==='yes';
+    const rounds=selectedRounds(),current=roundById(transferExportState.roundId);if(!rounds.length||!current)return toast('ไม่มีรายการให้ส่งออก');
+    const total=rounds.reduce((sum,round)=>sum+itemRows(round).length,0),scopeLabel=transferExportState.scope==='round'?`รอบที่ ${roundNumber(current)}`:'ทั้งหมดของวันนี้';
+    const modal=ensureModal('transferExportPreviewModal','shortageExportModal shortagePreviewModal');
+    modal.innerHTML=`<div class="sheet shortagePreviewSheet"><div class="shortageExportTop"><h2>ตัวอย่างก่อนส่งออก</h2><button class="btn gray" onclick="closeModal('transferExportPreviewModal')">ปิด</button></div><div class="shortagePaperStage"><article class="shortageClassicPaper"><header><h1>รายการแบ่งของ</h1><p>${esc(displayDate(dateKey(current)))}</p><p>สาขา ${esc(current.from)} → สาขา ${esc(current.to)} • ${scopeLabel}</p></header>${paperHtml(rounds)}<footer><span>รวม ${total} รายการ</span><span>Stock Alert</span></footer></article></div><div class="shortagePreviewActions"><button class="btn gray" onclick="closeModal('transferExportPreviewModal')">กลับไปเลือกใหม่</button><button class="btn primary" onclick="saveTransferImage()">บันทึกรูป</button><button class="btn ok" onclick="shareTransferImage()">แชร์</button></div></div>`;
+    closeModal('transferExportOptionsModal');modal.classList.add('show');
+  };
+  function wrapLines(ctx,text,maxWidth){const chars=Array.from(String(text||'')),lines=[];let current='';chars.forEach(char=>{const test=current+char;if(current&&ctx.measureText(test).width>maxWidth){lines.push(current);current=char;}else current=test;});if(current)lines.push(current);return lines.length?lines:[''];}
+  function layoutFlow(ctx,rows,startY,width,left,right){
+    const gap=24,maxWidth=390,available=width-left-right,lineHeight=36;let x=left,y=startY,rowHeight=lineHeight;ctx.font='bold 27px Tahoma, sans-serif';
+    rows.forEach((item,index)=>{const numberWidth=ctx.measureText(`${index+1}. `).width,entryWidth=Math.min(Math.max(135,Math.min(maxWidth,numberWidth+ctx.measureText(item.name).width+20)),available);if(x>left&&x+entryWidth>width-right){x=left;y+=rowHeight;rowHeight=lineHeight;}const lines=wrapLines(ctx,item.name,entryWidth-numberWidth-10),height=Math.max(lineHeight,lines.length*lineHeight);item._flow={x,y,width:entryWidth,height,lines,numberWidth,index};x+=entryWidth+gap;rowHeight=Math.max(rowHeight,height);});return y+rowHeight;
+  }
+  function canvasPlan(){const rounds=selectedRounds(),width=1080,left=88,right=88,ctx=document.createElement('canvas').getContext('2d');let y=210;rounds.forEach(round=>{const rows=itemRows(round);round._exportRows=rows;y+=42;y=layoutFlow(ctx,rows,y,width,left,right)+12;});return {rounds,width,left,right,height:Math.max(620,y+92)};}
+  window.drawTransferExportCanvas=function(){
+    const plan=canvasPlan(),current=roundById(transferExportState.roundId),canvas=document.createElement('canvas');canvas.width=plan.width;canvas.height=plan.height;const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#fff8cf';ctx.fillRect(0,0,plan.width,plan.height);ctx.fillStyle='rgba(125,96,28,.035)';for(let y=17;y<plan.height;y+=37)for(let x=(y%74?19:41);x<plan.width;x+=73)ctx.fillRect(x,y,2,2);ctx.strokeStyle='rgba(91,138,180,.24)';ctx.lineWidth=1;for(let y=205;y<plan.height-65;y+=36){ctx.beginPath();ctx.moveTo(42,y);ctx.lineTo(plan.width-42,y);ctx.stroke();}
+    ctx.fillStyle='#3b321f';ctx.textAlign='center';ctx.font='bold 43px Tahoma, sans-serif';ctx.fillText('รายการแบ่งของ',plan.width/2,65);ctx.fillStyle='#73674b';ctx.font='24px Tahoma, sans-serif';ctx.fillText(displayDate(dateKey(current)),plan.width/2,105);ctx.fillText(`สาขา ${current.from} → สาขา ${current.to} • ${transferExportState.scope==='round'?`รอบที่ ${roundNumber(current)}`:'ทั้งหมดของวันนี้'}`,plan.width/2,142);ctx.strokeStyle='#ccb86c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(plan.left,172);ctx.lineTo(plan.width-plan.right,172);ctx.stroke();
+    let y=210;plan.rounds.forEach(round=>{ctx.textAlign='left';ctx.fillStyle='#6f571d';ctx.font='bold 23px Tahoma, sans-serif';ctx.fillText(`รอบที่ ${roundNumber(round)}`,plan.left,y+27);y+=42;layoutFlow(ctx,round._exportRows,y,plan.width,plan.left,plan.right);round._exportRows.forEach(item=>{const entry=item._flow;if(transferExportState.quantity){ctx.font='bold 15px Tahoma, sans-serif';const label=qtyText(item),badgeWidth=Math.min(entry.width-16,Math.max(62,ctx.measureText(label).width+18)),badgeX=entry.x+entry.width-badgeWidth,badgeY=entry.y-12,tone=qtyTone(item);ctx.fillStyle=tone==='red'?'#ef4444':tone==='green'?'#22a447':'#e7b92f';ctx.beginPath();ctx.roundRect(badgeX,badgeY,badgeWidth,23,11);ctx.fill();ctx.fillStyle=tone==='yellow'?'#5f4808':'#fff';ctx.textAlign='center';ctx.fillText(label,badgeX+badgeWidth/2,badgeY+17);}ctx.fillStyle='#8b7b57';ctx.font='18px Tahoma, sans-serif';ctx.textAlign='left';ctx.fillText(`${entry.index+1}.`,entry.x,entry.y+30);ctx.fillStyle='#403824';ctx.font='bold 27px Tahoma, sans-serif';entry.lines.forEach((line,i)=>ctx.fillText(line,entry.x+entry.numberWidth,entry.y+30+i*36));});y=Math.max(...round._exportRows.map(item=>item._flow.y+item._flow.height),y)+12;});
+    ctx.fillStyle='#766a4f';ctx.font='bold 20px Tahoma, sans-serif';ctx.textAlign='left';ctx.fillText(`รวม ${plan.rounds.reduce((sum,round)=>sum+round._exportRows.length,0)} รายการ`,plan.left,plan.height-38);ctx.textAlign='right';ctx.fillText('Stock Alert',plan.width-plan.right,plan.height-38);return canvas;
+  };
+  function blob(){return new Promise((resolve,reject)=>drawTransferExportCanvas().toBlob(value=>value?resolve(value):reject(new Error('canvas export failed')),'image/png',0.96));}
+  function fileName(){const round=roundById(transferExportState.roundId);return `รายการแบ่งของ_${dateKey(round)}_${transferExportState.scope==='round'?'รอบที่_'+roundNumber(round):'ทั้งหมดของวันนี้'}.png`;}
+  window.saveTransferImage=async function(){try{const value=await blob(),url=URL.createObjectURL(value),link=document.createElement('a');link.href=url;link.download=fileName();link.click();setTimeout(()=>URL.revokeObjectURL(url),2500);toast('บันทึกรูปภาพแล้ว');}catch(error){console.error(error);toast('สร้างรูปภาพไม่สำเร็จ');}};
+  window.shareTransferImage=async function(){try{const value=await blob(),file=new File([value],fileName(),{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'รายการแบ่งของ'});toast('แชร์รูปภาพแล้ว');}else await saveTransferImage();}catch(error){if(error?.name!=='AbortError'){console.error(error);toast('แชร์รูปภาพไม่สำเร็จ');}}};
+  function exportButton(round){return round?`<button class="btn ok transferImageExportBtn" type="button" onclick="openTransferImageExport('${encodeURIComponent(String(round.id||''))}')">ส่งออกเป็นรูปภาพ</button>`:'';}
+  const baseStatus=window.renderTransferStatusDetail;
+  if(typeof baseStatus==='function')window.renderTransferStatusDetail=renderTransferStatusDetail=function(){const result=baseStatus.apply(this,arguments),round=window.StockAlertTransferRounds?.getActiveRound?.(),hero=document.querySelector('#transferStatusDetailBox .statusHero');if(hero&&round&&!hero.querySelector('.transferImageExportBtn'))hero.insertAdjacentHTML('beforeend',exportButton(round));return result;};
+  const baseArchived=window.openArchivedTransferRound;
+  if(typeof baseArchived==='function')window.openArchivedTransferRound=function(encodedId){const id=decodeURIComponent(String(encodedId||'')),round=roundById(id),result=baseArchived.apply(this,arguments),box=document.getElementById('archivedTransferDetailBox');if(box&&round&&!box.querySelector('.transferImageExportBtn'))box.insertAdjacentHTML('afterbegin',exportButton(round));return result;};
+  const baseHistoryDetail=window.openTransferHistoryDetail;
+  if(typeof baseHistoryDetail==='function')window.openTransferHistoryDetail=openTransferHistoryDetail=function(id){const round=roundById(id),result=baseHistoryDetail.apply(this,arguments),box=document.getElementById('transferHistoryDetailBox');if(box&&round&&!box.querySelector('.transferImageExportBtn'))box.insertAdjacentHTML('afterbegin',exportButton(round));return result;};
+  const style=document.createElement('style');style.textContent='.transferImageExportBtn{width:100%;margin:0 0 12px}.statusHero .transferImageExportBtn{margin:10px 0 0}';document.head.appendChild(style);
 })();
 </script>
 </body></html>

@@ -1,1 +1,1 @@
-Stock Alert V7.15 - Natural spacing between shortage date groups.
+Stock Alert V7.16 - Paper-style shortage list image export.

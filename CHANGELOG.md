@@ -4,6 +4,14 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.16 — 2026-06-24
+
+### Added
+
+- Added paper-style image export to all, Branch 1, and Branch 2 shortage pages.
+- Added all/date and with/without quantity choices with a preview before save or share.
+- Combined Branch 1 and Branch 2 remaining quantities on the combined shortage export.
+
 ## 7.15 — 2026-06-23
 
 ### Fixed
