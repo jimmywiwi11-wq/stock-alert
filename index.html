@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.23</title>
+<title>Stock Alert V7.24</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -102,6 +102,32 @@ input,textarea,select,button{font-size:16px;}
 .supplierSuggestItem{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;padding:14px 16px!important;cursor:pointer!important;}
 .supplierSuggestItem span{font-weight:900!important;}
 .supplierSuggestMeta,.supplierDeleteHint{display:none!important;}
+</style>
+<style id="stock-alert-tablet-sync-v724">
+@media (min-width: 768px){
+  body{background:#e8eef5}
+  .phone{width:min(100%,980px);min-height:100vh;margin:0 auto;border-radius:0;box-shadow:none;padding:24px 24px 112px;overflow:visible}
+  .hero{margin:-24px -24px 22px;padding:28px 28px 24px;border-radius:0 0 30px 30px}
+  .brand{font-size:38px;letter-spacing:0}
+  .grid{grid-template-columns:repeat(4,1fr);gap:1px}
+  .tile{min-height:136px}
+  .summary,.summaryPageGrid,.orderSubGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .item,.card,.poPanel,.statusHero,.allShortage{border-radius:18px}
+  .itemTop,.batchHead{gap:18px}
+  .supplierList.companyDirectoryList,.supplierList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+  .nameChipWrap{min-height:0!important}
+  .bottom{width:min(100%,980px);height:86px}
+  .sheet{width:min(100%,720px);border-radius:26px 26px 0 0}
+  .modal{align-items:center}.modal .sheet{border-radius:24px;max-height:88vh}
+}
+@media (min-width: 1024px){
+  .phone{width:min(100%,1120px)}
+  .bottom{width:min(100%,1120px)}
+  .grid{grid-template-columns:repeat(4,1fr)}
+  .supplierList.companyDirectoryList,.supplierList{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.stockSyncNotice{position:fixed;left:50%;bottom:98px;transform:translateX(-50%);z-index:75;width:min(calc(100% - 24px),560px);display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:16px;background:#0f172a;color:#fff;box-shadow:0 12px 28px rgba(15,23,42,.22);font-weight:900}
+.stockSyncNotice.show{display:flex}.stockSyncNotice button{border:0;border-radius:12px;background:#fff;color:#0967f2;padding:8px 11px;font-weight:900}.isBusy{opacity:.72;pointer-events:none}
 </style>
 </head>
 <body><div class="phone">
@@ -1770,8 +1796,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.23';
-  const APP_VERSION_LABEL='V7.23';
+  const APP_VERSION='7.24';
+  const APP_VERSION_LABEL='V7.24';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3301,7 +3327,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.23';if(versionBox)versionBox.textContent='V7.23';
+  if(versionSub)versionSub.textContent='V7.24';if(versionBox)versionBox.textContent='V7.24';
 })();
 </script>
 <script>
@@ -3491,6 +3517,249 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   function listenSupplierDetails(){if(online&&db){db.collection(SUPPLIERS).doc('main').onSnapshot(snapshot=>{if(!snapshot.exists)return;const data=snapshot.data()||{};if(Array.isArray(data.details))supplierDetails=data.details;localStorage.setItem(SUPPLIER_DETAILS_KEY,JSON.stringify(supplierDetails));if(document.getElementById('companySelectPage')?.classList.contains('active'))renderCompanyDirectory();},error=>console.warn('Supplier details sync unavailable',error));}}
   const style=document.createElement('style');style.textContent='.manualCompanyEntry{display:block;width:100%;border:0;text-align:left;margin-top:12px;color:inherit}.companyDirectoryActions{display:flex;justify-content:flex-end;margin-bottom:12px}.companyDirectoryActions .btn{padding:9px 13px}.companyDirectoryCard{min-height:64px}.companyDirectoryCard small{display:block;color:#64748b;font-weight:700;margin-top:4px}.companyArrow{font-size:28px;color:#94a3b8}.manualProductSearch{position:relative}.manualProductMatches{display:none;position:relative;z-index:6;margin-top:6px;padding:7px;background:#fff;border:1px solid #dbe5f0;border-radius:14px;box-shadow:0 10px 24px rgba(15,23,42,.10)}.manualProductMatches.show{display:grid;gap:5px}.manualProductMatches button{border:0;background:#eef5ff;border-radius:11px;padding:10px 12px;text-align:left;color:#0f172a}.manualProductMatches b,.manualProductMatches small{display:block}.manualProductMatches small{color:#64748b;margin-top:2px}';document.head.appendChild(style);
   window.StockAlertOrderingWorkflow={activeItems,companyNames,catalog,editor};ensureOrderingEntry();ensureCompanyPage();listenSupplierDetails();
+})();
+</script>
+<script>
+/* === V7.24 realtime safety net + faster partial transfer confirmation === */
+(function(){
+  const DATA_NOTICE_ID='stockSyncNoticeV724';
+  let noticeTimer=null, renderTimer=null, syncUnsubs=[];
+
+  function byId(id){return document.getElementById(id);}
+  function txt(value){return String(value??'');}
+  function userName(){try{return nickname||localStorage.getItem('stockAlertNickname')||'ไม่ระบุ';}catch(e){return 'ไม่ระบุ';}}
+  function escapeText(value){return txt(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function clone(value){return JSON.parse(JSON.stringify(value));}
+  function saveLocal(){
+    try{localStorage.setItem(COLLECTION,JSON.stringify(items||[]));}catch(e){}
+    try{localStorage.setItem('stockAlertTransferHistory',JSON.stringify(transferHistory||[]));}catch(e){}
+  }
+  function renderSoon(){
+    clearTimeout(renderTimer);
+    renderTimer=setTimeout(()=>{try{renderAll();}catch(e){}},80);
+  }
+  function ensureNotice(){
+    let el=byId(DATA_NOTICE_ID);
+    if(el)return el;
+    el=document.createElement('div');
+    el.id=DATA_NOTICE_ID;
+    el.className='stockSyncNotice';
+    el.innerHTML='<span id="stockSyncNoticeText">ข้อมูลอัปเดตแล้ว</span><button type="button" onclick="refreshStockAlertData()">โหลดล่าสุด</button>';
+    document.body.appendChild(el);
+    return el;
+  }
+  function showNotice(message,sticky){
+    const el=ensureNotice(), label=byId('stockSyncNoticeText');
+    if(label)label.textContent=message;
+    el.classList.add('show');
+    clearTimeout(noticeTimer);
+    if(!sticky)noticeTimer=setTimeout(()=>el.classList.remove('show'),2200);
+  }
+  function setSyncText(message){
+    const el=byId('syncText');
+    if(el)el.textContent=message;
+  }
+  function applyDocArray(doc, setter, storageKey){
+    if(!doc || !doc.exists)return;
+    const data=doc.data()||{}, next=Array.isArray(data.items)?data.items:null;
+    if(!next)return;
+    setter(next);
+    try{localStorage.setItem(storageKey,JSON.stringify(next));}catch(e){}
+  }
+  window.refreshStockAlertData=async function(){
+    if(!(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db)){
+      showNotice('ยังเชื่อมต่อ Firebase ไม่ได้',true);
+      return;
+    }
+    showNotice('กำลังโหลดข้อมูลล่าสุด...',true);
+    try{
+      const reads=[
+        db.collection(COLLECTION).get({source:'server'}),
+        db.collection(ORDERS).doc('main').get({source:'server'}),
+        db.collection(DELIVERIES).doc('main').get({source:'server'}),
+        db.collection(TRANSFER_HISTORY).doc('main').get({source:'server'}),
+        db.collection(CATEGORIES).doc('main').get({source:'server'}),
+        db.collection(SUPPLIERS).doc('main').get({source:'server'})
+      ];
+      const [itemSnap,ordersDoc,deliveriesDoc,historyDoc,categoriesDoc,suppliersDoc]=await Promise.all(reads);
+      items=itemSnap.docs.map(doc=>({id:doc.id,...doc.data()}));
+      try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+      applyDocArray(ordersDoc,next=>{purchaseOrders=next;},'stockAlertPurchaseOrders');
+      applyDocArray(deliveriesDoc,next=>{deliveryHistory=next;},'stockAlertDeliveryHistory');
+      applyDocArray(historyDoc,next=>{transferHistory=next;},'stockAlertTransferHistory');
+      applyDocArray(categoriesDoc,next=>{categories=next;},'stockAlertCategories');
+      applyDocArray(suppliersDoc,next=>{suppliersMaster=next;},'stockAlertSuppliers');
+      renderSoon();
+      setSyncText('Sync Firebase พร้อมใช้งาน');
+      showNotice('โหลดข้อมูลล่าสุดแล้ว',false);
+    }catch(error){
+      console.warn('Manual data refresh failed',error);
+      showNotice('โหลดข้อมูลล่าสุดไม่สำเร็จ',true);
+    }
+  };
+  function startRealtimeSafetyNet(){
+    if(!(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db)||syncUnsubs.length)return;
+    try{
+      syncUnsubs.push(db.collection(COLLECTION).onSnapshot({includeMetadataChanges:true},snap=>{
+        if(snap.metadata.fromCache)return;
+        items=snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+        try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+        renderSoon();
+        setSyncText('Sync Firebase พร้อมใช้งาน');
+      },()=>showNotice('การซิงก์ข้อมูลสะดุด กดโหลดล่าสุดได้',true)));
+      const docListeners=[
+        [ORDERS,'stockAlertPurchaseOrders',next=>{purchaseOrders=next;}],
+        [DELIVERIES,'stockAlertDeliveryHistory',next=>{deliveryHistory=next;}],
+        [TRANSFER_HISTORY,'stockAlertTransferHistory',next=>{transferHistory=next;}],
+        [CATEGORIES,'stockAlertCategories',next=>{categories=next;}],
+        [SUPPLIERS,'stockAlertSuppliers',next=>{suppliersMaster=next;}]
+      ];
+      docListeners.forEach(([coll,key,setter])=>{
+        syncUnsubs.push(db.collection(coll).doc('main').onSnapshot({includeMetadataChanges:true},doc=>{
+          if(doc.metadata.fromCache)return;
+          applyDocArray(doc,setter,key);
+          renderSoon();
+        },()=>showNotice('การซิงก์ข้อมูลสะดุด กดโหลดล่าสุดได้',true)));
+      });
+    }catch(error){
+      console.warn('Realtime safety net unavailable',error);
+    }
+  }
+
+  function parseQty(value){
+    const number=Number(txt(value).replace(/,/g,'').trim());
+    return Number.isFinite(number)?number:null;
+  }
+  function formatQty(value){
+    return txt(Math.round(Number(value)*1000)/1000).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+  }
+  function sameUnit(a,b){return txt(a).trim().toLowerCase()===txt(b).trim().toLowerCase();}
+  function lineId(line,index){return txt(line?.shortageItemId||line?.needId||line?.id||index);}
+  function findItem(id){return (items||[]).find(item=>txt(item.id)===txt(id))||null;}
+  function clearTransferData(extra){
+    return Object.assign({
+      transferPrepared:false,transferDone:false,transferQty:'',transferUnit:'',
+      transferBaseQty:'',transferBaseUnit:'',transferConversionRate:'',
+      transferConversionNote:'',transferDecision:'remove',transferBy:'',
+      transferAt:null,transferRoundId:'',transferDateKey:'',transferRoundNumber:'',
+      updatedAt:Date.now(),updatedBy:userName()
+    },extra||{});
+  }
+  function transferQtyForItem(item,line){
+    const shortageUnit=txt(item?.unit).trim();
+    const baseQty=parseQty(line?.transferBaseQty??line?.addedQty);
+    const baseUnit=txt(line?.transferBaseUnit||line?.baseUnit).trim();
+    if(baseQty!==null&&(!shortageUnit||!baseUnit||sameUnit(shortageUnit,baseUnit)))return baseQty;
+    const directQty=parseQty(line?.qty);
+    const directUnit=txt(line?.unit).trim();
+    if(directQty!==null&&(!shortageUnit||!directUnit||sameUnit(shortageUnit,directUnit)))return directQty;
+    return null;
+  }
+  function planFor(item,line){
+    if(!item)return {operation:'none',result:'already_absent'};
+    const currentQty=parseQty(item.qty), movedQty=transferQtyForItem(item,line);
+    if(currentQty!==null&&currentQty>0&&movedQty!==null){
+      const remaining=Math.max(0,currentQty-movedQty);
+      if(remaining<=0)return {operation:'remove',result:'fully_covered'};
+      return {operation:'reduce',result:'partially_covered',remainingQty:formatQty(remaining),unit:item.unit||line.transferBaseUnit||line.unit||''};
+    }
+    if((line?.decision||line?.transferDecision||'remove')==='remove')return {operation:'remove',result:'covered_by_saved_decision'};
+    return {operation:'keep',result:'kept_by_saved_decision'};
+  }
+  async function commitShortageBatch(changes){
+    if(!(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db)||!changes.length)return;
+    for(let start=0;start<changes.length;start+=450){
+      const batch=db.batch();
+      changes.slice(start,start+450).forEach(change=>{
+        const ref=db.collection(COLLECTION).doc(change.id);
+        if(change.type==='delete')batch.delete(ref);
+        else batch.update(ref,change.data);
+      });
+      await batch.commit();
+    }
+  }
+  async function persistTransferHistoryOnly(){
+    const snapshot=clone(transferHistory||[]);
+    try{localStorage.setItem('stockAlertTransferHistory',JSON.stringify(snapshot));}catch(e){}
+    if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db&&typeof TRANSFER_HISTORY!=='undefined'){
+      await db.collection(TRANSFER_HISTORY).doc('main').set({items:snapshot,updatedAt:Date.now()},{merge:true});
+    }
+  }
+  async function fastCompleteRound(round,reason){
+    const now=Date.now(), confirmer=userName(), lines=Array.isArray(round.items)?round.items:[];
+    const changes=[];
+    round.status='confirming';
+    round.archiveReason=reason||round.archiveReason||'take_partial_now';
+    round.archivedAt=round.archivedAt||now;
+    round.archivedBy=round.archivedBy||confirmer;
+    lines.forEach((line,index)=>{
+      const id=lineId(line,index), item=findItem(id), plan=planFor(item,line);
+      line.lineId=line.lineId||`${round.id}:${id||index}`;
+      line.confirmationPlan=plan;
+      line.confirmationStatus='confirmed';
+      line.confirmationResult=plan.result;
+      line.appliedAt=now;
+      line.appliedBy=confirmer;
+      if(!id||plan.operation==='none')return;
+      if(plan.operation==='remove'){
+        items=(items||[]).filter(entry=>txt(entry.id)!==id);
+        changes.push({type:'delete',id});
+        return;
+      }
+      const data=plan.operation==='reduce'
+        ? clearTransferData({qty:plan.remainingQty,unit:plan.unit||item?.unit||'',status:'low'})
+        : clearTransferData();
+      const target=findItem(id);
+      if(target)Object.assign(target,data);
+      changes.push({type:'update',id,data});
+    });
+    round.status='confirmed';
+    round.doneAt=round.doneAt||now;
+    round.confirmedAt=now;
+    round.confirmedBy=confirmer;
+    round.confirmationError='';
+    saveLocal();
+    renderSoon();
+    await commitShortageBatch(changes);
+    await persistTransferHistoryOnly();
+    return round;
+  }
+
+  window.completeManualPartialTransferRound=async function(roundId){
+    const round=(Array.isArray(transferHistory)?transferHistory:[]).find(entry=>txt(entry?.id)===txt(roundId));
+    if(!round||round.status!=='active')throw new Error('ACTIVE_TRANSFER_ROUND_NOT_FOUND');
+    if(!Array.isArray(round.items)||!round.items.length)throw new Error('TRANSFER_ROUND_HAS_NO_ITEMS');
+    return fastCompleteRound(round,'take_partial_now');
+  };
+
+  window.archiveCurrentTransferRound=async function(){
+    const round=window.StockAlertTransferRounds?.getActiveRound?.();
+    if(!round)return toast('ไม่มีรอบแบ่งของที่กำลังทำอยู่');
+    const count=Array.isArray(round.items)?round.items.length:0;
+    if(!count)return toast('ยังไม่มีรายการที่แบ่งในรอบนี้');
+    if(!confirm(`ยืนยันรับ/ส่ง ${count} รายการในรอบนี้ใช่ไหม?`))return;
+    const button=document.querySelector('button[onclick="archiveCurrentTransferRound()"]');
+    const oldHtml=button?button.innerHTML:'';
+    if(button){button.classList.add('isBusy');button.disabled=true;button.textContent='กำลังยืนยัน...';}
+    try{
+      await window.completeManualPartialTransferRound(round.id);
+      try{await log('ยืนยันรับ/ส่งของที่แบ่งแล้ว',`สาขา ${escapeText(round.from)} -> สาขา ${escapeText(round.to)}`);}catch(e){}
+      renderSoon();
+      go('home');
+      showNotice('รับ/ส่งรอบแบ่งแล้ว',false);
+      toast('รับ/ส่งรอบแบ่งแล้ว');
+    }catch(error){
+      console.error('Fast partial transfer confirmation failed',error);
+      showNotice('ยืนยันไม่สำเร็จ กรุณาลองอีกครั้ง',true);
+      toast('ยืนยันไม่สำเร็จ กรุณาลองอีกครั้ง');
+    }finally{
+      if(button){button.classList.remove('isBusy');button.disabled=false;button.innerHTML=oldHtml;}
+    }
+  };
+
+  startRealtimeSafetyNet();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){startRealtimeSafetyNet();setTimeout(window.refreshStockAlertData,250);}});
+  window.addEventListener('online',()=>{startRealtimeSafetyNet();setTimeout(window.refreshStockAlertData,500);});
 })();
 </script>
 </body></html>
