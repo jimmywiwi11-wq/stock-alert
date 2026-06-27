@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.25</title>
+<title>Stock Alert V7.26</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.25</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.26</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">🔥</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">‹</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">‹</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.25</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.26</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1796,8 +1796,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.25';
-  const APP_VERSION_LABEL='V7.25';
+  const APP_VERSION='7.26';
+  const APP_VERSION_LABEL='V7.26';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3327,7 +3327,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.25';if(versionBox)versionBox.textContent='V7.25';
+  if(versionSub)versionSub.textContent='V7.26';if(versionBox)versionBox.textContent='V7.26';
 })();
 </script>
 <script>
@@ -4045,6 +4045,221 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
     const rows=(entry.items||[]).map((line,index)=>`<div class="batchItem" style="align-items:flex-start"><span>${index+1}. ${esc(line.name||'-')}<div class="muted">จากสาขา ${esc(line.fromBranch||line.from||entry.from)} → สาขา ${esc(line.toBranch||line.to||entry.to)}</div><div class="muted">คนที่กดแบ่ง: ${esc(line.preparedBy||line.by||'-')} • คนที่ยืนยัน: ${esc(line.confirmedBy||entry.confirmedBy||'-')}</div><div class="muted">สถานะ: ${esc(line.receiveStatus||entry.statusLabel||'รับครบ')}</div>${line.conversionNote?`<div class="muted">แปลงหน่วย: ${esc(line.conversionNote)}</div>`:''}</span><span>${esc(line.qty||'-')} ${esc(line.unit||'')}</span></div>`).join('');
     box.innerHTML=`<div class="batchCard"><div class="batchHead"><div><b>รอบที่ ${esc(entry.roundNumber||entry.round||'-')}</b><div class="meta">วันที่/เวลา: ${fmt(entry.doneAt||entry.confirmedAt||entry.archivedAt)}</div><div class="meta">สถานะ: ${esc(entry.statusLabel||'รับครบ')}</div></div><span class="batchTag">${(entry.items||[]).length} รายการ</span></div><div class="batchItems">${rows||'<div class="empty">ไม่มีรายละเอียดสินค้า</div>'}</div></div>`;
   };
+})();
+</script>
+<script>
+/* === V7.26 home transfer status and three-step split state === */
+(function(){
+  const TRANSFER_WAITING='waiting_split';
+  const TRANSFER_SPLIT_DONE='split_done_waiting_confirm';
+  const TRANSFER_CONFIRMED='transfer_confirmed';
+  const CONFIRMED_VALUES=new Set([TRANSFER_CONFIRMED,'confirmed','completed','received','done']);
+  const SPLIT_VALUES=new Set([TRANSFER_SPLIT_DONE,'divided','split_done','prepared']);
+  const UNKNOWN='ไม่ระบุ';
+  const previousUpdateDoc=window.updateDoc||updateDoc;
+  const previousTransferTasks=window.transferTasks||transferTasks;
+  const previousCompleteManual=window.completeManualPartialTransferRound;
+
+  function str(value){return String(value??'');}
+  function esc(value){return str(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function user(){try{return nickname||localStorage.getItem('stockAlertNickname')||UNKNOWN;}catch(e){return UNKNOWN;}}
+  function allItems(){return Array.isArray(items)?items:[];}
+  function history(){return Array.isArray(transferHistory)?transferHistory:[];}
+  function directionOf(item){const to=Number(item?.branch);return to===1?{from:2,to:1}:to===2?{from:1,to:2}:null;}
+  function matches(item,from,to){const d=directionOf(item);return !!d&&Number(d.from)===Number(from)&&Number(d.to)===Number(to);}
+  function statusOf(item){
+    if(CONFIRMED_VALUES.has(str(item?.transferStatus))||CONFIRMED_VALUES.has(str(item?.splitStatus))||item?.transferDone===true)return 'completedTransfer';
+    if(item?.transferPrepared===true||SPLIT_VALUES.has(str(item?.transferStatus))||SPLIT_VALUES.has(str(item?.splitStatus)))return 'splitPendingConfirm';
+    return 'pendingSplit';
+  }
+  function isCompleted(item){return statusOf(item)==='completedTransfer';}
+  function isSplitPending(item,from,to){return statusOf(item)==='splitPendingConfirm'&&matches(item,from,to);}
+  function tasksFor(from,to){return (previousTransferTasks()||[]).filter(task=>Number(task.from)===Number(from)&&Number(task.to)===Number(to)&&!isCompleted(task.need));}
+  function splitTasksFor(from,to){return tasksFor(from,to).filter(task=>isSplitPending(task.need,from,to));}
+  function pendingTasksFor(from,to){return tasksFor(from,to).filter(task=>statusOf(task.need)==='pendingSplit');}
+  function findItem(id){return allItems().find(item=>str(item.id)===str(id))||null;}
+  function activeRoundFor(from,to){
+    return history().find(round=>Number(round?.schemaVersion||0)>=2&&round.status==='active'&&Number(round.from)===Number(from)&&Number(round.to)===Number(to))||window.StockAlertTransferRounds?.getActiveRound?.()||null;
+  }
+  function ensureRoundForDirection(from,to){
+    const existing=activeRoundFor(from,to);
+    if(existing&&Number(existing.from)===Number(from)&&Number(existing.to)===Number(to))return existing;
+    const at=Date.now();
+    const dateKey=window.StockAlertTransferRounds?.shopDateKey?.(at)||new Date(at).toISOString().slice(0,10);
+    const roundNumber=typeof transferRound==='function'?transferRound(from,to):1;
+    const round={id:`trr_${dateKey.replace(/-/g,'')}_${from}to${to}_${roundNumber}_${at}`,schemaVersion:2,dateKey,roundNumber,round:roundNumber,from:Number(from),to:Number(to),receivingBranch:Number(to),status:'active',archiveReason:'',createdAt:at,createdBy:user(),items:[]};
+    history().unshift(round);
+    return round;
+  }
+  function lineFromTask(task,mode,confirmedAt){
+    const item=task.need;
+    return {
+      lineId:`${item.transferRoundId||'live'}:${item.id}`,
+      shortageItemId:item.id,
+      needId:item.id,
+      name:item.name||'',
+      from:task.from,
+      to:task.to,
+      fromBranch:task.from,
+      toBranch:task.to,
+      qty:item.transferQty||'',
+      unit:item.transferUnit||'',
+      transferBaseQty:item.transferBaseQty||'',
+      transferBaseUnit:item.transferBaseUnit||'',
+      transferConversionRate:item.transferConversionRate||'',
+      conversionNote:item.transferConversionNote||'',
+      decision:item.transferDecision||'remove',
+      preparedAt:item.transferAt||confirmedAt,
+      preparedBy:item.transferBy||UNKNOWN,
+      confirmedAt,
+      confirmedBy:user(),
+      confirmationStatus:'confirmed',
+      receiveStatus:mode==='partial'?'รับเฉพาะส่วนที่แบ่ง':'รับครบ'
+    };
+  }
+  async function persistHistory(){
+    try{localStorage.setItem('stockAlertTransferHistory',JSON.stringify(history()));}catch(e){}
+    if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db&&typeof TRANSFER_HISTORY!=='undefined'){
+      await db.collection(TRANSFER_HISTORY).doc('main').set({items:JSON.parse(JSON.stringify(history())),updatedAt:Date.now()},{merge:true});
+    }
+  }
+  async function directItemUpdate(id,data){
+    const item=findItem(id);
+    if(item)Object.assign(item,data);
+    if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db){
+      await db.collection(COLLECTION).doc(id).update(data);
+      try{renderAll();}catch(e){}
+    }else{
+      items=allItems().map(entry=>str(entry.id)===str(id)?Object.assign({},entry,data):entry);
+      try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+      try{renderAll();}catch(e){}
+    }
+  }
+
+  window.updateDoc=updateDoc=async function(id,data){
+    let payload=data;
+    if(data&&data.transferPrepared===true){
+      payload=Object.assign({},data,{transferStatus:TRANSFER_SPLIT_DONE,splitStatus:TRANSFER_SPLIT_DONE,transferDone:false});
+      return directItemUpdate(id,payload);
+    }else if(data&&data.transferPrepared===false&&data.transferDone===true){
+      payload=Object.assign({},data,{transferStatus:TRANSFER_CONFIRMED,splitStatus:TRANSFER_CONFIRMED});
+    }else if(data&&(data.transferPrepared===false||data.transferPrepared==='')){
+      payload=Object.assign({},data,{transferStatus:data.transferStatus||TRANSFER_WAITING,splitStatus:data.splitStatus||TRANSFER_WAITING});
+    }
+    return previousUpdateDoc(id,payload);
+  };
+
+  window.transferTasks=transferTasks=function(){
+    return (previousTransferTasks()||[]).filter(task=>!isCompleted(task.need));
+  };
+  window.transferTasksByDirection=transferTasksByDirection=function(from,to){
+    return tasksFor(from,to);
+  };
+  window.transferSummary=transferSummary=function(from,to){
+    const tasks=tasksFor(from,to), split=splitTasksFor(from,to), pending=pendingTasksFor(from,to);
+    return {from:Number(from),to:Number(to),total:tasks.length,done:split.length,remain:pending.length,complete:tasks.length>0&&split.length===tasks.length,started:split.length>0,splitPendingConfirm:split.length,pendingSplit:pending.length,completedTransfer:0,round:activeRoundFor(from,to)};
+  };
+  window.renderTransferAlerts=renderTransferAlerts=function(){
+    const box=document.getElementById('transferAlerts'); if(!box)return;
+    const dirs=[transferSummary(1,2),transferSummary(2,1)].filter(summary=>summary.splitPendingConfirm>0);
+    box.innerHTML=dirs.map(summary=>`<div class="alertCard ${summary.complete?'done':''}" onclick="openStatusDirection(${summary.from},${summary.to})"><h3>สาขา ${summary.from} เริ่มแบ่งของบางส่วนแล้ว</h3><p>รอยืนยันรับ/ส่ง ${summary.splitPendingConfirm} รายการ</p><div class="transferRound">แบ่งแล้ว ${summary.done}/${summary.total}</div></div>`).join('');
+  };
+  window.renderTransfers=renderTransfers=function(){
+    const from=Number(transferFrom||1),to=Number(transferTo||2),box=document.getElementById('transferBox'); if(!box)return;
+    const tasks=tasksFor(from,to);
+    box.innerHTML=tasks.length?tasks.map(task=>{
+      const item=task.need, state=statusOf(item), prepared=state==='splitPendingConfirm';
+      return `<div class="item"><div class="itemTop"><div><b>${esc(item.name)}</b><div class="muted">สาขา ${task.from} → สาขา ${task.to}</div><div class="muted">สถานะของสาขา ${task.to}: ${branchText(item)}</div>${prepared?`<div class="muted">แบ่งแล้ว: ${esc(item.transferQty||'-')} ${esc(item.transferUnit||'')} โดย ${esc(item.transferBy||'-')} เวลา ${fmt(item.transferAt)}</div>`:''}</div>${prepared?'<span class="pill green">แบ่งแล้ว</span>':'<span class="pill blue">รอแบ่ง</span>'}</div><div class="rowBtns"><button class="btn ok" onclick="openTransfer('${esc(item.id)}',${task.from},${task.to})">${prepared?'แก้ไขจำนวน':'แบ่งแล้ว'}</button><button class="btn gray" onclick="openSameShortage('${esc(item.id)}',${task.from},${task.to})">หมดเหมือนกัน</button></div></div>`;
+    }).join(''):'<div class="empty">ยังไม่มีรายการที่ต้องแบ่งในทิศทางนี้</div>';
+  };
+  window.renderTransferStatusDetail=renderTransferStatusDetail=function(){
+    const from=Number(statusFrom||1),to=Number(statusTo||2),summary=transferSummary(from,to),box=document.getElementById('transferStatusDetailBox'); if(!box)return;
+    if(!summary.total){box.innerHTML='<div class="empty">ยังไม่มีรายการที่ต้องแบ่งในทิศทางนี้</div>';return;}
+    const pct=summary.total?Math.round((summary.done/summary.total)*100):0,color=statusColor(pct,summary.complete);
+    const splitRows=splitTasksFor(from,to).map(task=>{
+      const item=task.need;
+      return `<div class="item"><div class="itemTop"><div><b>${esc(item.name)}</b><div class="muted">แบ่งแล้ว ${esc(item.transferQty||'-')} ${esc(item.transferUnit||'')} โดย ${esc(item.transferBy||'-')} เวลา ${fmt(item.transferAt)}</div></div><span class="pill green">แบ่งแล้ว</span></div><div class="rowBtns"><button class="btn ok" onclick="openTransfer('${esc(item.id)}',${task.from},${task.to})">แก้ไขจำนวน</button></div></div>`;
+    }).join('');
+    const pendingRows=pendingTasksFor(from,to).map(task=>`<div class="item"><div class="itemTop"><div><b>${esc(task.need.name)}</b><div class="muted">ยังไม่ได้แบ่ง</div></div><span class="pill blue">รอแบ่ง</span></div></div>`).join('');
+    const partialButton=summary.done>0?`<button class="btn primary" style="width:100%;margin-top:10px" onclick="archiveCurrentTransferRound(${from},${to})">ยืนยันรับ/ส่งเฉพาะส่วนที่แบ่งไว้</button>`:'';
+    const fullButton=summary.complete?`<button class="btn confirmDone" onclick="confirmTransferReceived(${from},${to})">ยืนยันรับ/ส่งเมื่อแบ่งครบ</button>`:'';
+    box.innerHTML=`<div class="statusHero"><div class="statusIcon ${color}">↔</div><div class="smallTitle">สาขา ${from} → สาขา ${to}</div><h2 style="margin:8px 0 6px">แบ่งแล้ว ${pct}%</h2><div class="progressOuter"><div class="progressBar ${color}" style="width:${pct}%"></div></div><div class="bigPercent">${pct}%</div><div class="statusRows"><div class="statusRow"><span>ต้องแบ่งทั้งหมด</span><span>${summary.total} รายการ</span></div><div class="statusRow"><span>แบ่งแล้ว</span><span>${summary.done} รายการ</span></div><div class="statusRow"><span>เหลือรอแบ่ง</span><span>${summary.remain} รายการ</span></div></div>${partialButton}${fullButton}</div><div class="sectionTitle">รายการที่แบ่งแล้วแต่ยังไม่ยืนยันรับ/ส่ง</div>${splitRows||'<div class="empty">ยังไม่มีรายการที่แบ่งแล้ว</div>'}<div class="sectionTitle">รายการรอแบ่ง</div>${pendingRows||'<div class="empty">ไม่มีรายการรอแบ่ง</div>'}`;
+  };
+
+  async function markConfirmedItem(id){
+    const item=findItem(id);
+    if(!item)return;
+    const doneData={transferPrepared:false,transferDone:true,transferStatus:TRANSFER_CONFIRMED,splitStatus:TRANSFER_CONFIRMED,transferQty:'',transferUnit:'',transferBaseQty:'',transferBaseUnit:'',transferConversionRate:'',transferConversionNote:'',transferDecision:'remove',transferBy:'',transferAt:null,transferRoundId:'',transferDateKey:'',transferRoundNumber:'',updatedAt:Date.now(),updatedBy:user()};
+    if((item.transferDecision||'remove')==='remove'){
+      items=allItems().filter(entry=>str(entry.id)!==str(id));
+      try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+      if(typeof online!=='undefined'&&online&&typeof db!=='undefined'&&db)await db.collection(COLLECTION).doc(id).delete();
+    }else{
+      Object.assign(item,doneData);
+      await previousUpdateDoc(id,doneData);
+    }
+  }
+  async function completeDirection(from,to,mode){
+    const split=splitTasksFor(from,to);
+    if(!split.length)throw new Error('NO_SPLIT_ITEMS');
+    const confirmedAt=Date.now(), round=ensureRoundForDirection(from,to);
+    const lines=split.map(task=>lineFromTask(task,mode,confirmedAt));
+    for(const line of lines)await markConfirmedItem(line.needId);
+    round.status='confirmed';
+    round.archiveReason=mode==='partial'?'take_partial_now':'completed';
+    round.confirmationMode=mode;
+    round.statusLabel=mode==='partial'?'รับเฉพาะส่วนที่แบ่ง':'รับครบ';
+    round.doneAt=round.doneAt||confirmedAt;
+    round.confirmedAt=confirmedAt;
+    round.confirmedBy=user();
+    round.archivedAt=round.archivedAt||confirmedAt;
+    round.archivedBy=round.archivedBy||user();
+    round.items=lines;
+    await persistHistory();
+    try{localStorage.setItem(COLLECTION,JSON.stringify(items||[]));}catch(e){}
+    return round;
+  }
+  window.confirmTransferReceived=confirmTransferReceived=async function(from,to){
+    const summary=transferSummary(from,to);
+    if(!summary.complete)return toast('ยังแบ่งไม่ครบ กรุณาใช้ปุ่มยืนยันเฉพาะส่วนที่แบ่งไว้');
+    if(!confirm('ยืนยันรับ/ส่งเมื่อแบ่งครบใช่ไหม?'))return;
+    try{
+      await completeDirection(from,to,'full');
+      try{await log('ยืนยันรับ/ส่งเมื่อแบ่งครบ',`สาขา ${from} -> สาขา ${to}`);}catch(e){}
+      if(typeof renderAll==='function')renderAll();
+      try{renderTransferHistory();}catch(e){}
+      go('home');
+      toast('ยืนยันรับ/ส่งแล้ว');
+    }catch(error){
+      console.error('Full transfer confirmation failed',error);
+      toast('ยืนยันรับ/ส่งไม่สำเร็จ กรุณาลองใหม่');
+    }
+  };
+  window.completeManualPartialTransferRound=async function(roundId){
+    const round=history().find(entry=>str(entry?.id)===str(roundId));
+    if(round)return previousCompleteManual?previousCompleteManual(roundId):round;
+    throw new Error('ACTIVE_TRANSFER_ROUND_NOT_FOUND');
+  };
+  window.archiveCurrentTransferRound=async function(from=statusFrom||transferFrom||1,to=statusTo||transferTo||2){
+    const count=splitTasksFor(from,to).length;
+    if(!count)return toast('ยังไม่มีรายการที่แบ่งไว้');
+    if(!confirm(`ยืนยันรับ/ส่งเฉพาะ ${count} รายการที่แบ่งไว้ใช่ไหม?`))return;
+    try{
+      await completeDirection(from,to,'partial');
+      try{await log('ยืนยันรับ/ส่งเฉพาะส่วนที่แบ่งไว้',`สาขา ${from} -> สาขา ${to}`);}catch(e){}
+      if(typeof renderAll==='function')renderAll();
+      try{renderTransferHistory();}catch(e){}
+      go('home');
+      toast('รับ/ส่งเฉพาะส่วนที่แบ่งไว้แล้ว');
+    }catch(error){
+      console.error('Partial transfer confirmation failed',error);
+      toast('ยืนยันไม่สำเร็จ กรุณาลองอีกครั้ง');
+    }
+  };
+
+  const style=document.createElement('style');
+  style.textContent='.transferAlerts .alertCard,.alerts .alertCard{cursor:pointer}.statusHero+.sectionTitle{margin-top:14px}';
+  document.head.appendChild(style);
 })();
 </script>
 </body></html>
