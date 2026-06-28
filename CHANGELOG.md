@@ -4,6 +4,13 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.27 - 2026-06-28
+
+### Fixed
+
+- Restored shortage date grouping to use each shortage record's original `createdAt` date instead of `updatedAt`.
+- Kept recent transfer, supplier ordering, copy, quantity badge, and image export behavior intact while preventing edited records from moving into newer date buckets.
+
 ## 7.23 — 2026-06-24
 
 ### Fixed

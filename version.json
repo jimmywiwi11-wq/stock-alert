@@ -1,6 +1,6 @@
 {
-  "version": "7.26",
-  "label": "V7.26",
-  "releasedAt": "2026-06-27T00:00:00Z",
-  "message": "แก้สถานะหน้าแรกของการแบ่งของขาดให้แสดงรายการแบ่งแล้วรอยืนยันรับ/ส่งตามทิศทางสาขา และปรับสถานะแบ่งของเป็น 3 ขั้น"
+  "version": "7.27",
+  "label": "V7.27",
+  "releasedAt": "2026-06-28T00:00:00Z",
+  "message": "Fix shortage date grouping to use original created dates instead of edit/update dates."
 }
