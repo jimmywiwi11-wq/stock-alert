@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.27</title>
+<title>Stock Alert V7.29</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.27</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.29</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">🔥</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">‹</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">‹</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.27</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.29</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1796,8 +1796,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.27';
-  const APP_VERSION_LABEL='V7.27';
+  const APP_VERSION='7.29';
+  const APP_VERSION_LABEL='V7.29';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3330,7 +3330,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.27';if(versionBox)versionBox.textContent='V7.27';
+  if(versionSub)versionSub.textContent='V7.29';if(versionBox)versionBox.textContent='V7.29';
 })();
 </script>
 <script>
@@ -4263,6 +4263,358 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   const style=document.createElement('style');
   style.textContent='.transferAlerts .alertCard,.alerts .alertCard{cursor:pointer}.statusHero+.sectionTitle{margin-top:14px}';
   document.head.appendChild(style);
+})();
+</script>
+<script>
+/* === V7.28 expected delivery + product status + urgent customer orders === */
+(function(){
+  const APP_VERSION='V7.29';
+  const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
+  let pendingUrgentPayload=null;
+
+  function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function txt(value){return String(value??'').trim();}
+  function key(value){try{return typeof norm==='function'?norm(value):txt(value).toLowerCase().replace(/[\s\-_/.,()]+/g,'');}catch(e){return txt(value).toLowerCase().replace(/[\s\-_/.,()]+/g,'');}}
+  function asTime(value){return value&&typeof value.toMillis==='function'?value.toMillis():Number(value||0);}
+  function user(){return nickname||localStorage.getItem('stockAlertNickname')||'ไม่ระบุ';}
+  function toastSafe(message){try{toast(message);}catch(e){alert(message);}}
+  function todayInput(value){if(!value)return '';const d=new Date(String(value).includes('-')?`${value}T00:00:00`:Number(value));return Number.isNaN(d.getTime())?String(value):`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  function dateText(value){const input=todayInput(value);if(!input)return '';const [y,m,d]=input.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'});}
+  function sameName(a,b){return key(a)===key(b);}
+  function isUnknownSupplier(value){const v=txt(value);return !v||v===UNKNOWN_SUPPLIER||v==='ไม่ระบุบริษัท';}
+  function splitQtyUnit(value){
+    const source=String(value||'');
+    let qty='',unit='',unitStarted=false;
+    for(const ch of source){
+      if(!unitStarted&&/[0-9.,/\-\s]/.test(ch))qty+=ch;
+      else{unitStarted=true;unit+=ch;}
+    }
+    return {qty:qty.trim(),unit:unit.trim()};
+  }
+  function urgentQtyParts(item){
+    const legacy=splitQtyUnit(item?.urgentQty||'');
+    return {qty:legacy.qty||txt(item?.urgentQty),unit:txt(item?.urgentUnit)||legacy.unit};
+  }
+  function urgentQtyText(item){
+    const parts=urgentQtyParts(item);
+    return `${parts.qty||item?.qty||'-'}${parts.unit?' '+parts.unit:(item?.unit?' '+item.unit:'')}`.trim();
+  }
+  function orderLineIds(order){return (order?.items||[]).flatMap(item=>Array.isArray(item.shortageIds)?item.shortageIds.map(String):[]);}
+  function itemOrder(item){
+    const byId=(purchaseOrders||[]).find(order=>order.status!=='delivered'&&orderLineIds(order).includes(String(item?.id)));
+    if(byId)return byId;
+    return (purchaseOrders||[]).find(order=>order.status!=='delivered'&&(order.items||[]).some(line=>sameName(line.name,item?.name)));
+  }
+  function orderLineFor(order,name,id){
+    return (order?.items||[]).find(line=>Array.isArray(line.shortageIds)&&line.shortageIds.map(String).includes(String(id)))||
+      (order?.items||[]).find(line=>sameName(line.name,name));
+  }
+  function latestDeliveryFor(name,id){
+    const rows=[...(deliveryHistory||[])].sort((a,b)=>asTime(b.receivedAt)-asTime(a.receivedAt));
+    return rows.find(row=>[...(row.deliveredItems||[]),...(row.missingItems||[])].some(line=>{
+      const ids=Array.isArray(line.shortageIds)?line.shortageIds.map(String):[];
+      return ids.includes(String(id))||sameName(line.name,name);
+    }));
+  }
+  async function updateShortages(ids,data){
+    const unique=[...new Set((ids||[]).map(String).filter(Boolean))];
+    if(!unique.length)return;
+    items.forEach(item=>{if(unique.includes(String(item.id)))Object.assign(item,data);});
+    try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+    if(online&&db){
+      for(let i=0;i<unique.length;i+=450){
+        const batch=db.batch();
+        unique.slice(i,i+450).forEach(id=>batch.update(db.collection(COLLECTION).doc(id),data));
+        await batch.commit();
+      }
+    }
+    try{renderAll();}catch(e){}
+  }
+  async function persistOrdersV728(){
+    if(typeof persistOrders==='function')persistOrders();
+    else{
+      localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders||[]));
+      localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory||[]));
+      if(online&&db&&typeof ORDERS!=='undefined')await db.collection(ORDERS).doc('main').set({items:purchaseOrders,updatedAt:Date.now()},{merge:true});
+      try{renderAll();}catch(e){}
+    }
+  }
+
+  function ensureHomeButtons(){
+    const grid=document.getElementById('mainGrid');
+    if(!grid||document.getElementById('workflowButtonsV728'))return;
+    const wrap=document.createElement('div');
+    wrap.id='workflowButtonsV728';
+    wrap.className='workflowButtonsV728';
+    wrap.innerHTML=`<button class="workflowBtnV728 status" onclick="go('productStatusPage')"><b>เช็คสถานะสินค้า</b><span>ค้นหาว่าสั่งแล้วหรือยัง</span></button><button class="workflowBtnV728 urgent" onclick="go('urgentOrdersPage')"><b>สินค้าด่วน</b><span>รายการลูกค้าสั่ง</span></button>`;
+    grid.insertAdjacentElement('afterend',wrap);
+  }
+  function ensurePages(){
+    const phone=document.querySelector('.phone')||document.body;
+    if(!document.getElementById('productStatusPage')){
+      const page=document.createElement('section');
+      page.id='productStatusPage';page.className='page';
+      page.innerHTML=`<div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">เช็คสถานะสินค้า</h2><div class="smallTitle">ค้นหาสินค้าทีละรายการ</div></div></div><div class="card searchCard"><input class="input" id="statusSearchInput" placeholder="พิมพ์ชื่อสินค้า..." autocomplete="off" oninput="renderStatusSuggestions()"><div id="statusSuggestionBox" class="statusSuggestionBox"></div></div><div id="productStatusBox"></div>`;
+      phone.appendChild(page);
+    }
+    if(!document.getElementById('urgentOrdersPage')){
+      const page=document.createElement('section');
+      page.id='urgentOrdersPage';page.className='page';
+      page.innerHTML=`<div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">สินค้าด่วน</h2><div class="smallTitle">รายการลูกค้าสั่งที่อ้างอิงจากของขาด</div></div></div><div id="urgentOrdersBox"></div>`;
+      phone.appendChild(page);
+    }
+  }
+  function ensureDeliveryModal(){
+    if(document.getElementById('deliveryDateModalV728'))return;
+    const modal=document.createElement('div');
+    modal.id='deliveryDateModalV728';modal.className='modal';
+    modal.innerHTML=`<div class="sheet"><h2 id="deliveryDateTitleV728">กำหนดวันส่ง</h2><p class="muted" id="deliveryDateSubV728"></p><label>วันที่สินค้าจะมาส่ง <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="deliveryDateInputV728" type="date"><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveExpectedDeliveryDateV728()">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('deliveryDateModalV728')">ยกเลิก</button></div>`;
+    document.body.appendChild(modal);
+  }
+  function ensureFormUrgent(){
+    const card=document.querySelector('#formPage .card');
+    const saveButton=card?.querySelector('button[onclick="saveItem()"]');
+    if(!card||!saveButton||document.getElementById('urgentFieldsV728'))return;
+    const block=document.createElement('div');
+    block.id='urgentFieldsV728';
+    block.innerHTML=`<label class="urgentToggleV728"><input type="checkbox" id="urgentSwitchV728" onchange="toggleUrgentFieldsV728()"><span>สินค้าด่วน</span></label><div id="urgentExtraV728" class="urgentExtraV728" style="display:none"><label>ชื่อลูกค้า <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="urgentCustomerV728" placeholder="ชื่อลูกค้า"><label>จำนวนที่ลูกค้าต้องการ <span class="supplierUnknown">(บังคับเมื่อเป็นสินค้าด่วน)</span></label><div class="qtyUnitGrid urgentQtyGridV728"><div><input class="input" id="urgentQtyV728" type="text" inputmode="decimal" placeholder="จำนวน" autocomplete="off"></div><div><input class="input" id="urgentUnitV728" type="text" placeholder="ตัว / อัน / เส้น / ถุง / กล่อง" autocomplete="off"></div></div><label>วันที่ลูกค้าต้องการสินค้า <span class="supplierUnknown">(ไม่บังคับ)</span></label><div class="urgentDateWrapV728" data-placeholder="วันที่ลูกค้าต้องการสินค้า"><input class="input dateEmptyV728" id="urgentRequiredDateV728" type="date" placeholder="วันที่ลูกค้าต้องการสินค้า" onfocus="setUrgentDateFocusV728(true)" onblur="setUrgentDateFocusV728(false)" oninput="syncUrgentDatePlaceholderV728()"></div><label>ชำระเงินแล้วหรือยัง</label><div class="seg urgentPaySegV728"><button type="button" id="urgentPayUnpaidV728" class="active" onclick="setUrgentPaymentV728('unpaid')">ยังไม่ชำระ</button><button type="button" id="urgentPayPaidV728" onclick="setUrgentPaymentV728('paid')">ชำระแล้ว</button></div></div>`;
+    saveButton.insertAdjacentElement('beforebegin',block);
+    bindUrgentQtyUnit();
+    syncUrgentDatePlaceholderV728();
+  }
+  function bindUrgentQtyUnit(){
+    const qty=document.getElementById('urgentQtyV728'),unit=document.getElementById('urgentUnitV728');
+    if(!qty||!unit||qty.dataset.urgentQtyBound==='1')return;
+    qty.dataset.urgentQtyBound='1';
+    function apply(){
+      const parts=splitQtyUnit(qty.value);
+      const cleanQty=parts.qty.replace(/\s+/g,'');
+      if(qty.value!==cleanQty)qty.value=cleanQty;
+      if(parts.unit){
+        unit.value=parts.unit;
+        setTimeout(()=>{try{unit.focus();unit.setSelectionRange(unit.value.length,unit.value.length);}catch(e){}},0);
+      }
+    }
+    qty.addEventListener('input',apply);
+    qty.addEventListener('keyup',apply);
+    qty.addEventListener('compositionend',apply);
+    qty.addEventListener('paste',()=>setTimeout(apply,0));
+  }
+  window.setUrgentDateFocusV728=function(focused){
+    const wrap=document.querySelector('.urgentDateWrapV728');
+    if(wrap)wrap.classList.toggle('focused',!!focused);
+    syncUrgentDatePlaceholderV728();
+  };
+  window.syncUrgentDatePlaceholderV728=function(){
+    const input=document.getElementById('urgentRequiredDateV728');
+    const wrap=document.querySelector('.urgentDateWrapV728');
+    if(!input||!wrap)return;
+    const empty=!input.value;
+    input.classList.toggle('dateEmptyV728',empty);
+    wrap.classList.toggle('empty',empty);
+  };
+  function readUrgentPayload(){
+    const checked=document.getElementById('urgentSwitchV728')?.checked;
+    if(!checked)return {urgent:false,urgentCustomer:'',urgentQty:'',urgentUnit:'',urgentRequiredDate:'',urgentPaymentStatus:'unpaid',urgentUpdatedAt:Date.now(),urgentUpdatedBy:user()};
+    const payload={
+      urgent:true,
+      urgentCustomer:txt(document.getElementById('urgentCustomerV728')?.value),
+      urgentQty:txt(document.getElementById('urgentQtyV728')?.value),
+      urgentUnit:txt(document.getElementById('urgentUnitV728')?.value),
+      urgentRequiredDate:txt(document.getElementById('urgentRequiredDateV728')?.value),
+      urgentPaymentStatus:document.getElementById('urgentPayPaidV728')?.classList.contains('active')?'paid':'unpaid',
+      urgentUpdatedAt:Date.now(),
+      urgentUpdatedBy:user()
+    };
+    if(!editId){payload.urgentCreatedAt=Date.now();payload.urgentCreatedBy=user();}
+    return payload;
+  }
+  window.toggleUrgentFieldsV728=function(){
+    const show=document.getElementById('urgentSwitchV728')?.checked;
+    const box=document.getElementById('urgentExtraV728');
+    if(box)box.style.display=show?'block':'none';
+  };
+  window.setUrgentPaymentV728=function(value){
+    document.getElementById('urgentPayUnpaidV728')?.classList.toggle('active',value!=='paid');
+    document.getElementById('urgentPayPaidV728')?.classList.toggle('active',value==='paid');
+  };
+  function fillUrgentFields(item){
+    ensureFormUrgent();
+    const sw=document.getElementById('urgentSwitchV728');
+    if(!sw)return;
+    sw.checked=!!item?.urgent;
+    const qtyParts=urgentQtyParts(item);
+    document.getElementById('urgentCustomerV728').value=item?.urgentCustomer||'';
+    document.getElementById('urgentQtyV728').value=qtyParts.qty||'';
+    document.getElementById('urgentUnitV728').value=qtyParts.unit||'';
+    document.getElementById('urgentRequiredDateV728').value=todayInput(item?.urgentRequiredDate);
+    setUrgentPaymentV728(item?.urgentPaymentStatus==='paid'?'paid':'unpaid');
+    toggleUrgentFieldsV728();
+    bindUrgentQtyUnit();
+    syncUrgentDatePlaceholderV728();
+  }
+
+  function catalogProducts(){
+    const map=new Map();
+    function add(name){name=txt(name);if(!name)return;const k=key(name);if(!map.has(k))map.set(k,name);}
+    (items||[]).forEach(item=>add(item.name));
+    (purchaseOrders||[]).forEach(order=>(order.items||[]).forEach(line=>add(line.name)));
+    (deliveryHistory||[]).forEach(row=>[...(row.deliveredItems||[]),...(row.missingItems||[])].forEach(line=>add(line.name)));
+    return [...map.values()].sort((a,b)=>a.localeCompare(b,'th'));
+  }
+  function productScore(query,name){
+    const q=key(query),n=key(name);if(!q||!n)return 0;if(q===n)return 100;if(n.includes(q))return 85;if(q.includes(n))return 65;
+    let hit=0;for(const ch of q){if(n.includes(ch))hit++;}
+    return Math.round((hit/Math.max(q.length,n.length))*60);
+  }
+  window.renderStatusSuggestions=function(){
+    const q=txt(document.getElementById('statusSearchInput')?.value),box=document.getElementById('statusSuggestionBox');
+    if(!box)return;
+    if(!q){box.innerHTML='';box.classList.remove('show');document.getElementById('productStatusBox').innerHTML='';return;}
+    const matches=catalogProducts().map(name=>({name,score:productScore(q,name)})).filter(x=>x.score>=35).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name,'th')).slice(0,8);
+    box.innerHTML=matches.map(match=>`<button type="button" onclick="selectProductStatusV728('${encodeURIComponent(match.name)}')">${esc(match.name)}</button>`).join('');
+    box.classList.toggle('show',matches.length>0);
+  };
+  window.selectProductStatusV728=function(encodedName){
+    const name=decodeURIComponent(encodedName);
+    const input=document.getElementById('statusSearchInput');if(input)input.value=name;
+    const sugg=document.getElementById('statusSuggestionBox');if(sugg){sugg.innerHTML='';sugg.classList.remove('show');}
+    renderProductStatus(name);
+  };
+  function renderProductStatus(name){
+    const box=document.getElementById('productStatusBox');if(!box)return;
+    const shortage=(items||[]).find(item=>sameName(item.name,name));
+    const activeOrder=(purchaseOrders||[]).filter(order=>order.status!=='delivered').sort((a,b)=>asTime(b.orderAt)-asTime(a.orderAt)).find(order=>(order.items||[]).some(line=>sameName(line.name,name)||Array.isArray(line.shortageIds)&&shortage&&line.shortageIds.map(String).includes(String(shortage.id))));
+    const line=orderLineFor(activeOrder,name,shortage?.id);
+    if(activeOrder){
+      const delivery=activeOrder.expectedDeliveryDate||shortage?.expectedDeliveryDate||'';
+      box.innerHTML=`<div class="batchCard statusResultV728"><h3>สินค้า:</h3><div class="statusProductNameV728">${esc(name)}</div><div class="sectionTitle">สถานะ</div><div class="statusBadgeV728 ordered">สั่งแล้ว</div><div class="statusRows"><div class="statusRow"><span>บริษัท</span><span>${esc(activeOrder.supplier||shortage?.orderedSupplier||'-')}</span></div><div class="statusRow"><span>วันที่สั่ง</span><span>${fmt(activeOrder.orderAt)}</span></div><div class="statusRow"><span>จำนวนที่สั่ง</span><span>${esc(line?.qty||'-')} ${esc(line?.unit||'')}</span></div><div class="statusRow"><span>คนสั่ง</span><span>${esc(activeOrder.by||shortage?.orderedBy||'-')}</span></div>${delivery?`<div class="statusRow"><span>วันที่สินค้าจะมาส่ง</span><span>${esc(dateText(delivery))}</span></div>`:''}</div></div>`;
+      return;
+    }
+    box.innerHTML=`<div class="batchCard statusResultV728"><h3>สินค้า:</h3><div class="statusProductNameV728">${esc(name)}</div><div class="sectionTitle">สถานะ</div><div class="statusBadgeV728 notOrdered">ยังไม่ได้สั่ง</div>${shortage?'<div class="muted" style="margin-top:12px">มีอยู่ในรายการของขาดตอนนี้</div>':'<div class="muted" style="margin-top:12px">ไม่พบในรายการของขาดตอนนี้</div>'}</div>`;
+  }
+
+  function renderUrgentOrders(){
+    const box=document.getElementById('urgentOrdersBox');if(!box)return;
+    const urgent=(items||[]).filter(item=>item.urgent).sort((a,b)=>asTime(b.urgentUpdatedAt||b.updatedAt)-asTime(a.urgentUpdatedAt||a.updatedAt));
+    box.innerHTML=urgent.length?urgent.map(item=>{
+      const order=itemOrder(item),line=orderLineFor(order,item.name,item.id),delivery=order?.expectedDeliveryDate||item.expectedDeliveryDate||'',delivered=item.orderState==='completed'||!!latestDeliveryFor(item.name,item.id);
+      const orderLabel=delivered?'ส่งแล้ว':order||item.orderState==='ordered'?'สั่งแล้ว':'ยังไม่ได้สั่ง';
+      const orderClass=delivered?'green':order||item.orderState==='ordered'?'blue':'hold';
+      return `<div class="batchCard urgentCardV728"><div class="batchHead"><div><b>${esc(item.name)}</b><div class="muted">จำนวน: ${esc(urgentQtyText(item))}</div>${item.urgentCustomer?`<div class="muted">ลูกค้า: ${esc(item.urgentCustomer)}</div>`:''}${item.urgentRequiredDate?`<div class="muted">วันที่ลูกค้าต้องการ: ${esc(dateText(item.urgentRequiredDate))}</div>`:''}</div><span class="batchTag ${orderClass}">${orderLabel}</span></div><div class="statusRows"><div class="statusRow"><span>สถานะชำระเงิน</span><span>${item.urgentPaymentStatus==='paid'?'ชำระแล้ว':'ยังไม่ชำระ'}</span></div><div class="statusRow"><span>สถานะของขาด</span><span>${item.status==='out'?'หมดเกลี้ยง':`เหลือ ${esc(item.qty||'-')} ${esc(item.unit||'')}`}</span></div><div class="statusRow"><span>Ordered / Not Ordered</span><span>${order||item.orderState==='ordered'?'Ordered':'Not Ordered'}</span></div>${order?`<div class="statusRow"><span>บริษัท</span><span>${esc(order.supplier||'-')}</span></div><div class="statusRow"><span>จำนวนที่สั่ง</span><span>${esc(line?.qty||'-')} ${esc(line?.unit||'')}</span></div>`:''}${delivery?`<div class="statusRow"><span>วันที่สินค้าจะมาส่ง</span><span>${esc(dateText(delivery))}</span></div>`:''}</div></div>`;
+    }).join(''):'<div class="empty">ยังไม่มีสินค้าด่วน</div>';
+  }
+
+  let editingDeliveryOrderId='';
+  window.openDeliveryDateDialogV728=function(orderId){
+    ensureDeliveryModal();
+    const order=(purchaseOrders||[]).find(entry=>String(entry.id)===String(orderId));
+    if(!order)return toastSafe('ไม่พบใบสั่งสินค้า');
+    editingDeliveryOrderId=String(orderId);
+    document.getElementById('deliveryDateTitleV728').textContent=order.expectedDeliveryDate?'แก้ไขวันส่ง':'กำหนดวันส่ง';
+    document.getElementById('deliveryDateSubV728').textContent=`${order.supplier||'ไม่ระบุบริษัท'} • ${(order.items||[]).length} รายการ`;
+    document.getElementById('deliveryDateInputV728').value=todayInput(order.expectedDeliveryDate);
+    document.getElementById('deliveryDateModalV728').classList.add('show');
+  };
+  window.saveExpectedDeliveryDateV728=async function(){
+    const order=(purchaseOrders||[]).find(entry=>String(entry.id)===editingDeliveryOrderId);
+    if(!order)return;
+    const value=txt(document.getElementById('deliveryDateInputV728')?.value);
+    order.expectedDeliveryDate=value;
+    order.updatedAt=Date.now();
+    order.updatedBy=user();
+    await persistOrdersV728();
+    await updateShortages(orderLineIds(order),{expectedDeliveryDate:value,updatedAt:Date.now(),updatedBy:user()});
+    closeModal('deliveryDateModalV728');
+    try{renderOrderSupplier();renderProductStatus(txt(document.getElementById('statusSearchInput')?.value));renderUrgentOrders();}catch(e){}
+    toastSafe('บันทึกวันส่งแล้ว');
+  };
+
+  const baseOpenForm=window.openForm||openForm;
+  window.openForm=openForm=function(b,it=null){
+    const result=baseOpenForm.apply(this,arguments);
+    setTimeout(()=>fillUrgentFields(it),30);
+    return result;
+  };
+  const baseSaveItem=window.saveItem||saveItem;
+  window.saveItem=saveItem=async function(){
+    ensureFormUrgent();
+    const payload=readUrgentPayload();
+    if(payload.urgent&&!payload.urgentQty)return toastSafe('กรุณาใส่จำนวนที่ลูกค้าต้องการ');
+    pendingUrgentPayload=payload;
+    try{return await baseSaveItem.apply(this,arguments);}
+    finally{pendingUrgentPayload=null;}
+  };
+  const baseAddDoc=window.addDoc||addDoc;
+  window.addDoc=addDoc=async function(data){
+    if(pendingUrgentPayload)data=Object.assign({},data,pendingUrgentPayload,pendingUrgentPayload.urgent?{urgentCreatedAt:data.createdAt||Date.now(),urgentCreatedBy:user()}:null);
+    return baseAddDoc.call(this,data);
+  };
+  const baseUpdateDoc=window.updateDoc||updateDoc;
+  window.updateDoc=updateDoc=async function(id,data){
+    if(pendingUrgentPayload)data=Object.assign({},data,pendingUrgentPayload);
+    return baseUpdateDoc.call(this,id,data);
+  };
+  const baseRenderOrderSupplier=window.renderOrderSupplier||renderOrderSupplier;
+  window.renderOrderSupplier=renderOrderSupplier=function(){
+    const result=baseRenderOrderSupplier.apply(this,arguments);
+    setTimeout(()=>{
+      const supplier=currentOrderSupplier||'';
+      const cards=[...document.querySelectorAll('#orderSupplierBox .batchCard')];
+      const orders=(purchaseOrders||[]).filter(order=>(order.supplier||'ไม่ระบุบริษัท')===supplier&&order.status!=='delivered').sort((a,b)=>asTime(b.orderAt)-asTime(a.orderAt));
+      cards.forEach((card,index)=>{
+        const order=orders[index];if(!order||card.querySelector('.deliveryDateActionV728'))return;
+        const note=order.expectedDeliveryDate?`<div class="muted deliveryDateTextV728">วันส่ง: ${esc(dateText(order.expectedDeliveryDate))}</div>`:'';
+        const btn=`<button class="btn gray deliveryDateActionV728" onclick="openDeliveryDateDialogV728('${esc(order.id)}')">${order.expectedDeliveryDate?'แก้ไขวันส่ง':'กำหนดวันส่ง'}</button>`;
+        card.insertAdjacentHTML('beforeend',`${note}<div class="rowBtns deliveryDateRowV728">${btn}</div>`);
+      });
+    },0);
+    return result;
+  };
+  const baseGo=window.go||go;
+  window.go=go=function(id){
+    ensurePages();ensureHomeButtons();ensureFormUrgent();ensureDeliveryModal();
+    const result=baseGo.apply(this,arguments);
+    if(id==='productStatusPage'){document.getElementById('statusSearchInput')?.focus();document.getElementById('productStatusBox').innerHTML='';}
+    if(id==='urgentOrdersPage')renderUrgentOrders();
+    return result;
+  };
+  const baseRenderAll=window.renderAll||renderAll;
+  window.renderAll=renderAll=function(){
+    const result=baseRenderAll.apply(this,arguments);
+    ensureHomeButtons();
+    if(document.getElementById('urgentOrdersPage')?.classList.contains('active'))renderUrgentOrders();
+    const selected=txt(document.getElementById('statusSearchInput')?.value);
+    if(selected&&document.getElementById('productStatusPage')?.classList.contains('active'))renderProductStatus(selected);
+    return result;
+  };
+  const baseAfterOrder=window.afterSupplierOrderConfirmed;
+  if(typeof baseAfterOrder==='function'){
+    window.afterSupplierOrderConfirmed=async function(args){
+      const result=await baseAfterOrder.apply(this,arguments);
+      const ids=(args?.lines||[]).flatMap(line=>Array.isArray(line.shortageIds)?line.shortageIds:[]);
+      if(ids.length)await updateShortages(ids,{urgentOrderState:'ordered',urgentOrderedOrderId:String(args?.order?.id||''),urgentOrderedAt:Number(args?.order?.orderAt||Date.now()),updatedAt:Date.now(),updatedBy:user()});
+      return result;
+    };
+  }
+  const baseRemoveDelivered=window.removeDeliveredShortages;
+  if(typeof baseRemoveDelivered==='function'){
+    window.removeDeliveredShortages=function(deliveredItems,supplier){
+      const ids=(deliveredItems||[]).flatMap(item=>Array.isArray(item.shortageIds)?item.shortageIds:[]);
+      if(ids.length)updateShortages(ids,{urgentDeliveryState:'delivered',urgentDeliveredAt:Date.now(),updatedAt:Date.now(),updatedBy:user()}).catch(console.error);
+      return baseRemoveDelivered.apply(this,arguments);
+    };
+  }
+  function versionLabels(){
+    document.title='Stock Alert V7.29';
+    document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
+    const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
+  }
+  const style=document.createElement('style');
+  style.textContent=`
+    .workflowButtonsV728{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 6px}.workflowBtnV728{border:0;border-radius:16px;padding:13px 12px;text-align:left;color:white;box-shadow:0 10px 22px rgba(15,23,42,.12)}.workflowBtnV728 b,.workflowBtnV728 span{display:block}.workflowBtnV728 b{font-size:16px}.workflowBtnV728 span{font-size:12px;margin-top:4px;opacity:.9}.workflowBtnV728.status{background:linear-gradient(135deg,#0ea5e9,#14b8a6)}.workflowBtnV728.urgent{background:#F59E0B}.urgentToggleV728{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid #fed7aa;background:#fff7ed;border-radius:14px;color:#9a3412;font-weight:950}.urgentToggleV728 input{width:18px;height:18px}.urgentExtraV728{margin-top:10px;padding:12px;border:1px solid #fed7aa;background:#fffbeb;border-radius:16px}.urgentQtyGridV728{margin-top:0}.urgentDateWrapV728{position:relative}.urgentDateWrapV728.empty:not(.focused)::before{content:attr(data-placeholder);position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;font-size:16px;line-height:1;z-index:1}.urgentDateWrapV728 input{position:relative;background:#fff}.urgentDateWrapV728 input.dateEmptyV728:not(:focus){color:transparent}.urgentDateWrapV728 input.dateEmptyV728:not(:focus)::-webkit-datetime-edit{color:transparent}.urgentPaySegV728 button.active{background:#F59E0B!important;color:white!important}.statusSuggestionBox{display:none;gap:6px;flex-direction:column;margin-top:8px}.statusSuggestionBox.show{display:flex}.statusSuggestionBox button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:12px;padding:10px;text-align:left;font-weight:900}.statusResultV728 h3{margin:0 0 4px}.statusProductNameV728{font-size:20px;font-weight:950;line-height:1.35}.statusBadgeV728{display:inline-flex;margin-top:8px;border-radius:999px;padding:7px 11px;font-weight:950}.statusBadgeV728.ordered{background:#dcfce7;color:#166534}.statusBadgeV728.notOrdered{background:#fee2e2;color:#b91c1c}.deliveryDateRowV728{margin:10px 0 0}.deliveryDateActionV728{width:100%}.deliveryDateTextV728{margin-top:10px}.urgentCardV728 .statusRows{margin-top:12px}@media(max-width:370px){.workflowButtonsV728{grid-template-columns:1fr}.workflowBtnV728{padding:11px 12px}}`;
+  document.head.appendChild(style);
+  ensurePages();ensureHomeButtons();ensureFormUrgent();ensureDeliveryModal();versionLabels();
 })();
 </script>
 </body></html>

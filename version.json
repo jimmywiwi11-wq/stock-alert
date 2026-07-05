@@ -1,6 +1,6 @@
 {
-  "version": "7.27",
-  "label": "V7.27",
-  "releasedAt": "2026-06-28T00:00:00Z",
-  "message": "Fix shortage date grouping to use original created dates instead of edit/update dates."
+  "version": "7.29",
+  "label": "V7.29",
+  "releasedAt": "2026-07-04T00:00:00Z",
+  "message": "Split urgent customer quantity into quantity and unit fields and improve urgent date placeholder."
 }
