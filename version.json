@@ -1,7 +1,7 @@
 ﻿{
-  "version": "7.32",
-  "label": "V7.32",
+  "version": "7.33",
+  "label": "V7.33",
   "releasedAt": "2026-07-15T00:00:00Z",
-  "message": "Add unlimited dynamic product selling prices and expected delivery date tracking for orders and Product Status."
+  "message": "Stabilize Home navigation and lazy-load the Product/Price database."
 }
 
