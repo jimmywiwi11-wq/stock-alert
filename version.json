@@ -1,6 +1,7 @@
-{
-  "version": "7.29",
-  "label": "V7.29",
-  "releasedAt": "2026-07-04T00:00:00Z",
-  "message": "Split urgent customer quantity into quantity and unit fields and improve urgent date placeholder."
+﻿{
+  "version": "7.32",
+  "label": "V7.32",
+  "releasedAt": "2026-07-15T00:00:00Z",
+  "message": "Add unlimited dynamic product selling prices and expected delivery date tracking for orders and Product Status."
 }
+

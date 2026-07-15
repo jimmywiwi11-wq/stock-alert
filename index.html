@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.29</title>
+<title>Stock Alert V7.32</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.29</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.32</small></button><div class="search"><span class="mag">⌕</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">🔥</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">‹</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">‹</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.29</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.32</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1796,8 +1796,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.29';
-  const APP_VERSION_LABEL='V7.29';
+  const APP_VERSION='7.32';
+  const APP_VERSION_LABEL='V7.32';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3306,7 +3306,8 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   window.confirmPOOrder=confirmPOOrder=async function(){
     if(orderConfirmationInFlight)return toast('กำลังบันทึกคำสั่งซื้อนี้');
     const lines=collectPOLines();if(!lines.length)return toast('กรุณาใส่จำนวนสินค้าที่ต้องการสั่ง');
-    const supplier=currentPOSupplier||UNKNOWN_SUPPLIER,intent=pendingIntent(supplier,lines),order={id:'po_'+intent.orderAt+'_'+Math.random().toString(36).slice(2,6),confirmationKey:'confirm_'+intent.orderAt+'_'+shortHash(intent.signature),supplier,items:lines,orderAt:intent.orderAt,status:'ordered',by:nickname||'ไม่ระบุ'},button=document.querySelector('#poSupplierPage button[onclick="confirmPOOrder()"]');
+    const expectedDeliveryDate=String(document.getElementById('poExpectedDeliveryDateV732')?.value||'').trim();
+    const supplier=currentPOSupplier||UNKNOWN_SUPPLIER,intent=pendingIntent(supplier,lines),order={id:'po_'+intent.orderAt+'_'+Math.random().toString(36).slice(2,6),confirmationKey:'confirm_'+intent.orderAt+'_'+shortHash(intent.signature),supplier,items:lines,orderAt:intent.orderAt,status:'ordered',by:nickname||'ไม่ระบุ',expectedDeliveryDate},button=document.querySelector('#poSupplierPage button[onclick="confirmPOOrder()"]');
     orderConfirmationInFlight=true;setConfirmBusy(button,true);
     try{const result=await storeOrderAtomically(order);if(typeof window.afterSupplierOrderConfirmed==='function')await window.afterSupplierOrderConfirmed({order:result.order,created:result.created,lines,supplier});finishIntent(intent.signature);poManualItems[supplier]=[];if(typeof stockAlertHiddenPO!=='undefined')stockAlertHiddenPO[supplier]={};currentOrderSupplier=supplier;go('orderPage');toast(result.created?'บันทึกการสั่งสินค้าแล้ว':'คำสั่งซื้อนี้ถูกบันทึกแล้ว');}
     catch(error){console.error('Could not confirm supplier order',error);toast('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง');}
@@ -3330,7 +3331,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.29';if(versionBox)versionBox.textContent='V7.29';
+  if(versionSub)versionSub.textContent='V7.32';if(versionBox)versionBox.textContent='V7.32';
 })();
 </script>
 <script>
@@ -4268,7 +4269,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.29';
+  const APP_VERSION='V7.32';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4606,7 +4607,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.29';
+    document.title='Stock Alert V7.32';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -4616,5 +4617,554 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
   document.head.appendChild(style);
   ensurePages();ensureHomeButtons();ensureFormUrgent();ensureDeliveryModal();versionLabels();
 })();
+/* === V7.32 Product & Pricing Database === */
+(function(){
+  const UNKNOWN_CATEGORY='ยังไม่ระบุ';
+  const PRODUCT_COLL='stock_alert_beta1_products';
+  const PRODUCT_CACHE='stockAlertProductsV730';
+  const PRODUCT_FILTERS=['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด','เคมี','กันรั่ว กันซึม','น้ำมันต่างๆ','กาว',UNKNOWN_CATEGORY];
+  let products=readJSON(PRODUCT_CACHE,[]);
+  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null, productLongTimer=null;
+  function readJSON(keyName,def){try{return JSON.parse(localStorage.getItem(keyName)||JSON.stringify(def));}catch(e){return def;}}
+  function saveCache(){try{localStorage.setItem(PRODUCT_CACHE,JSON.stringify(products.slice(0,5000)));}catch(e){}}
+  function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function enc(value){return encodeURIComponent(String(value??''));}
+  function dec(value){return decodeURIComponent(String(value??''));}
+  function txt(value){return String(value??'').trim();}
+  function clean(value){return txt(value).toLowerCase().replace(/[\s\u200b\-_/.,()]+/g,'');}
+  function nowUser(){return nickname||localStorage.getItem('stockAlertNickname')||'ไม่ระบุ';}
+  function productId(name){return 'p_'+clean(name).replace(/[^\u0E00-\u0E7Fa-z0-9]/gi,'').slice(0,120);}
+  function display(value,unknown){const v=txt(value);return v?v:(unknown||'—');}
+  function ensureUnknownCategory(){
+    try{
+      if(!Array.isArray(categories))categories=[];
+      if(!categories.includes(UNKNOWN_CATEGORY)){
+        categories=[...categories,UNKNOWN_CATEGORY];
+        window.categories=categories;
+        localStorage.setItem('stockAlertCategories',JSON.stringify(categories));
+        if(online&&db&&typeof CATEGORIES!=='undefined')db.collection(CATEGORIES).doc('main').set({items:categories,updatedAt:Date.now()},{merge:true}).catch(()=>{});
+      }
+    }catch(e){}
+  }
+  function grams(value){const s=clean(value), out=new Set(); if(!s)return out; for(let i=0;i<s.length-1;i++)out.add(s.slice(i,i+2)); out.add(s); return out;}
+  function score(q,name){
+    const a=clean(q),b=clean(name); if(!a||!b)return 0; if(a===b)return 100; if(b.includes(a)||a.includes(b))return 92;
+    const A=grams(a),B=grams(b); let hit=0; A.forEach(x=>{if(B.has(x))hit++}); return Math.round((hit/Math.max(1,A.size+B.size-hit))*100);
+  }
+  function upsertLocal(product){
+    const id=product.id||productId(product.name);
+    const next={...product,id,search:clean(product.name),updatedAt:product.updatedAt||Date.now()};
+    const idx=products.findIndex(x=>String(x.id)===String(id)||clean(x.name)===clean(next.name));
+    if(idx>=0)products[idx]={...products[idx],...next}; else products.push(next);
+  }
+  function productFromShortage(item){
+    if(!item||!txt(item.name))return null;
+    const supplier=txt(item.supplier)==='ยังไม่ได้ระบุ'?'':txt(item.supplier);
+    return {id:productId(item.name),name:txt(item.name),cost:'',price:'',unit:txt(item.unit),category:txt(item.category)||UNKNOWN_CATEGORY,supplier,notes:'',source:'shortage',createdAt:item.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:item.updatedBy||item.createdBy||nowUser(),previousNames:[]};
+  }
+  async function saveProductRecord(product,historyEntry){
+    const localProduct=historyEntry?{...product,history:[...(product.history||[]),historyEntry]}:product;
+    upsertLocal(localProduct); saveCache();
+    if(online&&db){
+      const payload={...product,search:clean(product.name),updatedAt:Date.now(),updatedBy:nowUser()};
+      if(historyEntry)payload.history=firebase.firestore.FieldValue.arrayUnion(historyEntry);
+      await db.collection(PRODUCT_COLL).doc(payload.id).set(payload,{merge:true});
+    }
+  }
+  async function rememberProductFromShortage(item){
+    const product=productFromShortage(item); if(!product)return;
+    const existing=products.find(x=>String(x.id)===String(product.id)||clean(x.name)===clean(product.name));
+    const merged={...(existing||{}),...product,category:product.category||existing?.category||UNKNOWN_CATEGORY,unit:product.unit||existing?.unit||'',supplier:product.supplier||existing?.supplier||'',source:existing?.source||'shortage'};
+    try{await saveProductRecord(merged,null);}catch(e){console.warn('Product memory unavailable',e);}
+  }
+  function bootstrapProductsFromShortages(){
+    let changed=false;
+    (items||[]).forEach(item=>{const p=productFromShortage(item); if(p&&!products.some(x=>clean(x.name)===clean(p.name))){products.push(p); changed=true;}});
+    if(changed)saveCache();
+    if(online&&db)(items||[]).slice(0,150).forEach(item=>rememberProductFromShortage(item));
+  }
+  function listenProducts(){
+    if(productLoaded)return; productLoaded=true;
+    if(online&&db){
+      db.collection(PRODUCT_COLL).orderBy('updatedAt','desc').limit(1200).onSnapshot(snapshot=>{
+        snapshot.docs.forEach(doc=>upsertLocal({id:doc.id,...doc.data()}));
+        saveCache(); renderProductPage(); renderProductSuggestions();
+      },error=>console.warn('Product database sync unavailable',error));
+    }
+  }
+  async function remoteSearchProducts(q){
+    if(!online||!db||!q)return [];
+    const k=clean(q); if(!k)return [];
+    try{
+      const snap=await db.collection(PRODUCT_COLL).orderBy('search').startAt(k).endAt(k+'\uf8ff').limit(80).get();
+      const found=snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+      found.forEach(upsertLocal); saveCache();
+      return found;
+    }catch(e){return [];}
+  }
+  function rankedProducts(q){
+    let rows=products.slice();
+    if(productFilter)rows=rows.filter(p=>(txt(p.category)||UNKNOWN_CATEGORY)===productFilter);
+    if(q){
+      rows=rows.map(p=>({...p,_score:Math.max(score(q,p.name),...(p.previousNames||[]).map(n=>score(q,n)))})).filter(p=>p._score>=28).sort((a,b)=>b._score-a._score||String(a.name).localeCompare(String(b.name),'th'));
+    }else{
+      rows.sort((a,b)=>{
+        const av=txt(a[productSort]),bv=txt(b[productSort]);
+        if(productSort==='cost'||productSort==='price')return ((parseFloat(av)||0)-(parseFloat(bv)||0))*productSortDir;
+        return av.localeCompare(bv,'th')*productSortDir;
+      });
+    }
+    return rows;
+  }
+  function ensureProductUI(){
+    ensureUnknownCategory(); listenProducts();
+    const phone=document.querySelector('.phone')||document.body;
+    if(!document.getElementById('productDbPage')){
+      const page=document.createElement('section');
+      page.id='productDbPage'; page.className='page';
+      page.innerHTML=`<div class="pageHeader productDbHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">สินค้า / ราคา</h2><div class="smallTitle">ฐานข้อมูลสินค้าและประวัติราคา</div></div><button class="manageBtn productAddBtn" onclick="openProductEditor()">เพิ่มสินค้า</button></div><div class="card searchCard productSearchCard"><input class="input" id="productSearchInput" placeholder="ค้นหาสินค้า..." autocomplete="off" oninput="scheduleProductSearch()"><div id="productDidYouMean" class="productHintV730"></div></div><button class="categoryShortcut productFilterToggle" onclick="toggleProductFilters()"><div class="ico productDbIcon">${productIcon()}</div><div><b>แยกหมวดหมู่</b><div class="muted" id="productFilterLabel">ดูสินค้าตามหมวดหมู่</div></div></button><div id="productFilterBox" class="productFilterBox"></div><div id="productTableBox"></div>`;
+      phone.appendChild(page);
+    }
+    if(!document.getElementById('productEditorModal')){
+      const modal=document.createElement('div'); modal.id='productEditorModal'; modal.className='modal'; document.body.appendChild(modal);
+    }
+    if(!document.getElementById('productInfoModal')){
+      const modal=document.createElement('div'); modal.id='productInfoModal'; modal.className='modal'; document.body.appendChild(modal);
+    }
+    if(!document.getElementById('productMenuModal')){
+      const modal=document.createElement('div'); modal.id='productMenuModal'; modal.className='modal'; document.body.appendChild(modal);
+    }
+    const grid=document.getElementById('mainGrid');
+    if(grid&&!document.getElementById('productDbHomeTile')){
+      const tile=document.createElement('button');
+      tile.id='productDbHomeTile'; tile.className='productDbHomeButton'; tile.type='button'; tile.onclick=()=>go('productDbPage');
+      tile.innerHTML=`<div class="ico productDbIcon">${productIcon()}</div><div><b>สินค้า / ราคา</b><span>ฐานข้อมูลสินค้า ราคาทุน ราคาขาย และบริษัทผู้จำหน่าย</span></div>`;
+      grid.insertAdjacentElement('afterend',tile);
+    }
+  }
+  function productIcon(){return '<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M7 9h5M7 13h3M15 9h2M14 15c.8 1 2.6 1 3.4 0 .7-.9.1-1.8-1.2-2.1-1.4-.3-2-.9-1.3-1.8.8-1 2.5-1 3.2 0"/><path d="M16.5 8v10"/></svg>';}
+  window.toggleProductFilters=function(){
+    const box=document.getElementById('productFilterBox'); if(!box)return;
+    box.classList.toggle('show');
+    renderProductFilters();
+  };
+  function renderProductFilters(){
+    const box=document.getElementById('productFilterBox'), label=document.getElementById('productFilterLabel');
+    if(label)label.textContent=productFilter?productFilter:'ดูสินค้าตามหมวดหมู่';
+    if(!box)return;
+    box.innerHTML=`<button class="chip ${!productFilter?'active':''}" onclick="setProductFilter('')">ทั้งหมด</button>`+PRODUCT_FILTERS.map(c=>`<button class="chip ${productFilter===c?'active':''}" onclick="setProductFilter(decodeURIComponent('${enc(c)}'))">${esc(c)}</button>`).join('');
+  }
+  window.setProductFilter=function(cat){productFilter=cat; renderProductFilters(); renderProductPage();};
+  window.scheduleProductSearch=function(){
+    clearTimeout(productSearchTimer);
+    renderProductPage();
+    productSearchTimer=setTimeout(async()=>{const q=txt(document.getElementById('productSearchInput')?.value); if(q){await remoteSearchProducts(q); renderProductPage();}},220);
+  };
+  window.sortProducts=function(field){
+    if(productSort===field)productSortDir*=-1; else{productSort=field; productSortDir=1;}
+    renderProductPage();
+  };
+  function renderProductPage(){
+    const box=document.getElementById('productTableBox'); if(!box)return;
+    bootstrapProductsFromShortages();
+    const q=txt(document.getElementById('productSearchInput')?.value);
+    const rows=rankedProducts(q).slice(0,260);
+    const hint=document.getElementById('productDidYouMean');
+    if(hint){
+      const best=q?rankedProducts(q)[0]:null;
+      hint.innerHTML=best&&best._score>=55&&clean(best.name)!==clean(q)?`คุณหมายถึงสินค้านี้หรือไม่ <button onclick="chooseProductSearch(decodeURIComponent('${enc(best.name)}'))">${esc(best.name)}</button>`:'';
+    }
+    box.innerHTML=rows.length?`<div class="productTableV730"><div class="productRowV730 head"><button onclick="sortProducts('name')">ลำดับ</button><button onclick="sortProducts('name')">ชื่อสินค้า</button><button onclick="sortProducts('cost')">ราคาทุน</button><button onclick="sortProducts('price')">ราคาขาย</button><button onclick="sortProducts('unit')">หน่วย</button><button onclick="sortProducts('category')">หมวดหมู่</button><button onclick="sortProducts('supplier')">บริษัท</button></div>${rows.map((p,i)=>productRow(p,i)).join('')}</div><div class="muted productLimitNote">แสดง ${rows.length} รายการแรก${rankedProducts(q).length>rows.length?' จากผลลัพธ์ทั้งหมด ให้ค้นหาเพื่อเจาะจงสินค้า':''}</div>`:'<div class="empty">ยังไม่มีสินค้าในฐานข้อมูล</div>';
+  }
+  function productRow(p,i){
+    return `<div class="productRowV730" data-id="${esc(p.id)}" onpointerdown="startProductPress(decodeURIComponent('${enc(p.id)}'))" onpointerup="cancelProductPress()" onpointerleave="cancelProductPress()" ondblclick="openProductMenu(decodeURIComponent('${enc(p.id)}'))"><div>${i+1}</div><div class="productNameCell">${esc(p.name)}</div><div class="productCostValue">${esc(display(p.cost))}</div><div class="productPriceValue">${esc(display(p.price))}</div><div>${esc(display(p.unit))}</div><div>${esc(display(p.category,UNKNOWN_CATEGORY))}</div><div>${esc(display(p.supplier))}</div></div>`;
+  }
+  window.chooseProductSearch=function(name){const input=document.getElementById('productSearchInput'); if(input)input.value=name; renderProductPage();};
+  window.startProductPress=function(id){clearTimeout(productLongTimer); productLongTimer=setTimeout(()=>openProductMenu(id),520);};
+  window.cancelProductPress=function(){clearTimeout(productLongTimer);};
+  window.openProductMenu=function(id){
+    const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
+    const modal=document.getElementById('productMenuModal');
+    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="rowBtns"><button class="btn primary" style="flex:1" onclick="closeModal('productMenuModal');openProductEditor(decodeURIComponent('${enc(p.id)}'))">แก้ไข</button><button class="btn gray" style="flex:1" onclick="closeModal('productMenuModal');openProductInfo(decodeURIComponent('${enc(p.id)}'))">ข้อมูล</button></div><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productMenuModal')">ปิด</button></div>`;
+    modal.classList.add('show');
+  };
+  window.openProductEditor=function(id=''){
+    const p=products.find(x=>String(x.id)===String(id))||{};
+    const modal=document.getElementById('productEditorModal');
+    modal.innerHTML=`<div class="sheet"><h2>${id?'แก้ไขสินค้า':'เพิ่มสินค้า'}</h2><label>ชื่อสินค้า</label><input class="input" id="productEditName" value="${esc(p.name||'')}" placeholder="ชื่อสินค้า"><label>ราคาทุน</label><input class="input" id="productEditCost" inputmode="decimal" value="${esc(p.cost||'')}" placeholder="ราคาทุน"><label>ราคาขาย</label><input class="input" id="productEditPrice" inputmode="decimal" value="${esc(p.price||'')}" placeholder="ราคาขาย"><label>หน่วย</label><input class="input" id="productEditUnit" value="${esc(p.unit||'')}" placeholder="หน่วย"><label>หมวดหมู่</label><select id="productEditCategory">${PRODUCT_FILTERS.map(c=>`<option value="${esc(c)}" ${(p.category||UNKNOWN_CATEGORY)===c?'selected':''}>${esc(c)}</option>`).join('')}</select><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="productEditSupplier" value="${esc(p.supplier||'')}" placeholder="TOA / พูนกิจ / สุนทร / ดูโฮม"><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="productEditNotes" placeholder="Optional notes">${esc(p.notes||'')}</textarea><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProductEditor(decodeURIComponent('${enc(id)}'))">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productEditorModal')">ยกเลิก</button></div>`;
+    modal.classList.add('show');
+  };
+  window.saveProductEditor=async function(id=''){
+    const name=txt(document.getElementById('productEditName')?.value); if(!name)return toast('กรุณาใส่ชื่อสินค้า');
+    const old=products.find(x=>String(x.id)===String(id))||{};
+    const newId=id||productId(name);
+    const product={...old,id:newId,name,cost:txt(document.getElementById('productEditCost')?.value),price:txt(document.getElementById('productEditPrice')?.value),unit:txt(document.getElementById('productEditUnit')?.value),category:txt(document.getElementById('productEditCategory')?.value)||UNKNOWN_CATEGORY,supplier:txt(document.getElementById('productEditSupplier')?.value),notes:txt(document.getElementById('productEditNotes')?.value),source:old.source||'manual',createdAt:old.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:nowUser(),previousNames:[...new Set([...(old.previousNames||[]),old.name&&clean(old.name)!==clean(name)?old.name:''].filter(Boolean))]};
+    const history={at:Date.now(),by:nowUser(),oldCost:old.cost||'',newCost:product.cost||'',oldPrice:old.price||'',newPrice:product.price||'',oldCategory:old.category||'',newCategory:product.category||'',oldUnit:old.unit||'',newUnit:product.unit||'',oldSupplier:old.supplier||'',newSupplier:product.supplier||'',oldName:old.name||'',newName:product.name};
+    try{await saveProductRecord(product,history); closeModal('productEditorModal'); renderProductPage(); toast('บันทึกสินค้าแล้ว');}catch(e){console.error(e); toast('บันทึกสินค้าไม่สำเร็จ');}
+  };
+  window.openProductInfo=function(id){
+    const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
+    const history=(p.history||[]).slice().sort((a,b)=>(b.at||0)-(a.at||0));
+    const rows=history.length?history.map(h=>`<div class="item"><b>${esc(fmt(h.at))}</b><div class="muted">ผู้แก้ไข: ${esc(h.by||'-')}</div><div class="statusRows"><div class="statusRow"><span>ต้นทุน</span><span>${esc(display(h.oldCost))} → ${esc(display(h.newCost))}</span></div><div class="statusRow"><span>ราคาขาย</span><span>${esc(display(h.oldPrice))} → ${esc(display(h.newPrice))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(h.oldCategory,UNKNOWN_CATEGORY))} → ${esc(display(h.newCategory,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>หน่วย</span><span>${esc(display(h.oldUnit))} → ${esc(display(h.newUnit))}</span></div><div class="statusRow"><span>บริษัท</span><span>${esc(display(h.oldSupplier))} → ${esc(display(h.newSupplier))}</span></div></div></div>`).join(''):'<div class="empty">ยังไม่มีประวัติการแก้ไข</div>';
+    const modal=document.getElementById('productInfoModal');
+    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="statusRows"><div class="statusRow"><span>ราคาทุน</span><span class="productCostValue">${esc(display(p.cost))}</span></div><div class="statusRow"><span>ราคาขาย</span><span class="productPriceValue">${esc(display(p.price))}</span></div><div class="statusRow"><span>หน่วย</span><span>${esc(display(p.unit))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(p.category,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>บริษัท</span><span>${esc(display(p.supplier))}</span></div></div><div class="sectionTitle">ประวัติราคา / ข้อมูล</div>${rows}<button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productInfoModal')">ปิด</button></div>`;
+    modal.classList.add('show');
+  };
+  function renderProductSuggestions(){
+    const box=document.getElementById('productNameSuggestV730'), input=document.getElementById('nameInput');
+    if(!box||!input)return;
+    const q=txt(input.value); if(clean(q).length<2){box.innerHTML='';box.classList.remove('show');return;}
+    const matches=rankProductSuggestions(q).slice(0,5);
+    box.innerHTML=matches.length?`<div class="muted">คุณหมายถึงสินค้านี้หรือไม่</div>${matches.map(p=>`<button type="button" onclick="applyProductSuggestion(decodeURIComponent('${enc(p.name)}'))">${esc(p.name)}</button>`).join('')}`:'';
+    box.classList.toggle('show',!!matches.length);
+  }
+  function rankProductSuggestions(q){return products.map(p=>({...p,_score:Math.max(score(q,p.name),...(p.previousNames||[]).map(n=>score(q,n)))})).filter(p=>p._score>=45&&clean(p.name)!==clean(q)).sort((a,b)=>b._score-a._score);}
+  window.applyProductSuggestion=function(name){
+    const input=document.getElementById('nameInput'); if(input){input.value=name; input.focus();}
+    const p=products.find(x=>clean(x.name)===clean(name));
+    if(p){
+      currentCategory=p.category||UNKNOWN_CATEGORY; window.currentCategory=currentCategory; try{renderCategoryChips();}catch(e){}
+      const supplier=document.getElementById('supplierInput'); if(supplier&&p.supplier)supplier.value=p.supplier;
+    }
+    const box=document.getElementById('productNameSuggestV730'); if(box)box.classList.remove('show');
+  };
+  function bindProductNameMemory(){
+    const input=document.getElementById('nameInput'); if(!input||input.dataset.productMemoryV730==='1')return;
+    input.dataset.productMemoryV730='1';
+    let timer=null;
+    input.insertAdjacentHTML('afterend','<div id="productNameSuggestV730" class="productNameSuggestV730"></div>');
+    input.addEventListener('input',()=>{clearTimeout(timer); timer=setTimeout(renderProductSuggestions,120);});
+    input.addEventListener('focus',renderProductSuggestions);
+    input.addEventListener('blur',()=>setTimeout(()=>document.getElementById('productNameSuggestV730')?.classList.remove('show'),180));
+  }
+  const baseOpenForm=window.openForm||openForm;
+  window.openForm=openForm=function(){ensureUnknownCategory(); const result=baseOpenForm.apply(this,arguments); setTimeout(bindProductNameMemory,50); return result;};
+  const baseSaveItem=window.saveItem||saveItem;
+  window.saveItem=saveItem=async function(){
+    const beforeName=txt(document.getElementById('nameInput')?.value);
+    const result=await baseSaveItem.apply(this,arguments);
+    if(!beforeName||document.getElementById('formPage')?.classList.contains('active'))return result;
+    const item={name:beforeName,unit:txt(document.getElementById('unitInput')?.value),category:currentCategory||UNKNOWN_CATEGORY,updatedBy:nowUser(),updatedAt:Date.now()};
+    rememberProductFromShortage(item);
+    return result;
+  };
+  const baseGo=window.go||go;
+  window.go=go=function(id){ensureProductUI(); const result=baseGo.apply(this,arguments); if(id==='productDbPage'){renderProductFilters(); renderProductPage(); document.getElementById('productSearchInput')?.focus();} return result;};
+  const baseRenderAll=window.renderAll||renderAll;
+  window.renderAll=renderAll=function(){ensureUnknownCategory(); const result=baseRenderAll.apply(this,arguments); ensureProductUI(); if(document.getElementById('productDbPage')?.classList.contains('active'))renderProductPage(); return result;};
+  const baseRenderCategoryChips=window.renderCategoryChips||renderCategoryChips;
+  window.renderCategoryChips=renderCategoryChips=function(){ensureUnknownCategory(); return baseRenderCategoryChips.apply(this,arguments);};
+  const css=document.createElement('style');
+  css.textContent=`.productDbIcon{background:#14532d}.productDbHomeButton{width:100%;border:0;border-radius:18px;margin:14px 0 6px;padding:16px 15px;display:flex;align-items:center;gap:14px;text-align:left;background:linear-gradient(135deg,#14532d,#166534);color:#fff;box-shadow:0 12px 26px rgba(20,83,45,.22);cursor:pointer}.productDbHomeButton:active{transform:scale(.985)}.productDbHomeButton .ico{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.16);box-shadow:none;flex:0 0 auto}.productDbHomeButton b{display:block;font-size:19px;line-height:1.15}.productDbHomeButton span{display:block;font-size:12px;font-weight:850;line-height:1.35;margin-top:4px;opacity:.9}.productDbHeader{position:relative}.productAddBtn{right:0;top:0}.productFilterToggle{width:100%;border:1px solid #edf2f7;text-align:left}.productFilterBox{display:none;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.productFilterBox.show{display:flex}.productHintV730{margin-top:8px;font-weight:900;color:#53627a}.productHintV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:999px;padding:7px 10px;font-weight:900}.productTableV730{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;max-height:62vh;box-shadow:0 5px 16px rgba(17,44,84,.05)}.productRowV730{display:grid;grid-template-columns:46px minmax(140px,1.5fr) 82px 82px 72px 116px 110px;gap:8px;align-items:center;min-width:770px;padding:11px 12px;border-bottom:1px solid var(--line);font-weight:850}.productRowV730:last-child{border-bottom:0}.productRowV730.head{position:sticky;top:0;background:#eef5ff;color:#0b4ab8;z-index:1}.productRowV730.head button{border:0;background:transparent;color:inherit;text-align:left;font-weight:950;padding:0}.productNameCell{overflow-wrap:anywhere;line-height:1.25}.productCostValue{color:#1d4ed8;font-weight:950}.productPriceValue{color:#15803d;font-weight:950}.productLimitNote{text-align:center}.productNameSuggestV730{display:none;flex-direction:column;gap:7px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:6px;box-shadow:0 10px 22px rgba(15,23,42,.10)}.productNameSuggestV730.show{display:flex}.productNameSuggestV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:12px;padding:10px;text-align:left;font-weight:900}@media(max-width:370px){.productAddBtn{position:static;margin-left:auto}.productDbHeader{align-items:flex-start}.productRowV730{grid-template-columns:38px minmax(120px,1.5fr) 72px 72px 62px 104px 100px;font-size:13px}.productDbHomeButton{padding:14px 13px}.productDbHomeButton b{font-size:18px}}`;
+  document.head.appendChild(css);
+  function normalizeSellingPrices(product){
+    const rows=Array.isArray(product?.sellingPrices)?product.sellingPrices:[];
+    const primary=rows.find(row=>row&&row.isPrimary)||{};
+    const mainPrice=txt(product?.price||primary.price);
+    const mainUnit=txt(product?.unit||primary.unit);
+    const legacyExtras=Array.isArray(product?.additionalPrices)?product.additionalPrices:[];
+    const extras=[...rows.filter(row=>row&&!row.isPrimary),...legacyExtras].filter(row=>txt(row.price)||txt(row.unit)).map(row=>({price:txt(row.price),unit:txt(row.unit),isPrimary:false}));
+    return {mainPrice,mainUnit,extras};
+  }
+  function collectSellingPrices(){
+    const mainPrice=txt(document.getElementById('productEditPrice')?.value);
+    const mainUnit=txt(document.getElementById('productEditUnit')?.value);
+    const extras=[...document.querySelectorAll('.extraPriceBlockV732')].map(block=>({price:txt(block.querySelector('.extraPriceInputV732')?.value),unit:txt(block.querySelector('.extraUnitInputV732')?.value),isPrimary:false})).filter(row=>row.price||row.unit);
+    return [{price:mainPrice,unit:mainUnit,isPrimary:true},...extras];
+  }
+  function splitPriceUnit(value){
+    const raw=String(value||'').trim();
+    const match=raw.match(/^([0-9]+(?:[.,][0-9]+)?)(?:\s*)(.*)$/);
+    if(!match)return {price:raw,unit:''};
+    return {price:match[1],unit:(match[2]||'').trim()};
+  }
+  function bindPriceUnit(priceInput,unitInput){
+    if(!priceInput||!unitInput||priceInput.dataset.priceUnitV732==='1')return;
+    priceInput.dataset.priceUnitV732='1';
+    function apply(){
+      const parts=splitPriceUnit(priceInput.value);
+      if(parts.unit){
+        priceInput.value=parts.price;
+        unitInput.value=parts.unit;
+        setTimeout(()=>{try{unitInput.focus();unitInput.setSelectionRange(unitInput.value.length,unitInput.value.length);}catch(e){}},0);
+      }
+    }
+    priceInput.addEventListener('input',apply);
+    priceInput.addEventListener('keyup',apply);
+    priceInput.addEventListener('compositionend',apply);
+    priceInput.addEventListener('paste',()=>setTimeout(apply,0));
+  }
+  function renderExtraPriceEditor(rows){
+    const box=document.getElementById('extraPricesEditorV732'); if(!box)return;
+    rows=Array.isArray(rows)?rows:[];
+    box.innerHTML=rows.map((row,index)=>`<div class="extraPriceBlockV732"><div class="extraPriceHeadV732"><b>ราคา ${index+2}</b><button type="button" class="removeMini" onclick="removeExtraPriceV732(${index})">ลบ</button></div><label>ราคา</label><input class="input extraPriceInputV732" inputmode="decimal" value="${esc(row.price||'')}" placeholder="ราคา"><label>หน่วย</label><input class="input extraUnitInputV732" value="${esc(row.unit||'')}" placeholder="เมตร / เส้น / มัด / กล่อง"></div>`).join('')+`<button type="button" class="btn gray addPriceBtnV732" onclick="addExtraPriceV732()">+ ราคา ${rows.length+2}</button>`;
+    [...box.querySelectorAll('.extraPriceBlockV732')].forEach(block=>bindPriceUnit(block.querySelector('.extraPriceInputV732'),block.querySelector('.extraUnitInputV732')));
+  }
+  window.addExtraPriceV732=function(){
+    const rows=collectSellingPrices().slice(1);
+    rows.push({price:'',unit:'',isPrimary:false});
+    renderExtraPriceEditor(rows);
+  };
+  window.removeExtraPriceV732=function(index){
+    if(!confirm('ลบราคานี้ใช่ไหม?'))return;
+    const rows=collectSellingPrices().slice(1).filter((_,i)=>i!==index);
+    renderExtraPriceEditor(rows);
+  };
+  const baseOpenProductEditorV732=window.openProductEditor;
+  window.openProductEditor=function(id=''){
+    baseOpenProductEditorV732(id);
+    setTimeout(()=>{
+      const p=products.find(x=>String(x.id)===String(id))||{};
+      const normalized=normalizeSellingPrices(p);
+      const price=document.getElementById('productEditPrice'), unit=document.getElementById('productEditUnit');
+      if(price&&!price.value&&normalized.mainPrice)price.value=normalized.mainPrice;
+      if(unit&&!unit.value&&normalized.mainUnit)unit.value=normalized.mainUnit;
+      bindPriceUnit(price,unit);
+      if(!document.getElementById('extraPricesEditorV732')){
+        unit?.insertAdjacentHTML('afterend','<div id="extraPricesEditorV732" class="extraPricesEditorV732"></div>');
+      }
+      renderExtraPriceEditor(normalized.extras);
+    },0);
+  };
+  const baseSaveProductEditorV732=window.saveProductEditor;
+  window.saveProductEditor=async function(id=''){
+    const old=products.find(x=>String(x.id)===String(id))||{};
+    const prices=collectSellingPrices();
+    await baseSaveProductEditorV732(id);
+    const name=txt(document.getElementById('productEditName')?.value);
+    const target=products.find(x=>String(x.id)===String(id))||products.find(x=>clean(x.name)===clean(name));
+    if(target){
+      target.sellingPrices=prices;
+      target.price=prices[0]?.price||target.price||'';
+      target.unit=prices[0]?.unit||target.unit||'';
+      const history={at:Date.now(),by:nowUser(),oldSellingPrices:normalizeSellingPrices(old),newSellingPrices:normalizeSellingPrices(target),type:'sellingPrices'};
+      await saveProductRecord(target,history);
+    }
+  };
+  const baseOpenProductInfoV732=window.openProductInfo;
+  window.openProductInfo=function(id){
+    baseOpenProductInfoV732(id);
+    setTimeout(()=>{
+      const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
+      const modal=document.getElementById('productInfoModal'), sheet=modal?.querySelector('.sheet'); if(!sheet)return;
+      const normalized=normalizeSellingPrices(p);
+      const extras=normalized.extras.filter(row=>txt(row.price)||txt(row.unit));
+      if(extras.length&&!sheet.querySelector('.extraPricesInfoV732')){
+        const html=`<div class="sectionTitle extraPricesInfoV732">ราคาขายเพิ่มเติม</div>${extras.map((row,index)=>`<div class="miniItem"><b>ราคา ${index+2}</b><span class="meta">${esc(display(row.price))} บาท / ${esc(display(row.unit))}</span></div>`).join('')}`;
+        const historyTitle=[...sheet.querySelectorAll('.sectionTitle')].find(el=>/ประวัติ/.test(el.textContent||''));
+        if(historyTitle)historyTitle.insertAdjacentHTML('beforebegin',html); else sheet.insertAdjacentHTML('beforeend',html);
+      }
+      if(p.notes&&!sheet.querySelector('.productNotesInfoV732')){
+        const rows=sheet.querySelector('.statusRows');
+        rows?.insertAdjacentHTML('beforeend',`<div class="statusRow productNotesInfoV732"><span>หมายเหตุ</span><span>${esc(p.notes)}</span></div>`);
+      }
+      const priceHistory=(p.history||[]).filter(entry=>entry&&entry.type==='sellingPrices'&&entry.newSellingPrices);
+      if(priceHistory.length&&!sheet.querySelector('.priceHistoryInfoV732')){
+        function priceSummary(snapshot){
+          const main=snapshot?.mainPrice||'', unit=snapshot?.mainUnit||'', extras=snapshot?.extras||[];
+          const lines=[main||unit?`หลัก: ${display(main)} บาท / ${display(unit)}`:''];
+          extras.forEach((row,index)=>lines.push(`ราคา ${index+2}: ${display(row.price)} บาท / ${display(row.unit)}`));
+          return lines.filter(Boolean).map(esc).join('<br>');
+        }
+        const html=`<div class="sectionTitle priceHistoryInfoV732">ประวัติราคาขายเพิ่มเติม</div>${priceHistory.slice().sort((a,b)=>(b.at||0)-(a.at||0)).map(entry=>`<div class="item"><b>${esc(fmt(entry.at))}</b><div class="muted">ผู้แก้ไข: ${esc(entry.by||'-')}</div><div class="muted">เดิม:<br>${priceSummary(entry.oldSellingPrices)||'—'}</div><div class="muted">ใหม่:<br>${priceSummary(entry.newSellingPrices)||'—'}</div></div>`).join('')}`;
+        const closeBtn=[...sheet.querySelectorAll('button')].find(button=>(button.getAttribute('onclick')||'').includes('productInfoModal'));
+        if(closeBtn)closeBtn.insertAdjacentHTML('beforebegin',html); else sheet.insertAdjacentHTML('beforeend',html);
+      }
+      const rows=sheet.querySelector('.statusRows');
+      if(rows&&!sheet.querySelector('.productUpdatedInfoV732'))rows.insertAdjacentHTML('beforeend',`<div class="statusRow productUpdatedInfoV732"><span>แก้ไขล่าสุด</span><span>${esc(fmt(p.updatedAt||p.createdAt))} ${p.updatedBy?`โดย ${esc(p.updatedBy)}`:''}</span></div>`);
+    },0);
+  };
+  const styleV732=document.createElement('style');
+  styleV732.textContent='.extraPricesEditorV732{margin-top:12px}.extraPriceBlockV732{border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:#f8fbff}.extraPriceHeadV732{display:flex;justify-content:space-between;align-items:center}.addPriceBtnV732{width:100%;margin-top:8px}.extraPricesInfoV732{margin-top:14px}';
+  document.head.appendChild(styleV732);
+  window.StockAlertProducts={rememberProductFromShortage,remoteSearchProducts,list:()=>products.slice(),normalizeSellingPrices};
+  ensureProductUI();
+})();
+/* === V7.32 dynamic prices and delivery-status follow-up === */
+(function(){
+  function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function text(value){return String(value??'').trim();}
+  function key(value){try{return typeof norm==='function'?norm(value):text(value).toLowerCase().replace(/[\s\-_/.,()]+/g,'');}catch(e){return text(value).toLowerCase().replace(/[\s\-_/.,()]+/g,'');}}
+  function sameName(a,b){return key(a)===key(b);}
+  function asTime(value){return value&&typeof value.toMillis==='function'?value.toMillis():Number(value||0);}
+  function userName(){return nickname||localStorage.getItem('stockAlertNickname')||'ไม่ระบุ';}
+  function todayInput(value){if(!value)return '';const d=new Date(String(value).includes('-')?`${value}T00:00:00`:Number(value));return Number.isNaN(d.getTime())?String(value):`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  function dateText(value){const input=todayInput(value);if(!input)return '';const [y,m,d]=input.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});}
+  function bangkokDateKey(date=new Date()){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(date);}
+  function overdueDays(value){
+    const expected=todayInput(value); if(!expected)return 0;
+    const today=bangkokDateKey();
+    const [ey,em,ed]=expected.split('-').map(Number), [ty,tm,td]=today.split('-').map(Number);
+    return Math.max(0,Math.round((Date.UTC(ty,tm-1,td)-Date.UTC(ey,em-1,ed))/86400000));
+  }
+  function orderLineIds(order){return (order?.items||[]).flatMap(item=>Array.isArray(item.shortageIds)?item.shortageIds.map(String):[]);}
+  function orderLineFor(order,name,id){
+    return (order?.items||[]).find(line=>Array.isArray(line.shortageIds)&&line.shortageIds.map(String).includes(String(id)))||
+      (order?.items||[]).find(line=>sameName(line.name,name));
+  }
+  async function saveOrders(){
+    if(typeof persistOrders==='function')persistOrders();
+    else{
+      localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders||[]));
+      if(online&&db&&typeof ORDERS!=='undefined')await db.collection(ORDERS).doc('main').set({items:purchaseOrders,updatedAt:Date.now()},{merge:true});
+      try{renderAll();}catch(e){}
+    }
+  }
+  async function updateShortageExpectedForOrder(order,value){
+    const ids=[...new Set(orderLineIds(order))];
+    if(!ids.length)return;
+    items.forEach(item=>{if(ids.includes(String(item.id))){item.expectedDeliveryDate=value;item.updatedAt=Date.now();item.updatedBy=userName();}});
+    try{localStorage.setItem(COLLECTION,JSON.stringify(items||[]));}catch(e){}
+    if(online&&db&&typeof COLLECTION!=='undefined'){
+      for(const id of ids){
+        try{await db.collection(COLLECTION).doc(id).set({expectedDeliveryDate:value,updatedAt:Date.now(),updatedBy:userName()},{merge:true});}catch(e){}
+      }
+    }
+  }
+  function ensurePOExpectedDateField(){
+    const panel=document.querySelector('#poItemsBox .poPanel');
+    const confirmBtn=document.querySelector('#poItemsBox button[onclick="confirmPOOrder()"]');
+    if(!panel||!confirmBtn||document.getElementById('poExpectedDeliveryDateV732'))return;
+    confirmBtn.insertAdjacentHTML('beforebegin',`<div class="expectedDeliveryFieldV732"><label>วันที่คาดว่าจะมาส่ง <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="poExpectedDeliveryDateV732" type="date"></div>`);
+  }
+  const baseRenderPOSupplierV732=window.renderPOSupplier||renderPOSupplier;
+  window.renderPOSupplier=renderPOSupplier=function(){
+    const result=baseRenderPOSupplierV732.apply(this,arguments);
+    setTimeout(ensurePOExpectedDateField,0);
+    return result;
+  };
+  function ensureDeliveryRemoveButton(order){
+    const sheet=document.querySelector('#deliveryDateModalV728 .sheet');
+    if(!sheet||document.getElementById('removeExpectedDeliveryDateV732'))return;
+    const cancel=sheet.querySelector('button.btn.gray');
+    const html=`<button id="removeExpectedDeliveryDateV732" class="btn danger" style="width:100%;margin-top:8px;display:${order?.expectedDeliveryDate?'block':'none'}" onclick="removeExpectedDeliveryDateV732()">ลบวันมาส่ง</button>`;
+    if(cancel)cancel.insertAdjacentHTML('beforebegin',html); else sheet.insertAdjacentHTML('beforeend',html);
+  }
+  let editingOrderId='';
+  const baseOpenDeliveryDateDialogV732=window.openDeliveryDateDialogV728;
+  window.openDeliveryDateDialogV728=function(orderId){
+    editingOrderId=String(orderId||'');
+    const result=baseOpenDeliveryDateDialogV732?baseOpenDeliveryDateDialogV732.apply(this,arguments):undefined;
+    const order=(purchaseOrders||[]).find(entry=>String(entry.id)===editingOrderId);
+    setTimeout(()=>{
+      ensureDeliveryRemoveButton(order);
+      const title=document.getElementById('deliveryDateTitleV728'); if(title)title.textContent=order?.expectedDeliveryDate?'แก้ไขวันมาส่ง':'ระบุวันมาส่ง';
+    },0);
+    return result;
+  };
+  window.removeExpectedDeliveryDateV732=async function(){
+    const order=(purchaseOrders||[]).find(entry=>String(entry.id)===editingOrderId);
+    if(!order)return;
+    if(!confirm('ลบวันที่คาดว่าจะมาส่งใช่ไหม?'))return;
+    order.expectedDeliveryDate='';
+    order.updatedAt=Date.now();
+    order.updatedBy=userName();
+    await saveOrders();
+    await updateShortageExpectedForOrder(order,'');
+    closeModal('deliveryDateModalV728');
+    try{renderOrderSupplier();}catch(e){}
+    toast('ลบวันมาส่งแล้ว');
+  };
+  const baseSaveDeliveryV732=window.saveExpectedDeliveryDateV728;
+  window.saveExpectedDeliveryDateV728=async function(){
+    const result=baseSaveDeliveryV732?await baseSaveDeliveryV732.apply(this,arguments):undefined;
+    try{renderOrderSupplier();}catch(e){}
+    return result;
+  };
+  const baseRenderOrderSupplierV732=window.renderOrderSupplier||renderOrderSupplier;
+  window.renderOrderSupplier=renderOrderSupplier=function(){
+    const result=baseRenderOrderSupplierV732.apply(this,arguments);
+    setTimeout(()=>{
+      const supplier=currentOrderSupplier||'';
+      const cards=[...document.querySelectorAll('#orderSupplierBox .batchCard')];
+      const orders=(purchaseOrders||[]).filter(order=>(order.supplier||'ไม่ระบุบริษัท')===supplier&&order.status!=='delivered').sort((a,b)=>asTime(b.orderAt)-asTime(a.orderAt));
+      cards.forEach((card,index)=>{
+        const order=orders[index]; if(!order)return;
+        card.querySelectorAll('.deliveryDateTextV728').forEach(el=>el.remove());
+        const head=card.querySelector('.batchHead > div')||card;
+        const days=overdueDays(order.expectedDeliveryDate);
+        const dateLine=order.expectedDeliveryDate?`<div class="muted deliveryDateTextV728">คาดว่าจะมาส่ง: ${esc(dateText(order.expectedDeliveryDate))}</div>${days>0?`<div class="overdueDeliveryV732">เลยกำหนดส่งแล้ว ${days} วัน</div>`:''}`:`<div class="muted deliveryDateTextV728">ยังไม่ระบุวันมาส่ง</div>`;
+        head.insertAdjacentHTML('beforeend',dateLine);
+        const btn=card.querySelector('.deliveryDateActionV728');
+        if(btn)btn.textContent=order.expectedDeliveryDate?'แก้ไขวันมาส่ง':'ระบุวันมาส่ง';
+      });
+    },0);
+    return result;
+  };
+  function productDbNames(){
+    try{return (window.StockAlertProducts?.list?.()||[]).map(product=>product.name).filter(Boolean);}catch(e){return [];}
+  }
+  function catalogProductsV732(){
+    const map=new Map();
+    function add(name){name=text(name);if(!name)return;const k=key(name);if(!map.has(k))map.set(k,name);}
+    (items||[]).forEach(item=>add(item.name));
+    (purchaseOrders||[]).forEach(order=>(order.items||[]).forEach(line=>add(line.name)));
+    (deliveryHistory||[]).forEach(row=>[...(row.deliveredItems||[]),...(row.missingItems||[])].forEach(line=>add(line.name)));
+    productDbNames().forEach(add);
+    return [...map.values()].sort((a,b)=>a.localeCompare(b,'th'));
+  }
+  function productScore(query,name){
+    const q=key(query),n=key(name);if(!q||!n)return 0;if(q===n)return 100;if(n.includes(q))return 90;if(q.includes(n))return 70;
+    let hit=0;for(const ch of q){if(n.includes(ch))hit++;}
+    return Math.round((hit/Math.max(q.length,n.length))*60);
+  }
+  window.renderStatusSuggestions=function(){
+    const q=text(document.getElementById('statusSearchInput')?.value),box=document.getElementById('statusSuggestionBox');
+    if(!box)return;
+    if(!q){box.innerHTML='';box.classList.remove('show');const result=document.getElementById('productStatusBox');if(result)result.innerHTML='';return;}
+    const matches=catalogProductsV732().map(name=>({name,score:productScore(q,name)})).filter(row=>row.score>=35).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name,'th')).slice(0,8);
+    box.innerHTML=matches.map(match=>`<button type="button" onclick="selectProductStatusV728('${encodeURIComponent(match.name)}')">${esc(match.name)}</button>`).join('');
+    box.classList.toggle('show',matches.length>0);
+  };
+  window.selectProductStatusV728=function(encodedName){
+    const name=decodeURIComponent(encodedName);
+    const input=document.getElementById('statusSearchInput'); if(input)input.value=name;
+    const sugg=document.getElementById('statusSuggestionBox'); if(sugg){sugg.innerHTML='';sugg.classList.remove('show');}
+    renderProductStatusV732(name);
+  };
+  function renderProductStatusV732(name){
+    const box=document.getElementById('productStatusBox'); if(!box)return;
+    const shortage=(items||[]).find(item=>sameName(item.name,name));
+    const activeOrders=(purchaseOrders||[]).filter(order=>order.status!=='delivered'&&(order.items||[]).some(line=>sameName(line.name,name)||Array.isArray(line.shortageIds)&&shortage&&line.shortageIds.map(String).includes(String(shortage.id)))).sort((a,b)=>asTime(b.orderAt)-asTime(a.orderAt));
+    const activeOrder=activeOrders[0];
+    const line=orderLineFor(activeOrder,name,shortage?.id);
+    if(activeOrder){
+      const delivery=activeOrder.expectedDeliveryDate||shortage?.expectedDeliveryDate||'';
+      const days=overdueDays(delivery);
+      box.innerHTML=`<div class="batchCard statusResultV728"><h3>สินค้า:</h3><div class="statusProductNameV728">${esc(name)}</div><div class="sectionTitle">สถานะ</div><div class="statusBadgeV728 ordered">สั่งแล้ว</div>${days>0?`<div class="overdueDeliveryV732 statusOverdueV732">เลยกำหนดส่งแล้ว ${days} วัน</div>`:''}<div class="statusRows"><div class="statusRow"><span>บริษัทผู้จำหน่าย</span><span>${esc(activeOrder.supplier||shortage?.orderedSupplier||'-')}</span></div><div class="statusRow"><span>วันที่สั่ง</span><span>${esc(fmt(activeOrder.orderAt))}</span></div><div class="statusRow"><span>จำนวนที่สั่ง</span><span>${esc(line?.qty||'-')} ${esc(line?.unit||'')}</span></div><div class="statusRow"><span>ผู้ยืนยันสั่ง</span><span>${esc(activeOrder.by||shortage?.orderedBy||'-')}</span></div>${delivery?`<div class="statusRow"><span>คาดว่าจะมาส่ง</span><span>${esc(dateText(delivery))}</span></div>`:''}</div></div>`;
+      return;
+    }
+    box.innerHTML=`<div class="batchCard statusResultV728"><h3>สินค้า:</h3><div class="statusProductNameV728">${esc(name)}</div><div class="sectionTitle">สถานะ</div><div class="statusBadgeV728 notOrdered">ยังไม่ได้สั่ง</div><div class="muted" style="margin-top:12px">${shortage?'รายละเอียด: อยู่ในรายการของขาด':'ไม่พบในรายการของขาดตอนนี้'}</div></div>`;
+  }
+  const baseGoV732=window.go||go;
+  window.go=go=function(id){
+    const result=baseGoV732.apply(this,arguments);
+    if(id==='poSupplierPage')setTimeout(ensurePOExpectedDateField,0);
+    if(id==='productStatusPage'){
+      const selected=text(document.getElementById('statusSearchInput')?.value);
+      if(selected)renderProductStatusV732(selected);
+    }
+    return result;
+  };
+  const baseDeliveredArchiveV732=window.deliveredArchive||deliveredArchive;
+  window.deliveredArchive=deliveredArchive=function(supplier,deliveredItems,missingItems,orderAt,orderId){
+    const order=(purchaseOrders||[]).find(entry=>String(entry.id)===String(orderId));
+    const result=baseDeliveredArchiveV732.apply(this,arguments);
+    if(order?.expectedDeliveryDate){
+      const entry=(deliveryHistory||[]).find(row=>String(row.orderId)===String(orderId));
+      if(entry&&!entry.expectedDeliveryDate){
+        entry.expectedDeliveryDate=order.expectedDeliveryDate;
+        try{localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory||[]));}catch(e){}
+      }
+    }
+    return result;
+  };
+  const css=document.createElement('style');
+  css.textContent='.expectedDeliveryFieldV732{margin:12px 0}.overdueDeliveryV732{display:inline-block;margin-top:8px;border-radius:999px;background:#ffedd5;color:#c2410c;font-weight:950;padding:7px 10px}.statusOverdueV732{margin-bottom:8px}.deliveryDateTextV728+.deliveryDateTextV728{display:none}';
+  document.head.appendChild(css);
+})();
 </script>
 </body></html>
+
+
+
