@@ -1,7 +1,6 @@
-﻿{
-  "version": "7.33",
-  "label": "V7.33",
-  "releasedAt": "2026-07-15T00:00:00Z",
-  "message": "Stabilize Home navigation and lazy-load the Product/Price database."
+{
+  "version": "7.36",
+  "label": "V7.36",
+  "releasedAt": "2026-07-16T00:00:00Z",
+  "message": "Verify and harden transfer-to-shortage synchronization."
 }
-
