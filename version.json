@@ -1,6 +1,6 @@
 {
-  "version": "7.41",
-  "label": "V7.41",
+  "version": "7.42",
+  "label": "V7.42",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Refine custom cost-code glyph stroke weight."
+  "message": "Darken Product/Price table cost-code color."
 }
