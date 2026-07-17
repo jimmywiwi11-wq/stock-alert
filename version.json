@@ -1,6 +1,6 @@
 {
-  "version": "7.44",
-  "label": "V7.44",
+  "version": "7.45",
+  "label": "V7.45",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Restore whole-app Firebase synchronization."
+  "message": "Add Firebase diagnostic instrumentation."
 }
