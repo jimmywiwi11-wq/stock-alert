@@ -1,6 +1,6 @@
 {
-  "version": "7.38",
-  "label": "V7.38",
+  "version": "7.41",
+  "label": "V7.41",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Replace Product/Price long press with quick detail buttons and usage history."
+  "message": "Refine custom cost-code glyph stroke weight."
 }

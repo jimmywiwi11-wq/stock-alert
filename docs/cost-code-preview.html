@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cost Code Glyph Preview</title>
+<style>
+  body{margin:0;padding:24px;background:#f8fafc;color:#0f172a;font-family:Arial,sans-serif}
+  h1,h2{margin:0 0 12px}
+  section{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:0 0 16px}
+  .glyphRow,.digitRow,.code{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .glyphCard{display:flex;flex-direction:column;align-items:center;gap:6px;color:#111827}
+  .glyphId{font-size:11px;color:#64748b}
+  .costGlyphSvg{width:34px;height:44px;overflow:visible;color:#111827}
+  .costGlyphSvg path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+  .digitRow span{font-size:44px;line-height:1;border-bottom:1px solid #94a3b8}
+  .keypad{display:grid;gap:8px;max-width:360px}
+  .keyRow{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px}
+  button{height:58px;border:1px solid #dbe3ef;border-radius:10px;background:#fff;color:#0b2a60}
+  button .costGlyphSvg{width:34px;height:40px}
+  .table{overflow:auto;border:1px solid #e5e7eb;border-radius:10px}
+  .row{display:grid;grid-template-columns:44px minmax(160px,1.5fr) 86px 112px 72px 116px 110px;gap:8px;align-items:center;min-width:760px;padding:9px 12px;border-bottom:1px solid #e5e7eb;font-weight:700}
+  .head{background:#eef5ff;color:#0b4ab8}
+  .price{color:#15803d}.cost{color:#1d4ed8}
+</style>
+</head>
+<body>
+<h1>Cost Code Glyph Preview</h1>
+<section>
+  <h2>All 12 Glyphs</h2>
+  <div class="glyphRow" id="allGlyphs"></div>
+</section>
+<section>
+  <h2>Height Beside Digits</h2>
+  <div class="digitRow"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="code" id="digitGlyphs"></span></div>
+</section>
+<section>
+  <h2>Custom Keypad</h2>
+  <div class="keypad" id="keypad"></div>
+</section>
+<section>
+  <h2>Example Product Table Row</h2>
+  <div class="table">
+    <div class="row head"><div></div><div>ชื่อสินค้า</div><div>ราคาขาย</div><div>ราคาทุน</div><div>หน่วย</div><div>หมวดหมู่</div><div>บริษัท</div></div>
+    <div class="row"><div><button>...</button></div><div>สายไฟ VAF 2x1.5</div><div class="price">25</div><div class="cost" id="tableCode"></div><div>เมตร</div><div>ไฟฟ้า</div><div>SCG</div></div>
+  </div>
+</section>
+<script>
+const COST_GLYPH_IDS=Array.from({length:13},(_,i)=>`glyph${String(i+1).padStart(2,'0')}`);
+const COST_GLYPH_PATHS={
+  glyph01:'M32 13 Q15 13 11 35 Q10 55 27 61 Q45 67 56 51 Q66 31 50 18 Q43 13 32 13',
+  glyph02:'M16 16 H50 M16 32 H50 M33 16 V64',
+  glyph03:'M16 14 L32 64 L49 14 M17 61 H48',
+  glyph04:'M22 12 V64 M23 38 L50 12 M24 38 L52 64',
+  glyph05:'M18 14 V48 Q18 58 32 62 L47 62 Q54 60 54 51 V14 M54 51 Q57 60 61 60',
+  glyph06:'M16 16 L50 60 M50 16 L16 60',
+  glyph07:'M32 12 V57 Q32 63 43 63 Q48 63 51 60 M22 24 H45',
+  glyph08:'M32 10 L14 50 H50 L32 10 M32 10 V64',
+  glyph09:'M50 16 Q36 10 24 17 Q16 24 16 38 Q16 55 31 60 Q43 64 54 56 M18 36 Q36 39 56 36 Q58 27 53 21',
+  glyph10:'M18 15 V64 M34 15 V64 M50 15 V64 M10 34 H58',
+  glyph11:'M34 9 V66 M50 21 Q43 12 30 15 Q17 18 17 31 Q17 44 35 43 Q53 42 53 55 Q53 66 38 68 Q23 70 14 60',
+  glyph12:'M12 61 H58 M18 65 L24 16 L38 47 L52 14 L56 65',
+  glyph13:'M32 13 Q15 13 11 35 Q10 55 27 61 Q45 67 56 51 Q66 31 50 18 Q43 13 32 13 M45 49 L61 62'
+};
+function glyph(id){return `<svg class="costGlyphSvg" data-glyph-id="${id}" viewBox="0 0 72 72"><path d="${COST_GLYPH_PATHS[id]}"/></svg>`;}
+document.getElementById('allGlyphs').innerHTML=COST_GLYPH_IDS.map(id=>`<div class="glyphCard">${glyph(id)}<div class="glyphId">${id}</div></div>`).join('');
+document.getElementById('digitGlyphs').innerHTML=COST_GLYPH_IDS.map(glyph).join('');
+document.getElementById('keypad').innerHTML=[COST_GLYPH_IDS.slice(0,4),COST_GLYPH_IDS.slice(4,8),COST_GLYPH_IDS.slice(8,13)].map(row=>`<div class="keyRow">${row.map(id=>`<button>${glyph(id)}</button>`).join('')}</div>`).join('');
+document.getElementById('tableCode').innerHTML=[glyph('glyph01'),glyph('glyph05'),glyph('glyph10')].join('');
+</script>
+</body>
+</html>
