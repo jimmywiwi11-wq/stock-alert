@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.36</title>
+<title>Stock Alert V7.37</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.36</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.37</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.36</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.37</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1810,8 +1810,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.36';
-  const APP_VERSION_LABEL='V7.36';
+  const APP_VERSION='7.37';
+  const APP_VERSION_LABEL='V7.37';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3344,7 +3344,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.36';if(versionBox)versionBox.textContent='V7.36';
+  if(versionSub)versionSub.textContent='V7.37';if(versionBox)versionBox.textContent='V7.37';
 })();
 </script>
 <script>
@@ -4283,7 +4283,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.36';
+  const APP_VERSION='V7.37';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4621,7 +4621,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.36';
+    document.title='Stock Alert V7.37';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -4639,7 +4639,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const PRODUCT_FILTERS=['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด','เคมี','กันรั่ว กันซึม','น้ำมันต่างๆ','กาว',UNKNOWN_CATEGORY];
   let products=readJSON(PRODUCT_CACHE,[]);
   let productUiReady=false;
-  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null, productLongTimer=null;
+  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null, productLongTimer=null, productPressFeedbackTimer=null, productPressState=null;
   function readJSON(keyName,def){try{return JSON.parse(localStorage.getItem(keyName)||JSON.stringify(def));}catch(e){return def;}}
   function saveCache(){try{localStorage.setItem(PRODUCT_CACHE,JSON.stringify(products.slice(0,5000)));}catch(e){}}
   function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -4797,11 +4797,39 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     box.innerHTML=rows.length?`<div class="productTableV730"><div class="productRowV730 head"><button onclick="sortProducts('name')">ลำดับ</button><button onclick="sortProducts('name')">ชื่อสินค้า</button><button onclick="sortProducts('cost')">ราคาทุน</button><button onclick="sortProducts('price')">ราคาขาย</button><button onclick="sortProducts('unit')">หน่วย</button><button onclick="sortProducts('category')">หมวดหมู่</button><button onclick="sortProducts('supplier')">บริษัท</button></div>${rows.map((p,i)=>productRow(p,i)).join('')}</div><div class="muted productLimitNote">แสดง ${rows.length} รายการแรก${ranked.length>rows.length?' จากผลลัพธ์ทั้งหมด ให้ค้นหาเพื่อเจาะจงสินค้า':''}</div>`:'<div class="empty">ยังไม่มีสินค้าในฐานข้อมูล</div>';
   }
   function productRow(p,i){
-    return `<div class="productRowV730" data-id="${esc(p.id)}" onpointerdown="startProductPress(decodeURIComponent('${enc(p.id)}'))" onpointerup="cancelProductPress()" onpointerleave="cancelProductPress()" ondblclick="openProductMenu(decodeURIComponent('${enc(p.id)}'))"><div>${i+1}</div><div class="productNameCell">${esc(p.name)}</div><div class="productCostValue">${esc(display(p.cost))}</div><div class="productPriceValue">${esc(display(p.price))}</div><div>${esc(display(p.unit))}</div><div>${esc(display(p.category,UNKNOWN_CATEGORY))}</div><div>${esc(display(p.supplier))}</div></div>`;
+    return `<div class="productRowV730" data-id="${esc(p.id)}" onpointerdown="startProductPress(event,decodeURIComponent('${enc(p.id)}'))" onpointermove="moveProductPress(event)" onpointerup="cancelProductPress()" onpointercancel="cancelProductPress()" onpointerleave="cancelProductPress()"><div>${i+1}</div><div class="productNameCell">${esc(p.name)}</div><div class="productCostValue">${esc(display(p.cost))}</div><div class="productPriceValue">${esc(display(p.price))}</div><div>${esc(display(p.unit))}</div><div>${esc(display(p.category,UNKNOWN_CATEGORY))}</div><div>${esc(display(p.supplier))}</div></div>`;
   }
   window.chooseProductSearch=function(name){const input=document.getElementById('productSearchInput'); if(input)input.value=name; renderProductPage();};
-  window.startProductPress=function(id){clearTimeout(productLongTimer); productLongTimer=setTimeout(()=>openProductMenu(id),520);};
-  window.cancelProductPress=function(){clearTimeout(productLongTimer);};
+  const PRODUCT_LONG_PRESS_MS=3000, PRODUCT_LONG_PRESS_MOVE_TOLERANCE=12, PRODUCT_PRESS_FEEDBACK_MS=2500;
+  window.startProductPress=function(ev,id){
+    if(ev?.pointerType==='mouse'&&ev.button!==0)return;
+    window.cancelProductPress();
+    productPressState={id,row:ev.currentTarget,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,opened:false};
+    productPressFeedbackTimer=setTimeout(()=>{if(productPressState?.row)productPressState.row.classList.add('productPressingV730');},PRODUCT_PRESS_FEEDBACK_MS);
+    productLongTimer=setTimeout(()=>{
+      if(!productPressState||productPressState.opened)return;
+      productPressState.opened=true;
+      const openId=productPressState.id;
+      window.cancelProductPress();
+      openProductMenu(openId);
+    },PRODUCT_LONG_PRESS_MS);
+  };
+  window.moveProductPress=function(ev){
+    if(!productPressState||ev.pointerId!==productPressState.pointerId)return;
+    const dx=ev.clientX-productPressState.startX,dy=ev.clientY-productPressState.startY;
+    if(Math.hypot(dx,dy)>PRODUCT_LONG_PRESS_MOVE_TOLERANCE)window.cancelProductPress();
+  };
+  window.cancelProductPress=function(){
+    clearTimeout(productLongTimer);clearTimeout(productPressFeedbackTimer);
+    if(productPressState?.row)productPressState.row.classList.remove('productPressingV730');
+    productLongTimer=null;productPressFeedbackTimer=null;productPressState=null;
+  };
+  if(!window.__stockAlertProductPressScrollCancelV730){
+    window.__stockAlertProductPressScrollCancelV730=1;
+    window.addEventListener('scroll',()=>window.cancelProductPress(),{passive:true,capture:true});
+    document.addEventListener('scroll',()=>window.cancelProductPress(),{passive:true,capture:true});
+    window.addEventListener('blur',()=>window.cancelProductPress(),{passive:true});
+  }
   window.openProductMenu=function(id){
     const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
     const modal=document.getElementById('productMenuModal');
@@ -4876,6 +4904,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   window.renderCategoryChips=renderCategoryChips=function(){ensureUnknownCategory(); return baseRenderCategoryChips.apply(this,arguments);};
   const css=document.createElement('style');
   css.textContent=`.productDbIcon{background:#14532d}.productDbHomeButton{width:100%;border:0;border-radius:18px;margin:14px 0 6px;padding:16px 15px;display:flex;align-items:center;gap:14px;text-align:left;background:linear-gradient(135deg,#14532d,#166534);color:#fff;box-shadow:0 12px 26px rgba(20,83,45,.22);cursor:pointer}.productDbHomeButton:active{transform:scale(.985)}.productDbHomeButton .ico{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.16);box-shadow:none;flex:0 0 auto}.productDbHomeButton b{display:block;font-size:19px;line-height:1.15}.productDbHomeButton span{display:block;font-size:12px;font-weight:850;line-height:1.35;margin-top:4px;opacity:.9}.productDbHeader{position:relative}.productAddBtn{right:0;top:0}.productFilterToggle{width:100%;border:1px solid #edf2f7;text-align:left}.productFilterBox{display:none;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.productFilterBox.show{display:flex}.productHintV730{margin-top:8px;font-weight:900;color:#53627a}.productHintV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:999px;padding:7px 10px;font-weight:900}.productTableV730{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;max-height:62vh;box-shadow:0 5px 16px rgba(17,44,84,.05)}.productRowV730{display:grid;grid-template-columns:46px minmax(140px,1.5fr) 82px 82px 72px 116px 110px;gap:8px;align-items:center;min-width:770px;padding:11px 12px;border-bottom:1px solid var(--line);font-weight:850}.productRowV730:last-child{border-bottom:0}.productRowV730.head{position:sticky;top:0;background:#eef5ff;color:#0b4ab8;z-index:1}.productRowV730.head button{border:0;background:transparent;color:inherit;text-align:left;font-weight:950;padding:0}.productNameCell{overflow-wrap:anywhere;line-height:1.25}.productCostValue{color:#1d4ed8;font-weight:950}.productPriceValue{color:#15803d;font-weight:950}.productLimitNote{text-align:center}.productNameSuggestV730{display:none;flex-direction:column;gap:7px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:6px;box-shadow:0 10px 22px rgba(15,23,42,.10)}.productNameSuggestV730.show{display:flex}.productNameSuggestV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:12px;padding:10px;text-align:left;font-weight:900}@media(max-width:370px){.productAddBtn{position:static;margin-left:auto}.productDbHeader{align-items:flex-start}.productRowV730{grid-template-columns:38px minmax(120px,1.5fr) 72px 72px 62px 104px 100px;font-size:13px}.productDbHomeButton{padding:14px 13px}.productDbHomeButton b{font-size:18px}}`;
+  css.textContent+=`.productRowV730.productPressingV730{background:#f8fafc}`;
   document.head.appendChild(css);
   function normalizeSellingPrices(product){
     const rows=Array.isArray(product?.sellingPrices)?product.sellingPrices:[];
@@ -5550,6 +5579,3 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 </body></html>
-
-
-
