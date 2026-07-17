@@ -1,6 +1,6 @@
 {
-  "version": "7.43",
-  "label": "V7.43",
+  "version": "7.44",
+  "label": "V7.44",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Fix Product/Price Firebase synchronization."
+  "message": "Restore whole-app Firebase synchronization."
 }
