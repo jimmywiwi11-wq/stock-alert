@@ -1,6 +1,6 @@
 {
-  "version": "7.37",
-  "label": "V7.37",
+  "version": "7.38",
+  "label": "V7.38",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Reduce accidental Product/Price action-sheet openings while scrolling."
+  "message": "Replace Product/Price long press with quick detail buttons and usage history."
 }

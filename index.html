@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.37</title>
+<title>Stock Alert V7.38</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.37</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.38</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.37</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.38</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1810,8 +1810,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.37';
-  const APP_VERSION_LABEL='V7.37';
+  const APP_VERSION='7.38';
+  const APP_VERSION_LABEL='V7.38';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3344,7 +3344,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.37';if(versionBox)versionBox.textContent='V7.37';
+  if(versionSub)versionSub.textContent='V7.38';if(versionBox)versionBox.textContent='V7.38';
 })();
 </script>
 <script>
@@ -4283,7 +4283,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.37';
+  const APP_VERSION='V7.38';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4621,7 +4621,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.37';
+    document.title='Stock Alert V7.38';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -4639,7 +4639,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const PRODUCT_FILTERS=['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด','เคมี','กันรั่ว กันซึม','น้ำมันต่างๆ','กาว',UNKNOWN_CATEGORY];
   let products=readJSON(PRODUCT_CACHE,[]);
   let productUiReady=false;
-  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null, productLongTimer=null, productPressFeedbackTimer=null, productPressState=null;
+  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null;
   function readJSON(keyName,def){try{return JSON.parse(localStorage.getItem(keyName)||JSON.stringify(def));}catch(e){return def;}}
   function saveCache(){try{localStorage.setItem(PRODUCT_CACHE,JSON.stringify(products.slice(0,5000)));}catch(e){}}
   function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -4752,6 +4752,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
       page.innerHTML=`<div class="pageHeader productDbHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">สินค้า / ราคา</h2><div class="smallTitle">ฐานข้อมูลสินค้าและประวัติราคา</div></div><button class="manageBtn productAddBtn" onclick="openProductEditor()">เพิ่มสินค้า</button></div><div class="card searchCard productSearchCard"><input class="input" id="productSearchInput" placeholder="ค้นหาสินค้า..." autocomplete="off" oninput="scheduleProductSearch()"><div id="productDidYouMean" class="productHintV730"></div></div><button class="categoryShortcut productFilterToggle" onclick="toggleProductFilters()"><div class="ico productDbIcon">${productIcon()}</div><div><b>แยกหมวดหมู่</b><div class="muted" id="productFilterLabel">ดูสินค้าตามหมวดหมู่</div></div></button><div id="productFilterBox" class="productFilterBox"></div><div id="productTableBox"></div>`;
       phone.appendChild(page);
     }
+    bindProductRowActions();
     if(!document.getElementById('productEditorModal')){
       const modal=document.createElement('div'); modal.id='productEditorModal'; modal.className='modal'; document.body.appendChild(modal);
     }
@@ -4763,6 +4764,19 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     }
   }
   function productIcon(){return '<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M7 9h5M7 13h3M15 9h2M14 15c.8 1 2.6 1 3.4 0 .7-.9.1-1.8-1.2-2.1-1.4-.3-2-.9-1.3-1.8.8-1 2.5-1 3.2 0"/><path d="M16.5 8v10"/></svg>';}
+  function bindProductRowActions(){
+    const box=document.getElementById('productTableBox');
+    if(!box||box.dataset.productActionsV738==='1')return;
+    box.dataset.productActionsV738='1';
+    box.addEventListener('click',ev=>{
+      const target=ev.target instanceof Element?ev.target:ev.target?.parentElement;
+      const btn=target?.closest('.productMoreBtnV738');
+      if(!btn||!box.contains(btn))return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      openProductQuickDetail(dec(btn.dataset.id||''));
+    });
+  }
   window.toggleProductFilters=function(){
     const box=document.getElementById('productFilterBox'); if(!box)return;
     box.classList.toggle('show');
@@ -4794,68 +4808,96 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
       const best=q?ranked[0]:null;
       hint.innerHTML=best&&best._score>=55&&clean(best.name)!==clean(q)?`คุณหมายถึงสินค้านี้หรือไม่ <button onclick="chooseProductSearch(decodeURIComponent('${enc(best.name)}'))">${esc(best.name)}</button>`:'';
     }
-    box.innerHTML=rows.length?`<div class="productTableV730"><div class="productRowV730 head"><button onclick="sortProducts('name')">ลำดับ</button><button onclick="sortProducts('name')">ชื่อสินค้า</button><button onclick="sortProducts('cost')">ราคาทุน</button><button onclick="sortProducts('price')">ราคาขาย</button><button onclick="sortProducts('unit')">หน่วย</button><button onclick="sortProducts('category')">หมวดหมู่</button><button onclick="sortProducts('supplier')">บริษัท</button></div>${rows.map((p,i)=>productRow(p,i)).join('')}</div><div class="muted productLimitNote">แสดง ${rows.length} รายการแรก${ranked.length>rows.length?' จากผลลัพธ์ทั้งหมด ให้ค้นหาเพื่อเจาะจงสินค้า':''}</div>`:'<div class="empty">ยังไม่มีสินค้าในฐานข้อมูล</div>';
+    box.innerHTML=rows.length?`<div class="productTableV730"><div class="productRowV730 head"><button onclick="sortProducts('name')">ลำดับ</button><span></span><button onclick="sortProducts('name')">ชื่อสินค้า</button><button onclick="sortProducts('cost')">ราคาทุน</button><button onclick="sortProducts('price')">ราคาขาย</button><button onclick="sortProducts('unit')">หน่วย</button><button onclick="sortProducts('category')">หมวดหมู่</button><button onclick="sortProducts('supplier')">บริษัท</button></div>${rows.map((p,i)=>productRow(p,i)).join('')}</div><div class="muted productLimitNote">แสดง ${rows.length} รายการแรก${ranked.length>rows.length?' จากผลลัพธ์ทั้งหมด ให้ค้นหาเพื่อเจาะจงสินค้า':''}</div>`:'<div class="empty">ยังไม่มีสินค้าในฐานข้อมูล</div>';
   }
   function productRow(p,i){
-    return `<div class="productRowV730" data-id="${esc(p.id)}" onpointerdown="startProductPress(event,decodeURIComponent('${enc(p.id)}'))" onpointermove="moveProductPress(event)" onpointerup="cancelProductPress()" onpointercancel="cancelProductPress()" onpointerleave="cancelProductPress()"><div>${i+1}</div><div class="productNameCell">${esc(p.name)}</div><div class="productCostValue">${esc(display(p.cost))}</div><div class="productPriceValue">${esc(display(p.price))}</div><div>${esc(display(p.unit))}</div><div>${esc(display(p.category,UNKNOWN_CATEGORY))}</div><div>${esc(display(p.supplier))}</div></div>`;
+    return `<div class="productRowV730" data-id="${esc(p.id)}"><div>${i+1}</div><div><button type="button" class="productMoreBtnV738" data-id="${enc(p.id)}" aria-label="ดูรายละเอียดสินค้า">...</button></div><div class="productNameCell">${esc(p.name)}</div><div class="productCostValue">${esc(display(p.cost))}</div><div class="productPriceValue">${esc(display(p.price))}</div><div>${esc(display(p.unit))}</div><div>${esc(display(p.category,UNKNOWN_CATEGORY))}</div><div>${esc(display(p.supplier))}</div></div>`;
   }
   window.chooseProductSearch=function(name){const input=document.getElementById('productSearchInput'); if(input)input.value=name; renderProductPage();};
-  const PRODUCT_LONG_PRESS_MS=3000, PRODUCT_LONG_PRESS_MOVE_TOLERANCE=12, PRODUCT_PRESS_FEEDBACK_MS=2500;
-  window.startProductPress=function(ev,id){
-    if(ev?.pointerType==='mouse'&&ev.button!==0)return;
-    window.cancelProductPress();
-    productPressState={id,row:ev.currentTarget,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,opened:false};
-    productPressFeedbackTimer=setTimeout(()=>{if(productPressState?.row)productPressState.row.classList.add('productPressingV730');},PRODUCT_PRESS_FEEDBACK_MS);
-    productLongTimer=setTimeout(()=>{
-      if(!productPressState||productPressState.opened)return;
-      productPressState.opened=true;
-      const openId=productPressState.id;
-      window.cancelProductPress();
-      openProductMenu(openId);
-    },PRODUCT_LONG_PRESS_MS);
-  };
-  window.moveProductPress=function(ev){
-    if(!productPressState||ev.pointerId!==productPressState.pointerId)return;
-    const dx=ev.clientX-productPressState.startX,dy=ev.clientY-productPressState.startY;
-    if(Math.hypot(dx,dy)>PRODUCT_LONG_PRESS_MOVE_TOLERANCE)window.cancelProductPress();
-  };
-  window.cancelProductPress=function(){
-    clearTimeout(productLongTimer);clearTimeout(productPressFeedbackTimer);
-    if(productPressState?.row)productPressState.row.classList.remove('productPressingV730');
-    productLongTimer=null;productPressFeedbackTimer=null;productPressState=null;
-  };
-  if(!window.__stockAlertProductPressScrollCancelV730){
-    window.__stockAlertProductPressScrollCancelV730=1;
-    window.addEventListener('scroll',()=>window.cancelProductPress(),{passive:true,capture:true});
-    document.addEventListener('scroll',()=>window.cancelProductPress(),{passive:true,capture:true});
-    window.addEventListener('blur',()=>window.cancelProductPress(),{passive:true});
-  }
-  window.openProductMenu=function(id){
+  window.openProductMenu=function(id){openProductQuickDetail(id);};
+  window.openProductQuickDetail=function(id){
     const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
     const modal=document.getElementById('productMenuModal');
-    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="rowBtns"><button class="btn primary" style="flex:1" onclick="closeModal('productMenuModal');openProductEditor(decodeURIComponent('${enc(p.id)}'))">แก้ไข</button><button class="btn gray" style="flex:1" onclick="closeModal('productMenuModal');openProductInfo(decodeURIComponent('${enc(p.id)}'))">ข้อมูล</button></div><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productMenuModal')">ปิด</button></div>`;
+    const normalized=normalizeSellingPrices(p);
+    const extras=normalized.extras.filter(row=>txt(row.price)||txt(row.unit));
+    const priceRows=[`<div class="miniItem"><b>ราคาหลัก</b><span class="meta">${esc(display(normalized.mainPrice))} บาท / ${esc(display(normalized.mainUnit))}</span></div>`,...extras.map((row,index)=>`<div class="miniItem"><b>ราคา ${index+2}</b><span class="meta">${esc(display(row.price))} บาท / ${esc(display(row.unit))}</span></div>`)].join('');
+    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="sectionTitle">ราคา</div>${priceRows}<div class="sectionTitle">สินค้านี้ใช้ทำอะไร</div><div class="item productPurposeTextV738">${esc(display(p.purpose,'ยังไม่ระบุ'))}</div><div class="statusRows"><div class="statusRow"><span>บริษัท</span><span>${esc(display(p.supplier,'ยังไม่ระบุ'))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(p.category,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>หน่วย</span><span>${esc(display(p.unit,'ยังไม่ระบุ'))}</span></div></div><div class="rowBtns"><button class="btn gray" style="flex:1" onclick="closeModal('productMenuModal');openProductInfo(decodeURIComponent('${enc(p.id)}'))">ข้อมูล</button><button class="btn primary" style="flex:1" onclick="closeModal('productMenuModal');openProductEditor(decodeURIComponent('${enc(p.id)}'))">แก้ไข</button></div><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productMenuModal')">ปิด</button></div>`;
     modal.classList.add('show');
   };
+  function sameValue(a,b){return txt(a)===txt(b);}
+  function priceLabel(row){return `${display(row?.price)} บาท / ${display(row?.unit)}`;}
+  function priceChanged(a,b){return txt(a?.price)!==txt(b?.price)||txt(a?.unit)!==txt(b?.unit);}
+  function buildProductHistory(oldProduct,newProduct){
+    const changes=[];
+    const addField=(key,label,oldValue,newValue)=>{
+      if(!sameValue(oldValue,newValue))changes.push({key,label,oldValue:txt(oldValue),newValue:txt(newValue)});
+    };
+    addField('name','ชื่อสินค้า',oldProduct.name,newProduct.name);
+    addField('cost','ราคาทุน',oldProduct.cost,newProduct.cost);
+    addField('price','ราคาขายหลัก',oldProduct.price,newProduct.price);
+    addField('unit','หน่วยหลัก',oldProduct.unit,newProduct.unit);
+    addField('category','หมวดหมู่',oldProduct.category,newProduct.category);
+    addField('supplier','บริษัท',oldProduct.supplier,newProduct.supplier);
+    addField('purpose','สินค้านี้ใช้ทำอะไร',oldProduct.purpose,newProduct.purpose);
+    addField('notes','หมายเหตุ',oldProduct.notes,newProduct.notes);
+    const oldPrices=normalizeSellingPrices(oldProduct),newPrices=normalizeSellingPrices(newProduct);
+    const oldExtras=oldPrices.extras||[],newExtras=newPrices.extras||[];
+    const max=Math.max(oldExtras.length,newExtras.length);
+    for(let i=0;i<max;i++){
+      const oldRow=oldExtras[i]||{},newRow=newExtras[i]||{};
+      const hadOld=txt(oldRow.price)||txt(oldRow.unit),hasNew=txt(newRow.price)||txt(newRow.unit);
+      if(!hadOld&&hasNew)changes.push({key:`price${i+2}`,label:`เพิ่มราคา ${i+2}`,oldValue:'',newValue:priceLabel(newRow)});
+      else if(hadOld&&!hasNew)changes.push({key:`price${i+2}`,label:`ลบราคา ${i+2}`,oldValue:priceLabel(oldRow),newValue:''});
+      else if(hadOld&&hasNew&&priceChanged(oldRow,newRow))changes.push({key:`price${i+2}`,label:`แก้ไขราคา ${i+2}`,oldValue:priceLabel(oldRow),newValue:priceLabel(newRow)});
+    }
+    if(!changes.length)return null;
+    return {at:Date.now(),by:nowUser(),type:'productEdit',changes,oldSellingPrices:oldPrices,newSellingPrices:newPrices};
+  }
+  function historyChangeRows(entry){
+    if(Array.isArray(entry?.changes)&&entry.changes.length){
+      return entry.changes.map(change=>`<div class="statusRow"><span>${esc(change.label||'ข้อมูล')}</span><span>${esc(display(change.oldValue))} → ${esc(display(change.newValue))}</span></div>`).join('');
+    }
+    if(entry?.type==='sellingPrices'&&entry.newSellingPrices){
+      function summary(snapshot){
+        const main=snapshot?.mainPrice||'',unit=snapshot?.mainUnit||'',extras=snapshot?.extras||[];
+        const lines=[main||unit?`หลัก: ${display(main)} บาท / ${display(unit)}`:''];
+        extras.forEach((row,index)=>lines.push(`ราคา ${index+2}: ${display(row.price)} บาท / ${display(row.unit)}`));
+        return lines.filter(Boolean).map(esc).join('<br>');
+      }
+      return `<div class="statusRow"><span>ราคาขาย</span><span>${summary(entry.oldSellingPrices)||'—'} → ${summary(entry.newSellingPrices)||'—'}</span></div>`;
+    }
+    const legacy=[
+      ['oldName','newName','ชื่อสินค้า'],
+      ['oldCost','newCost','ต้นทุน'],
+      ['oldPrice','newPrice','ราคาขาย'],
+      ['oldUnit','newUnit','หน่วย'],
+      ['oldCategory','newCategory','หมวดหมู่'],
+      ['oldSupplier','newSupplier','บริษัท'],
+      ['oldPurpose','newPurpose','สินค้านี้ใช้ทำอะไร']
+    ].filter(([oldKey,newKey])=>!sameValue(entry?.[oldKey],entry?.[newKey]));
+    return legacy.map(([oldKey,newKey,label])=>`<div class="statusRow"><span>${label}</span><span>${esc(display(entry?.[oldKey]))} → ${esc(display(entry?.[newKey]))}</span></div>`).join('')||'<div class="muted">ไม่มีรายละเอียดการเปลี่ยนแปลง</div>';
+  }
   window.openProductEditor=function(id=''){
     const p=products.find(x=>String(x.id)===String(id))||{};
     const modal=document.getElementById('productEditorModal');
-    modal.innerHTML=`<div class="sheet"><h2>${id?'แก้ไขสินค้า':'เพิ่มสินค้า'}</h2><label>ชื่อสินค้า</label><input class="input" id="productEditName" value="${esc(p.name||'')}" placeholder="ชื่อสินค้า"><label>ราคาทุน</label><input class="input" id="productEditCost" inputmode="decimal" value="${esc(p.cost||'')}" placeholder="ราคาทุน"><label>ราคาขาย</label><input class="input" id="productEditPrice" inputmode="decimal" value="${esc(p.price||'')}" placeholder="ราคาขาย"><label>หน่วย</label><input class="input" id="productEditUnit" value="${esc(p.unit||'')}" placeholder="หน่วย"><label>หมวดหมู่</label><select id="productEditCategory">${PRODUCT_FILTERS.map(c=>`<option value="${esc(c)}" ${(p.category||UNKNOWN_CATEGORY)===c?'selected':''}>${esc(c)}</option>`).join('')}</select><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="productEditSupplier" value="${esc(p.supplier||'')}" placeholder="TOA / พูนกิจ / สุนทร / ดูโฮม"><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="productEditNotes" placeholder="Optional notes">${esc(p.notes||'')}</textarea><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProductEditor(decodeURIComponent('${enc(id)}'))">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productEditorModal')">ยกเลิก</button></div>`;
+    modal.innerHTML=`<div class="sheet"><h2>${id?'แก้ไขสินค้า':'เพิ่มสินค้า'}</h2><label>ชื่อสินค้า</label><input class="input" id="productEditName" value="${esc(p.name||'')}" placeholder="ชื่อสินค้า"><label>ราคาทุน</label><input class="input" id="productEditCost" inputmode="decimal" value="${esc(p.cost||'')}" placeholder="ราคาทุน"><label>ราคาขายหลัก</label><input class="input" id="productEditPrice" inputmode="decimal" value="${esc(p.price||'')}" placeholder="ราคาขายหลัก"><label>หน่วยหลัก</label><input class="input" id="productEditUnit" value="${esc(p.unit||'')}" placeholder="หน่วยหลัก"><label>หมวดหมู่</label><select id="productEditCategory">${PRODUCT_FILTERS.map(c=>`<option value="${esc(c)}" ${(p.category||UNKNOWN_CATEGORY)===c?'selected':''}>${esc(c)}</option>`).join('')}</select><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="productEditSupplier" value="${esc(p.supplier||'')}" placeholder="TOA / พูนกิจ / สุนทร / ดูโฮม"><label>สินค้านี้ใช้ทำอะไร <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="productEditPurpose" placeholder="ระบุการใช้งานของสินค้า (ไม่บังคับ)">${esc(p.purpose||'')}</textarea><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="productEditNotes" placeholder="Optional notes">${esc(p.notes||'')}</textarea><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProductEditor(decodeURIComponent('${enc(id)}'))">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productEditorModal')">ยกเลิก</button></div>`;
     modal.classList.add('show');
   };
   window.saveProductEditor=async function(id=''){
     const name=txt(document.getElementById('productEditName')?.value); if(!name)return toast('กรุณาใส่ชื่อสินค้า');
     const old=products.find(x=>String(x.id)===String(id))||{};
+    const prices=typeof collectSellingPrices==='function'?collectSellingPrices():[{price:txt(document.getElementById('productEditPrice')?.value),unit:txt(document.getElementById('productEditUnit')?.value),isPrimary:true}];
     const newId=id||productId(name);
-    const product={...old,id:newId,name,cost:txt(document.getElementById('productEditCost')?.value),price:txt(document.getElementById('productEditPrice')?.value),unit:txt(document.getElementById('productEditUnit')?.value),category:txt(document.getElementById('productEditCategory')?.value)||UNKNOWN_CATEGORY,supplier:txt(document.getElementById('productEditSupplier')?.value),notes:txt(document.getElementById('productEditNotes')?.value),source:old.source||'manual',createdAt:old.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:nowUser(),previousNames:[...new Set([...(old.previousNames||[]),old.name&&clean(old.name)!==clean(name)?old.name:''].filter(Boolean))]};
-    const history={at:Date.now(),by:nowUser(),oldCost:old.cost||'',newCost:product.cost||'',oldPrice:old.price||'',newPrice:product.price||'',oldCategory:old.category||'',newCategory:product.category||'',oldUnit:old.unit||'',newUnit:product.unit||'',oldSupplier:old.supplier||'',newSupplier:product.supplier||'',oldName:old.name||'',newName:product.name};
+    const product={...old,id:newId,name,cost:txt(document.getElementById('productEditCost')?.value),price:prices[0]?.price||'',unit:prices[0]?.unit||'',sellingPrices:prices,category:txt(document.getElementById('productEditCategory')?.value)||UNKNOWN_CATEGORY,supplier:txt(document.getElementById('productEditSupplier')?.value),purpose:txt(document.getElementById('productEditPurpose')?.value),notes:txt(document.getElementById('productEditNotes')?.value),source:old.source||'manual',createdAt:old.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:nowUser(),previousNames:[...new Set([...(old.previousNames||[]),old.name&&clean(old.name)!==clean(name)?old.name:''].filter(Boolean))]};
+    const history=buildProductHistory(old,product);
     try{await saveProductRecord(product,history); closeModal('productEditorModal'); renderProductPage(); toast('บันทึกสินค้าแล้ว');}catch(e){console.error(e); toast('บันทึกสินค้าไม่สำเร็จ');}
   };
   window.openProductInfo=function(id){
     const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
     const history=(p.history||[]).slice().sort((a,b)=>(b.at||0)-(a.at||0));
-    const rows=history.length?history.map(h=>`<div class="item"><b>${esc(fmt(h.at))}</b><div class="muted">ผู้แก้ไข: ${esc(h.by||'-')}</div><div class="statusRows"><div class="statusRow"><span>ต้นทุน</span><span>${esc(display(h.oldCost))} → ${esc(display(h.newCost))}</span></div><div class="statusRow"><span>ราคาขาย</span><span>${esc(display(h.oldPrice))} → ${esc(display(h.newPrice))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(h.oldCategory,UNKNOWN_CATEGORY))} → ${esc(display(h.newCategory,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>หน่วย</span><span>${esc(display(h.oldUnit))} → ${esc(display(h.newUnit))}</span></div><div class="statusRow"><span>บริษัท</span><span>${esc(display(h.oldSupplier))} → ${esc(display(h.newSupplier))}</span></div></div></div>`).join(''):'<div class="empty">ยังไม่มีประวัติการแก้ไข</div>';
+    const rows=history.length?history.map(h=>`<div class="item"><b>${esc(fmt(h.at))}</b><div class="muted">ผู้แก้ไข: ${esc(h.by||'-')}</div><div class="statusRows">${historyChangeRows(h)}</div></div>`).join(''):'<div class="empty">ยังไม่มีประวัติการแก้ไข</div>';
     const modal=document.getElementById('productInfoModal');
-    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="statusRows"><div class="statusRow"><span>ราคาทุน</span><span class="productCostValue">${esc(display(p.cost))}</span></div><div class="statusRow"><span>ราคาขาย</span><span class="productPriceValue">${esc(display(p.price))}</span></div><div class="statusRow"><span>หน่วย</span><span>${esc(display(p.unit))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(p.category,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>บริษัท</span><span>${esc(display(p.supplier))}</span></div></div><div class="sectionTitle">ประวัติราคา / ข้อมูล</div>${rows}<button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productInfoModal')">ปิด</button></div>`;
+    modal.innerHTML=`<div class="sheet"><h2>${esc(p.name)}</h2><div class="statusRows"><div class="statusRow"><span>ราคาทุน</span><span class="productCostValue">${esc(display(p.cost))}</span></div><div class="statusRow"><span>ราคาขายหลัก</span><span class="productPriceValue">${esc(display(p.price))}</span></div><div class="statusRow"><span>หน่วยหลัก</span><span>${esc(display(p.unit))}</span></div><div class="statusRow"><span>หมวดหมู่</span><span>${esc(display(p.category,UNKNOWN_CATEGORY))}</span></div><div class="statusRow"><span>บริษัท</span><span>${esc(display(p.supplier))}</span></div><div class="statusRow"><span>สินค้านี้ใช้ทำอะไร</span><span>${esc(display(p.purpose,'ยังไม่ระบุ'))}</span></div></div><div class="sectionTitle">ประวัติราคา / ข้อมูล</div>${rows}<button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('productInfoModal')">ปิด</button></div>`;
     modal.classList.add('show');
   };
   function renderProductSuggestions(){
@@ -4903,8 +4945,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const baseRenderCategoryChips=window.renderCategoryChips||renderCategoryChips;
   window.renderCategoryChips=renderCategoryChips=function(){ensureUnknownCategory(); return baseRenderCategoryChips.apply(this,arguments);};
   const css=document.createElement('style');
-  css.textContent=`.productDbIcon{background:#14532d}.productDbHomeButton{width:100%;border:0;border-radius:18px;margin:14px 0 6px;padding:16px 15px;display:flex;align-items:center;gap:14px;text-align:left;background:linear-gradient(135deg,#14532d,#166534);color:#fff;box-shadow:0 12px 26px rgba(20,83,45,.22);cursor:pointer}.productDbHomeButton:active{transform:scale(.985)}.productDbHomeButton .ico{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.16);box-shadow:none;flex:0 0 auto}.productDbHomeButton b{display:block;font-size:19px;line-height:1.15}.productDbHomeButton span{display:block;font-size:12px;font-weight:850;line-height:1.35;margin-top:4px;opacity:.9}.productDbHeader{position:relative}.productAddBtn{right:0;top:0}.productFilterToggle{width:100%;border:1px solid #edf2f7;text-align:left}.productFilterBox{display:none;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.productFilterBox.show{display:flex}.productHintV730{margin-top:8px;font-weight:900;color:#53627a}.productHintV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:999px;padding:7px 10px;font-weight:900}.productTableV730{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;max-height:62vh;box-shadow:0 5px 16px rgba(17,44,84,.05)}.productRowV730{display:grid;grid-template-columns:46px minmax(140px,1.5fr) 82px 82px 72px 116px 110px;gap:8px;align-items:center;min-width:770px;padding:11px 12px;border-bottom:1px solid var(--line);font-weight:850}.productRowV730:last-child{border-bottom:0}.productRowV730.head{position:sticky;top:0;background:#eef5ff;color:#0b4ab8;z-index:1}.productRowV730.head button{border:0;background:transparent;color:inherit;text-align:left;font-weight:950;padding:0}.productNameCell{overflow-wrap:anywhere;line-height:1.25}.productCostValue{color:#1d4ed8;font-weight:950}.productPriceValue{color:#15803d;font-weight:950}.productLimitNote{text-align:center}.productNameSuggestV730{display:none;flex-direction:column;gap:7px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:6px;box-shadow:0 10px 22px rgba(15,23,42,.10)}.productNameSuggestV730.show{display:flex}.productNameSuggestV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:12px;padding:10px;text-align:left;font-weight:900}@media(max-width:370px){.productAddBtn{position:static;margin-left:auto}.productDbHeader{align-items:flex-start}.productRowV730{grid-template-columns:38px minmax(120px,1.5fr) 72px 72px 62px 104px 100px;font-size:13px}.productDbHomeButton{padding:14px 13px}.productDbHomeButton b{font-size:18px}}`;
-  css.textContent+=`.productRowV730.productPressingV730{background:#f8fafc}`;
+  css.textContent=`.productDbIcon{background:#14532d}.productDbHomeButton{width:100%;border:0;border-radius:18px;margin:14px 0 6px;padding:16px 15px;display:flex;align-items:center;gap:14px;text-align:left;background:linear-gradient(135deg,#14532d,#166534);color:#fff;box-shadow:0 12px 26px rgba(20,83,45,.22);cursor:pointer}.productDbHomeButton:active{transform:scale(.985)}.productDbHomeButton .ico{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.16);box-shadow:none;flex:0 0 auto}.productDbHomeButton b{display:block;font-size:19px;line-height:1.15}.productDbHomeButton span{display:block;font-size:12px;font-weight:850;line-height:1.35;margin-top:4px;opacity:.9}.productDbHeader{position:relative}.productAddBtn{right:0;top:0}.productFilterToggle{width:100%;border:1px solid #edf2f7;text-align:left}.productFilterBox{display:none;gap:8px;flex-wrap:wrap;margin:8px 0 12px}.productFilterBox.show{display:flex}.productHintV730{margin-top:8px;font-weight:900;color:#53627a}.productHintV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:999px;padding:7px 10px;font-weight:900}.productTableV730{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:auto;max-height:62vh;box-shadow:0 5px 16px rgba(17,44,84,.05)}.productRowV730{display:grid;grid-template-columns:46px 44px minmax(140px,1.5fr) 82px 82px 72px 116px 110px;gap:8px;align-items:center;min-width:822px;padding:9px 12px;border-bottom:1px solid var(--line);font-weight:850}.productRowV730:last-child{border-bottom:0}.productRowV730.head{position:sticky;top:0;background:#eef5ff;color:#0b4ab8;z-index:1}.productRowV730.head button{border:0;background:transparent;color:inherit;text-align:left;font-weight:950;padding:0}.productMoreBtnV738{width:34px;height:28px;border:0;border-radius:8px;background:#15803d;color:#fff;font-size:16px;line-height:1;font-weight:950;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(21,128,61,.22);touch-action:manipulation}.productMoreBtnV738:active{transform:scale(.96);background:#166534}.productNameCell{overflow-wrap:anywhere;line-height:1.25}.productCostValue{color:#1d4ed8;font-weight:950}.productPriceValue{color:#15803d;font-weight:950}.productLimitNote{text-align:center}.productPurposeTextV738{white-space:pre-wrap}.productNameSuggestV730{display:none;flex-direction:column;gap:7px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;margin-top:6px;box-shadow:0 10px 22px rgba(15,23,42,.10)}.productNameSuggestV730.show{display:flex}.productNameSuggestV730 button{border:0;background:#eef5ff;color:#0b4ab8;border-radius:12px;padding:10px;text-align:left;font-weight:900}@media(max-width:370px){.productAddBtn{position:static;margin-left:auto}.productDbHeader{align-items:flex-start}.productRowV730{grid-template-columns:38px 40px minmax(120px,1.5fr) 72px 72px 62px 104px 100px;font-size:13px;min-width:748px}.productMoreBtnV738{width:32px;height:28px}.productDbHomeButton{padding:14px 13px}.productDbHomeButton b{font-size:18px}}`;
   document.head.appendChild(css);
   function normalizeSellingPrices(product){
     const rows=Array.isArray(product?.sellingPrices)?product.sellingPrices:[];
@@ -4973,54 +5014,6 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
         unit?.insertAdjacentHTML('afterend','<div id="extraPricesEditorV732" class="extraPricesEditorV732"></div>');
       }
       renderExtraPriceEditor(normalized.extras);
-    },0);
-  };
-  const baseSaveProductEditorV732=window.saveProductEditor;
-  window.saveProductEditor=async function(id=''){
-    const old=products.find(x=>String(x.id)===String(id))||{};
-    const prices=collectSellingPrices();
-    await baseSaveProductEditorV732(id);
-    const name=txt(document.getElementById('productEditName')?.value);
-    const target=products.find(x=>String(x.id)===String(id))||products.find(x=>clean(x.name)===clean(name));
-    if(target){
-      target.sellingPrices=prices;
-      target.price=prices[0]?.price||target.price||'';
-      target.unit=prices[0]?.unit||target.unit||'';
-      const history={at:Date.now(),by:nowUser(),oldSellingPrices:normalizeSellingPrices(old),newSellingPrices:normalizeSellingPrices(target),type:'sellingPrices'};
-      await saveProductRecord(target,history);
-    }
-  };
-  const baseOpenProductInfoV732=window.openProductInfo;
-  window.openProductInfo=function(id){
-    baseOpenProductInfoV732(id);
-    setTimeout(()=>{
-      const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
-      const modal=document.getElementById('productInfoModal'), sheet=modal?.querySelector('.sheet'); if(!sheet)return;
-      const normalized=normalizeSellingPrices(p);
-      const extras=normalized.extras.filter(row=>txt(row.price)||txt(row.unit));
-      if(extras.length&&!sheet.querySelector('.extraPricesInfoV732')){
-        const html=`<div class="sectionTitle extraPricesInfoV732">ราคาขายเพิ่มเติม</div>${extras.map((row,index)=>`<div class="miniItem"><b>ราคา ${index+2}</b><span class="meta">${esc(display(row.price))} บาท / ${esc(display(row.unit))}</span></div>`).join('')}`;
-        const historyTitle=[...sheet.querySelectorAll('.sectionTitle')].find(el=>/ประวัติ/.test(el.textContent||''));
-        if(historyTitle)historyTitle.insertAdjacentHTML('beforebegin',html); else sheet.insertAdjacentHTML('beforeend',html);
-      }
-      if(p.notes&&!sheet.querySelector('.productNotesInfoV732')){
-        const rows=sheet.querySelector('.statusRows');
-        rows?.insertAdjacentHTML('beforeend',`<div class="statusRow productNotesInfoV732"><span>หมายเหตุ</span><span>${esc(p.notes)}</span></div>`);
-      }
-      const priceHistory=(p.history||[]).filter(entry=>entry&&entry.type==='sellingPrices'&&entry.newSellingPrices);
-      if(priceHistory.length&&!sheet.querySelector('.priceHistoryInfoV732')){
-        function priceSummary(snapshot){
-          const main=snapshot?.mainPrice||'', unit=snapshot?.mainUnit||'', extras=snapshot?.extras||[];
-          const lines=[main||unit?`หลัก: ${display(main)} บาท / ${display(unit)}`:''];
-          extras.forEach((row,index)=>lines.push(`ราคา ${index+2}: ${display(row.price)} บาท / ${display(row.unit)}`));
-          return lines.filter(Boolean).map(esc).join('<br>');
-        }
-        const html=`<div class="sectionTitle priceHistoryInfoV732">ประวัติราคาขายเพิ่มเติม</div>${priceHistory.slice().sort((a,b)=>(b.at||0)-(a.at||0)).map(entry=>`<div class="item"><b>${esc(fmt(entry.at))}</b><div class="muted">ผู้แก้ไข: ${esc(entry.by||'-')}</div><div class="muted">เดิม:<br>${priceSummary(entry.oldSellingPrices)||'—'}</div><div class="muted">ใหม่:<br>${priceSummary(entry.newSellingPrices)||'—'}</div></div>`).join('')}`;
-        const closeBtn=[...sheet.querySelectorAll('button')].find(button=>(button.getAttribute('onclick')||'').includes('productInfoModal'));
-        if(closeBtn)closeBtn.insertAdjacentHTML('beforebegin',html); else sheet.insertAdjacentHTML('beforeend',html);
-      }
-      const rows=sheet.querySelector('.statusRows');
-      if(rows&&!sheet.querySelector('.productUpdatedInfoV732'))rows.insertAdjacentHTML('beforeend',`<div class="statusRow productUpdatedInfoV732"><span>แก้ไขล่าสุด</span><span>${esc(fmt(p.updatedAt||p.createdAt))} ${p.updatedBy?`โดย ${esc(p.updatedBy)}`:''}</span></div>`);
     },0);
   };
   const styleV732=document.createElement('style');
