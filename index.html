@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.42</title>
+<title>Stock Alert V7.43</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.42</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.43</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.42</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.43</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1810,8 +1810,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.42';
-  const APP_VERSION_LABEL='V7.42';
+  const APP_VERSION='7.43';
+  const APP_VERSION_LABEL='V7.43';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3344,7 +3344,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.42';if(versionBox)versionBox.textContent='V7.42';
+  if(versionSub)versionSub.textContent='V7.43';if(versionBox)versionBox.textContent='V7.43';
 })();
 </script>
 <script>
@@ -4283,7 +4283,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.42';
+  const APP_VERSION='V7.43';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4621,7 +4621,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.42';
+    document.title='Stock Alert V7.43';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -4636,12 +4636,28 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const UNKNOWN_CATEGORY='ยังไม่ระบุ';
   const PRODUCT_COLL='stock_alert_beta1_products';
   const PRODUCT_CACHE='stockAlertProductsV730';
+  const PRODUCT_MIGRATION_KEY='stockAlertProductsFirebaseMigrationV743';
   const PRODUCT_FILTERS=['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด','เคมี','กันรั่ว กันซึม','น้ำมันต่างๆ','กาว',UNKNOWN_CATEGORY];
   let products=readJSON(PRODUCT_CACHE,[]);
   let productUiReady=false;
-  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null;
+  let productFilter='', productSort='name', productSortDir=1, productLoaded=false, productSearchTimer=null, productListenerUnsub=null, productRetryTimer=null;
+  const productSavingIds=new Set();
   function readJSON(keyName,def){try{return JSON.parse(localStorage.getItem(keyName)||JSON.stringify(def));}catch(e){return def;}}
   function saveCache(){try{localStorage.setItem(PRODUCT_CACHE,JSON.stringify(products.slice(0,5000)));}catch(e){}}
+  function firebaseReady(){return typeof db!=='undefined'&&db;}
+  function setProductSyncWarning(message){
+    const text=message||'ยังเชื่อมต่อ Firebase ไม่ได้';
+    const sync=document.getElementById('syncText'); if(sync)sync.textContent=text;
+    let notice=document.getElementById('stockSyncNoticeV724');
+    if(!notice){notice=document.createElement('div');notice.id='stockSyncNoticeV724';notice.className='stockSyncNotice';notice.innerHTML='<span id="stockSyncNoticeText"></span><button type="button" onclick="window.refreshStockAlertData&&window.refreshStockAlertData()">โหลดล่าสุด</button>';document.body.appendChild(notice);}
+    const label=document.getElementById('stockSyncNoticeText'); if(label)label.textContent=text;
+    notice.classList.add('show');
+  }
+  function clearProductSyncWarning(message){
+    const sync=document.getElementById('syncText'); if(sync)sync.textContent=message||'Sync Firebase พร้อมใช้งาน';
+    const notice=document.getElementById('stockSyncNoticeV724'), label=document.getElementById('stockSyncNoticeText');
+    if(notice&&label&&label.textContent==='ยังเชื่อมต่อ Firebase ไม่ได้')notice.classList.remove('show');
+  }
   function esc(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
   function enc(value){return encodeURIComponent(String(value??''));}
   function dec(value){return decodeURIComponent(String(value??''));}
@@ -4722,6 +4738,40 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     const idx=products.findIndex(x=>String(x.id)===String(id)||clean(x.name)===clean(next.name));
     if(idx>=0)products[idx]={...products[idx],...next}; else products.push(next);
   }
+  function remoteProductMaps(rows){
+    const byId=new Map(), byName=new Map();
+    rows.forEach(row=>{if(row?.id)byId.set(String(row.id),row);const nameKey=clean(row?.name);if(nameKey&&!byName.has(nameKey))byName.set(nameKey,row);});
+    return {byId,byName};
+  }
+  async function migrateLocalProductsToFirebase(remoteRows){
+    if(!firebaseReady())return;
+    const localRows=readJSON(PRODUCT_CACHE,[]);
+    if(!Array.isArray(localRows)||!localRows.length)return;
+    const done=readJSON(PRODUCT_MIGRATION_KEY,{});
+    const {byId,byName}=remoteProductMaps(remoteRows||[]);
+    const writes=[];
+    localRows.forEach(local=>{
+      if(!local||!txt(local.name))return;
+      const stableId=String(local.id||'').startsWith('p_')?String(local.id):productId(local.name);
+      const nameKey=clean(local.name);
+      const remote=byId.get(String(stableId))||byName.get(nameKey);
+      const localUpdated=Number(local.updatedAt||local.createdAt||0);
+      const remoteUpdated=Number(remote?.updatedAt||remote?.createdAt||0);
+      if(done[stableId]&&Number(done[stableId])>=localUpdated)return;
+      if(remote&&remoteUpdated>=localUpdated){done[stableId]=localUpdated||Date.now();return;}
+      const targetId=remote?.id||stableId;
+      const payload={...(remote||{}),...local,id:targetId,search:clean(local.name),updatedAt:Math.max(localUpdated,Date.now()),migratedFromLocal:true,migratedAt:Date.now()};
+      writes.push({id:targetId,payload,doneId:stableId,doneAt:localUpdated||Date.now()});
+    });
+    if(!writes.length){try{localStorage.setItem(PRODUCT_MIGRATION_KEY,JSON.stringify(done));}catch(e){};return;}
+    for(let i=0;i<writes.length;i+=450){
+      const batch=db.batch();
+      writes.slice(i,i+450).forEach(row=>batch.set(db.collection(PRODUCT_COLL).doc(row.id),row.payload,{merge:true}));
+      await batch.commit();
+      writes.slice(i,i+450).forEach(row=>{done[row.doneId]=row.doneAt;});
+      try{localStorage.setItem(PRODUCT_MIGRATION_KEY,JSON.stringify(done));}catch(e){}
+    }
+  }
   function productFromShortage(item){
     if(!item||!txt(item.name))return null;
     const supplier=txt(item.supplier)==='ยังไม่ได้ระบุ'?'':txt(item.supplier);
@@ -4730,10 +4780,19 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   async function saveProductRecord(product,historyEntry){
     const localProduct=historyEntry?{...product,history:[...(product.history||[]),historyEntry]}:product;
     upsertLocal(localProduct); saveCache();
-    if(online&&db){
+    if(firebaseReady()){
       const payload={...product,search:clean(product.name),updatedAt:Date.now(),updatedBy:nowUser()};
       if(historyEntry)payload.history=firebase.firestore.FieldValue.arrayUnion(historyEntry);
-      await db.collection(PRODUCT_COLL).doc(payload.id).set(payload,{merge:true});
+      const write=db.collection(PRODUCT_COLL).doc(payload.id).set(payload,{merge:true});
+      const queued=await Promise.race([write.then(()=>false),new Promise(resolve=>setTimeout(()=>resolve(true),1500))]);
+      if(queued){
+        setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');
+        write.then(()=>clearProductSyncWarning()).catch(error=>{console.warn('Product database write failed',error);setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');});
+      }else{
+        clearProductSyncWarning();
+      }
+    }else{
+      setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');
     }
   }
   async function rememberProductFromShortage(item){
@@ -4746,19 +4805,42 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     let changed=false;
     (items||[]).forEach(item=>{const p=productFromShortage(item); if(p&&!products.some(x=>clean(x.name)===clean(p.name))){products.push(p); changed=true;}});
     if(changed)saveCache();
-    if(online&&db)(items||[]).slice(0,150).forEach(item=>rememberProductFromShortage(item));
+    if(firebaseReady())(items||[]).slice(0,150).forEach(item=>rememberProductFromShortage(item));
   }
   function listenProducts(){
-    if(productLoaded)return; productLoaded=true;
-    if(online&&db){
-      db.collection(PRODUCT_COLL).orderBy('updatedAt','desc').limit(1200).onSnapshot(snapshot=>{
-        snapshot.docs.forEach(doc=>upsertLocal({id:doc.id,...doc.data()}));
-        saveCache(); renderProductPage(); renderProductSuggestions();
-      },error=>console.warn('Product database sync unavailable',error));
+    clearTimeout(productRetryTimer);
+    if(productListenerUnsub)return;
+    if(!firebaseReady()){
+      productLoaded=false;
+      setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');
+      productRetryTimer=setTimeout(listenProducts,4000);
+      return;
+    }
+    try{
+      productLoaded=true;
+      productListenerUnsub=db.collection(PRODUCT_COLL).orderBy('updatedAt','desc').limit(1200).onSnapshot({includeMetadataChanges:true},snapshot=>{
+        try{online=true;}catch(e){}
+        const remoteRows=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));
+        remoteRows.forEach(upsertLocal);
+        saveCache();
+        if(!snapshot.metadata.fromCache)migrateLocalProductsToFirebase(remoteRows).catch(error=>console.warn('Product local migration failed',error));
+        if(snapshot.metadata.fromCache&&!navigator.onLine)setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');else clearProductSyncWarning(snapshot.metadata.hasPendingWrites?'กำลังซิงก์ Firebase...':'Sync Firebase พร้อมใช้งาน');
+        renderProductPage(); renderProductSuggestions();
+      },error=>{
+        console.warn('Product database sync unavailable',error);
+        productListenerUnsub=null; productLoaded=false;
+        setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');
+        productRetryTimer=setTimeout(listenProducts,5000);
+      });
+    }catch(error){
+      console.warn('Product database listener failed to start',error);
+      productListenerUnsub=null; productLoaded=false;
+      setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้');
+      productRetryTimer=setTimeout(listenProducts,5000);
     }
   }
   async function remoteSearchProducts(q){
-    if(!online||!db||!q)return [];
+    if(!firebaseReady()||!q)return [];
     const k=clean(q); if(!k)return [];
     try{
       const snap=await db.collection(PRODUCT_COLL).orderBy('search').startAt(k).endAt(k+'\uf8ff').limit(80).get();
@@ -4939,13 +5021,17 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   };
   window.saveProductEditor=async function(id=''){
     const name=txt(document.getElementById('productEditName')?.value); if(!name)return toast('กรุณาใส่ชื่อสินค้า');
+    const saveId=id||productId(name);
+    if(productSavingIds.has(saveId))return;
+    productSavingIds.add(saveId);
     const old=products.find(x=>String(x.id)===String(id))||{};
     const prices=typeof collectSellingPrices==='function'?collectSellingPrices():[{price:txt(document.getElementById('productEditPrice')?.value),unit:txt(document.getElementById('productEditUnit')?.value),isPrimary:true}];
-    const newId=id||productId(name);
+    const newId=saveId;
     const costPrice=txt(document.getElementById('productEditCost')?.value);
     const product={...old,id:newId,name,cost:costPrice,costPrice,costCode:normalizeCostCode(productCostCodeDraft),price:prices[0]?.price||'',unit:prices[0]?.unit||'',sellingPrices:prices,category:txt(document.getElementById('productEditCategory')?.value)||UNKNOWN_CATEGORY,supplier:txt(document.getElementById('productEditSupplier')?.value),purpose:txt(document.getElementById('productEditPurpose')?.value),notes:txt(document.getElementById('productEditNotes')?.value),source:old.source||'manual',createdAt:old.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:nowUser(),previousNames:[...new Set([...(old.previousNames||[]),old.name&&clean(old.name)!==clean(name)?old.name:''].filter(Boolean))]};
     const history=buildProductHistory(old,product);
     try{await saveProductRecord(product,history); closeModal('productEditorModal'); renderProductPage(); toast('บันทึกสินค้าแล้ว');}catch(e){console.error(e); toast('บันทึกสินค้าไม่สำเร็จ');}
+    finally{productSavingIds.delete(saveId);}
   };
   window.openProductInfo=function(id){
     const p=products.find(x=>String(x.id)===String(id)); if(!p)return;
@@ -5075,6 +5161,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   styleV732.textContent='.extraPricesEditorV732{margin-top:12px}.extraPriceBlockV732{border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;background:#f8fbff}.extraPriceHeadV732{display:flex;justify-content:space-between;align-items:center}.addPriceBtnV732{width:100%;margin-top:8px}.extraPricesInfoV732{margin-top:14px}';
   document.head.appendChild(styleV732);
   window.StockAlertProducts={rememberProductFromShortage,remoteSearchProducts,list:()=>products.slice(),normalizeSellingPrices};
+  window.addEventListener('online',()=>{clearProductSyncWarning('กำลังเชื่อมต่อ Firebase...');listenProducts();});
+  window.addEventListener('offline',()=>setProductSyncWarning('ยังเชื่อมต่อ Firebase ไม่ได้'));
   ensureProductHomeTile();
 })();
 /* === V7.33 dynamic prices and delivery-status follow-up === */

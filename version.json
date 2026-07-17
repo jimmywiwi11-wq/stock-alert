@@ -1,6 +1,6 @@
 {
-  "version": "7.42",
-  "label": "V7.42",
+  "version": "7.43",
+  "label": "V7.43",
   "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Darken Product/Price table cost-code color."
+  "message": "Fix Product/Price Firebase synchronization."
 }
