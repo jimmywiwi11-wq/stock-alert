@@ -1,6 +1,6 @@
-/* Stock Alert V7.54 - Cash Reconciliation */
+/* Stock Alert V7.55 - Cash Reconciliation */
 (function(){
-  const APP_VERSION='V7.54';
+  const APP_VERSION='V7.55';
   const CASH_KEY='stockAlertDailyCashChecksV746';
   const DRAFT_KEY='stockAlertDailyCashDraftsV746';
   const CASH_COLL='stock_alert_beta1_cash_reconciliation';
@@ -11,8 +11,8 @@
   let cashBranch=1,cashInfoMode='history',cashSalesMode='daily';
   let editingExpenseIndex=-1,editingAddIndex=-1,cashSaving=false,cashUnsub=null;
   let cashDirty=false,cashSuppressDirty=false,cashEditingRecord=null;
-  let cashConnectionState='connecting',cashNoticeVisibleUntil=0,cashConnectionStartedAt=Date.now();
-  let cashSyncStarting=false,cashRetrying=false,cashToastTimer=null,cashToastText='',cashListenerRun=0,cashActiveListeners=0,cashLastError=null;
+  let cashConnectionState='initializing',cashNoticeVisibleUntil=0,cashConnectionStartedAt=Date.now();
+  let cashSyncStarting=false,cashRetrying=false,cashToastTimer=null,cashToastText='',cashListenerRun=0,cashActiveListeners=0,cashLastError=null,cashAuthReadyPromise=null;
 
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function read(key,def){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(def));}catch(e){return def;}}
@@ -26,7 +26,7 @@
   function monthKey(v){return String(v||'').slice(0,7)||today().slice(0,7);}
   function yearKey(v){return String(v||'').slice(0,4)||today().slice(0,4);}
   function userName(){try{return (typeof nickname!=='undefined'&&nickname)||localStorage.getItem('stockAlertNickname')||localStorage.getItem('stockAlertUserNickname')||'ไม่ระบุ';}catch(e){return 'ไม่ระบุ';}}
-  function ready(){return typeof db!=='undefined'&&db&&cashConnectionState==='online';}
+  function ready(){return typeof db!=='undefined'&&db&&cashConnectionState==='connected';}
   function firebaseDbReady(){return typeof db!=='undefined'&&db&&typeof db.collection==='function';}
   function isFileMode(){return location.protocol==='file:';}
   function isLocalServer(){return location.hostname==='localhost'||location.hostname==='127.0.0.1';}
@@ -36,6 +36,7 @@
     const auth=typeof firebase!=='undefined'&&firebase.auth?firebase.auth():null;
     console.info('[CashReconciliation]',label,{mode:runtimeMode(),firebaseApps:typeof firebase!=='undefined'&&firebase.apps?firebase.apps.length:0,dbReady:firebaseDbReady(),authAvailable:!!auth,authReady:!auth||!!auth.currentUser,hasUser:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,connection:cashConnectionState,activeListeners:cashActiveListeners,...extra});
   }
+  function authInstance(){try{return typeof firebase!=='undefined'&&firebase.auth?firebase.auth():null;}catch(e){return null;}}
   function toastCash(msg){
     try{
       const el=document.getElementById('toast');
@@ -100,17 +101,18 @@
   function setCashConnection(state,temporary=false){
     cashConnectionState=state;
     cashNoticeVisibleUntil=temporary?Date.now()+2600:0;
-    if(state==='online')clearCashToast();
+    if(state==='connected')clearCashToast();
     if(temporary)setTimeout(refreshCashActive,2700);
   }
   function stopCashSync(){
     if(cashUnsub){try{cashUnsub();}catch(e){}cashUnsub=null;cashActiveListeners=Math.max(0,cashActiveListeners-1);}
   }
   function waitForAuthReady(){
-    if(typeof firebase==='undefined'||!firebase.auth)return Promise.resolve({available:false});
-    const auth=firebase.auth();
-    if(auth.currentUser)return Promise.resolve({available:true,user:auth.currentUser});
-    return new Promise(resolve=>{
+    if(cashAuthReadyPromise)return cashAuthReadyPromise;
+    const auth=authInstance();
+    if(!auth){cashAuthReadyPromise=Promise.resolve({available:false});return cashAuthReadyPromise;}
+    if(auth.currentUser){cashAuthReadyPromise=Promise.resolve({available:true,user:auth.currentUser});return cashAuthReadyPromise;}
+    cashAuthReadyPromise=new Promise(resolve=>{
       let done=false;
       let unsub=()=>{};
       const finish=user=>{if(done)return;done=true;try{unsub();}catch(e){}resolve({available:true,user});};
@@ -121,6 +123,7 @@
       },error=>resolve({available:true,error}));
       setTimeout(()=>{if(done)return;done=true;try{unsub();}catch(e){}resolve({available:true,timeout:true});},3500);
     });
+    return cashAuthReadyPromise;
   }
   async function startCashSync(force=false){
     if(cashUnsub&&!force)return;
@@ -134,17 +137,18 @@
         debugCash('file-mode-skip-firebase');
         return;
       }
-      if(cashConnectionState==='file')setCashConnection('connecting');
+      if(cashConnectionState==='file')setCashConnection('initializing');
       if(!firebaseDbReady()){
-        setCashConnection(navigator.onLine===false?'offline':'unavailable');
+        setCashConnection(navigator.onLine===false?'offline-cache':'error');
         debugCash('db-not-ready');
         return;
       }
-      setCashConnection('connecting');
+      setCashConnection(force?'reconnecting':'initializing');
       const authState=await waitForAuthReady();
       if(authState.error){
         cashLastError=authState.error;
         console.warn('[CashReconciliation] auth error',authState.error.code||authState.error.name,authState.error.message||authState.error);
+        cashAuthReadyPromise=null;
         setCashConnection('error');
         return;
       }
@@ -156,7 +160,7 @@
         cashRetrying=false;
         cashLastError=null;
         const meta=snap.metadata||{};
-        setCashConnection('online',true);
+        setCashConnection(meta.fromCache&&navigator.onLine===false?'offline-cache':'connected',!(meta.fromCache&&navigator.onLine===false));
         debugCash('initial-snapshot-ok',{fromCache:!!meta.fromCache,hasPendingWrites:!!meta.hasPendingWrites,docs:snap.size,runId});
         const remoteRows=[],remoteDrafts={};
         snap.forEach(doc=>{const row=normalize({id:doc.id,...doc.data()});if(row.type==='draft')remoteDrafts[draftKey(row.branch,row.date)]=row;else remoteRows.push(row);});
@@ -169,7 +173,7 @@
         stopCashSync();
         const code=err?.code||err?.name||'unknown';
         console.warn('[CashReconciliation] Firestore listener error',code,err?.message||err);
-        setCashConnection(navigator.onLine===false?'offline':'error');
+        setCashConnection(navigator.onLine===false?'offline-cache':'error');
         refreshCashActive();
       });
     }finally{
@@ -179,7 +183,7 @@
   function pollCashSync(){
     if(cashUnsub||cashSyncStarting)return;
     if(Date.now()-cashConnectionStartedAt>3200){
-      setCashConnection(navigator.onLine===false?'offline':'unavailable');
+      setCashConnection(navigator.onLine===false?'offline-cache':'error');
       refreshCashActive();
       return;
     }
@@ -205,11 +209,12 @@
   function ensureModal(id){let m=document.getElementById(id);if(!m){m=document.createElement('div');m.id=id;m.className='modal';document.body.appendChild(m);}return m;}
   function actionDisabled(){return cashSaving?'disabled':'';}
   function connectionNotice(){
-    if(cashConnectionState==='online'&&Date.now()>cashNoticeVisibleUntil)return '';
-    if(cashConnectionState==='online')return '<div class="cashSync ok">ซิงค์ข้อมูลเรียบร้อย</div>';
+    if(cashConnectionState==='connected'&&Date.now()>cashNoticeVisibleUntil)return '';
+    if(cashConnectionState==='connected')return '<div class="cashSync ok">เชื่อมต่อข้อมูลสำเร็จ</div>';
     if(cashConnectionState==='file'&&isFileMode())return '<div class="cashSync wait">กำลังเปิดเวอร์ชันทดสอบในเครื่อง ควรทดสอบ Firebase ผ่าน localhost หรือ URL ที่ Deploy แล้ว</div>';
     if(cashConnectionState==='file')return '';
-    if(cashConnectionState==='offline')return '<div class="cashSync wait">กำลังแสดงข้อมูลที่บันทึกไว้ในเครื่อง <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>';
+    if(cashConnectionState==='offline-cache')return '<div class="cashSync wait">กำลังใช้ข้อมูลที่บันทึกไว้ในเครื่อง รอซิงค์เมื่อออนไลน์ <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>';
+    if(cashConnectionState==='reconnecting')return '<div class="cashSync wait">กำลังเชื่อมต่ออีกครั้ง...</div>';
     if(cashConnectionState==='error')return `<div class="cashSync error">เชื่อมต่อข้อมูลตรวจสอบเงินไม่สำเร็จ <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>`;
     if(cashConnectionState==='unavailable')return '<div class="cashSync wait">ยังไม่ได้เชื่อมต่อ Firebase <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>';
     return '<div class="cashSync wait">กำลังเชื่อมต่อข้อมูล...</div>';
@@ -233,7 +238,10 @@
   }
   function exportCardHtml(record){
     record=normalize(record);const c=calc(record),tone=resultTone(c.status),mobile=window.innerWidth<720?'mobile':'desktop';
-    return `<div class="cashExportCard ${mobile}" id="cashExportCard"><header><h2>${esc(branches[record.branch]?.name||'โชคอนันต์')}</h2><p>วันที่ ${dateText(record.date)}</p></header><section class="cashExportHero sales"><span>ยอดขายรวม</span><b>${money(c.sales)} บาท</b></section><section class="cashExportHero transfer"><span>ยอดโอน</span><b>${money(c.transfer)} บาท</b></section><div class="cashExportGrid"><div><span>เงินทอนตอนเช้า</span><b>${money(c.morning)} บาท</b></div><div><span>เติมเงินทอน</span><b>${money(c.addTotal)} บาท</b></div><div><span>ค่าใช้จ่ายรวม</span><b>${money(c.expenseTotal)} บาท</b></div><div><span>เงินสดที่ควรมี</span><b>${money(c.expected)} บาท</b></div><div><span>เงินทอนตอนเย็น</span><b>${money(c.evening)} บาท</b></div><div><span>แบงค์ 1,000 ตอนเย็น</span><b>${intText(record.eveningBank1000Count)} ใบ</b></div></div><section class="cashExportResult ${tone}">${resultText(c)}</section><section><h3>เพิ่มเงินทอน</h3>${record.cashAdds.length?record.cashAdds.map(x=>`<p>${esc(x.time)} เติมเงินทอน ${money(x.amount)} บาท — ${esc(x.detail||'-')} (${esc(x.by||'-')})</p>`).join(''):'<p>ไม่มี</p>'}</section><section><h3>ค่าใช้จ่าย</h3>${record.expenses.length?record.expenses.map(x=>`<p>${esc(x.name)} ${money(x.amount)} บาท${x.note?` — ${esc(x.note)}`:''} (${esc(x.by||'-')})</p>`).join(''):'<p>ไม่มี</p>'}</section><section><h3>หมายเหตุ</h3><p>${esc(record.note||'-')}</p></section><footer>ผู้บันทึก ${esc(record.savedBy||userName())} • ${timeNow(record.updatedAt||Date.now())}</footer></div>`;
+    const row=(label,value,cls='')=>`<div class="cashPaperRow ${cls}"><span>${label}</span><b>${value}</b></div>`;
+    const addRows=record.cashAdds.length?record.cashAdds.map(x=>`<div class="cashPaperLine"><span>${esc(x.time||'-')} ${esc(x.detail||'เติมเงินทอน')}</span><b>${money(x.amount)} บาท</b></div>`).join(''):'<div class="cashPaperLine mutedLine"><span>เพิ่มเงินทอน: ไม่มี</span><b></b></div>';
+    const expenseRows=record.expenses.length?record.expenses.map(x=>`<div class="cashPaperLine expense"><span>${esc(x.time||'-')} ${esc(x.name||'-')}${x.note?` • ${esc(x.note)}`:''}</span><b>${money(x.amount)} บาท</b></div>`).join(''):'<div class="cashPaperLine mutedLine"><span>ค่าใช้จ่าย: ไม่มี</span><b></b></div>';
+    return `<div class="cashExportCard cashPaper ${mobile}" id="cashExportCard"><header><h2>${esc(branches[record.branch]?.name||'โชคอนันต์')}</h2><p>วันที่ ${dateText(record.date)} • ผู้บันทึก ${esc(record.savedBy||userName())} • ${timeNow(record.updatedAt||Date.now())}</p></header><section class="cashPaperTable">${row('ยอดขายรวม',`${money(c.sales)} บาท`,'sales')}${row('ยอดโอน',`${money(c.transfer)} บาท`,'transfer')}${row('ยอดขายเงินสด',`${money(c.cashSales)} บาท`)}${row('เงินทอนตอนเช้า',`${money(c.morning)} บาท`)}${row('เพิ่มเงินทอนรวม',`${money(c.addTotal)} บาท`)}${row('ค่าใช้จ่ายรวม',`${money(c.expenseTotal)} บาท`,'expense')}${row('เงินสดที่ควรมี',`${money(c.expected)} บาท`,'expected')}${row('เงินทอนตอนเย็น',`${money(c.evening)} บาท`)}${row('แบงค์ 1,000 ตอนเย็น',`${intText(record.eveningBank1000Count)} ใบ`)}</section><section class="cashPaperResult ${tone}"><span>ผลการตรวจสอบ</span><b>${resultText(c)}</b></section><section class="cashPaperDetails"><h3>เพิ่มเงินทอน</h3>${addRows}<h3>ค่าใช้จ่าย</h3>${expenseRows}</section><footer><div>หมายเหตุ: ${esc(record.note||'-')}</div><div>ผู้บันทึก: ${esc(record.savedBy||userName())}</div><div>บันทึกเวลา: ${timeNow(record.updatedAt||Date.now())}</div></footer></div>`;
   }
   function summaryPanelHtml(record){return `<div id="cashResultBox">${cashFormulaHtml(record)}<div class="cashExportPreview">${exportCardHtml(record)}</div></div>`;}
   function dayListsHtml(record){
@@ -244,11 +252,11 @@
   }
   function textReport(record){
     record=normalize(record);const c=calc(record);
-    const lines=[branches[record.branch]?.name||'โชคอนันต์',`วันที่ ${dateText(record.date)}`,'',`ยอดขายรวม: ${money(c.sales)} บาท`,`ยอดโอน: ${money(c.transfer)} บาท`,'',`เงินทอนตอนเช้า: ${money(c.morning)} บาท`,'','เพิ่มเงินทอน:'];
-    if(record.cashAdds.length)record.cashAdds.forEach(x=>lines.push(`- ${x.time||'-'} เติมเงินทอน ${money(x.amount)} บาท${x.detail?` — ${x.detail}`:''}`));else lines.push('- ไม่มี');
+    const lines=[branches[record.branch]?.name||'โชคอนันต์',`วันที่ ${dateText(record.date)}`,'',`ยอดขายรวม: ${money(c.sales)} บาท`,`ยอดโอน: ${money(c.transfer)} บาท`,`ยอดขายเงินสด: ${money(c.cashSales)} บาท`,`เงินทอนตอนเช้า: ${money(c.morning)} บาท`,`เพิ่มเงินทอนรวม: ${money(c.addTotal)} บาท`,`ค่าใช้จ่ายรวม: ${money(c.expenseTotal)} บาท`,`เงินสดที่ควรมี: ${money(c.expected)} บาท`,`เงินทอนตอนเย็น: ${money(c.evening)} บาท`,`แบงค์ 1,000 ตอนเย็น: ${intText(record.eveningBank1000Count)} ใบ`,'',`ผลลัพธ์: ${resultText(c)}`,'','เพิ่มเงินทอน:'];
+    if(record.cashAdds.length)record.cashAdds.forEach(x=>lines.push(`- ${x.time||'-'} ${x.detail||'เติมเงินทอน'} ${money(x.amount)} บาท`));else lines.push('- ไม่มี');
     lines.push('','ค่าใช้จ่าย:');
-    if(record.expenses.length)record.expenses.forEach(x=>lines.push(`- ${x.name||'-'} ${money(x.amount)} บาท${x.note?` — ${x.note}`:''}`));else lines.push('- ไม่มี');
-    lines.push(`รวมค่าใช้จ่าย: ${money(c.expenseTotal)} บาท`,'',`เงินสดที่ควรมี: ${money(c.expected)} บาท`,`เงินทอนตอนเย็น: ${money(c.evening)} บาท`,`แบงค์ 1,000 ตอนเย็น: ${intText(record.eveningBank1000Count)} ใบ`,'',`ผลลัพธ์: ${resultText(c)}`,'',`หมายเหตุ: ${record.note||'-'}`,`ผู้บันทึก: ${record.savedBy||userName()} เวลา ${timeNow(record.updatedAt||Date.now())}`);
+    if(record.expenses.length)record.expenses.forEach(x=>lines.push(`- ${x.time||'-'} ${x.name||'-'} ${money(x.amount)} บาท${x.note?` — ${x.note}`:''}`));else lines.push('- ไม่มี');
+    lines.push('',`หมายเหตุ: ${record.note||'-'}`,`ผู้บันทึก: ${record.savedBy||userName()}`,`เวลา: ${timeNow(record.updatedAt||Date.now())}`);
     return lines.join('\n');
   }
   function ensurePages(){
@@ -296,7 +304,7 @@
     clearCashToast();
     debugCash('manual-retry-start');
     await startCashSync(true);
-    if(cashConnectionState!=='online'&&cashLastError){
+    if(cashConnectionState!=='connected'&&cashLastError){
       console.warn('[CashReconciliation] retry failed',cashLastError.code||cashLastError.name||'unknown',cashLastError.message||cashLastError);
     }
     cashRetrying=false;
@@ -369,7 +377,7 @@
   window.go=go=function(id){
     ensurePages();ensureHomeButton();
     if(cashDirty&&document.getElementById('cashBranchPage')?.classList.contains('active')&&id!=='cashBranchPage'&&!confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้ใช่หรือไม่?'))return;
-    if(String(id||'').startsWith('cash'))startCashSync();
+    if(id==='cashBranchPage'||id==='cashInfoPage'||id==='cashSalesSummaryPage')startCashSync();
     else clearCashToast();
     const r=oldGo.apply(this,arguments);
     if(id==='cashBranchPage')renderBranch(getRecord(cashBranch,today()));
@@ -381,11 +389,11 @@
   window.renderAll=renderAll=function(){const r=oldRenderAll.apply(this,arguments);ensurePages();ensureHomeButton();return r;};
   window.addEventListener('beforeunload',e=>{if(cashDirty){e.preventDefault();e.returnValue='';}});
   window.addEventListener('online',()=>setTimeout(()=>{if(isCashPageActive())startCashSync(true);refreshCashActive();},600));
-  window.addEventListener('offline',()=>{if(isCashPageActive()){setCashConnection('offline');refreshCashActive();}});
+  window.addEventListener('offline',()=>{if(isCashPageActive()){setCashConnection('offline-cache');refreshCashActive();}});
 
   const style=document.createElement('style');
-  style.textContent=`.cashHomeCardV749{width:100%;border:0;border-radius:22px;margin:14px 0 4px;padding:18px;display:flex;align-items:center;gap:14px;text-align:left;color:#fff;background:linear-gradient(135deg,#0f766e,#2563eb);box-shadow:0 14px 30px rgba(37,99,235,.24);font-family:inherit}.cashHomeCardV749 b{display:block;font-size:24px}.cashHomeCardV749 small{display:block;font-size:13px;font-weight:800;opacity:.92;margin-top:3px}.cashHomeIconV749{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:0 0 56px}.cashHomeCardV749 svg,.cashMenuCardV749 svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.cashMenuGridV749{display:grid;grid-template-columns:1fr;gap:14px;margin:12px 0 90px}.cashMenuCardV749{border:0;border-radius:22px;min-height:112px;padding:18px;color:#fff;text-align:left;display:flex;align-items:center;gap:14px;font:inherit;box-shadow:0 12px 26px rgba(15,23,42,.13)}.cashMenuCardV749 span{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.2);display:grid;place-items:center}.cashMenuCardV749 b{font-size:21px}.cashMenuCardV749.blue{background:linear-gradient(135deg,#0967f2,#38bdf8)}.cashMenuCardV749.green{background:linear-gradient(135deg,#0f9f6e,#7ddf95)}.cashMenuCardV749.purple{background:linear-gradient(135deg,#7c3aed,#c084fc)}.cashMenuCardV749.orange{background:linear-gradient(135deg,#f97316,#facc15);color:#382100}.cashBranchPanelV749{padding-bottom:92px}.cashBranchPanelV749.blue{--cash:#0967f2}.cashBranchPanelV749.green{--cash:#0f9f6e}.cashInputCard,.cashFormula,.cashExportCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:12px 0}.cashInputCard h3{margin:0 0 8px;color:var(--cash);font-size:18px}.cashInputCard p,.cashInputCard small{color:#64748b;font-weight:800}.cashQuickActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.cashQuickActions .btn{min-height:54px;width:100%;font-weight:950}.cashActionAdd{background:linear-gradient(135deg,#0967f2,#38bdf8)!important}.cashActionExpense{background:linear-gradient(135deg,#f97316,#fb7185)!important;color:#fff!important}.cashWideBtn{width:100%;min-height:52px;margin:10px 0}.cashWideBtn.expense{background:#7c3aed}.cashDayCards{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 0}.cashDayCard{border-radius:18px;padding:12px;border:1px solid #dbeafe;background:#eff6ff}.cashDayCard.expense{border-color:#fed7aa;background:#fff7ed}.cashDayCard header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}.cashDayCard h4{margin:0;font-size:16px;color:#0b3b80}.cashDayCard.expense h4{color:#9a3412}.cashDayCard header span{display:block;color:#64748b;font-size:12px;font-weight:900;margin-top:3px}.cashDayCard header>b{white-space:nowrap;color:#0967f2;font-size:17px}.cashDayCard.expense header>b{color:#c2410c}.cashDayList{display:grid;gap:8px}.cashDayItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border-radius:14px;border:1px solid rgba(37,99,235,.18);padding:10px}.cashExpenseItem{border-color:rgba(249,115,22,.24)}.cashDayMain{min-width:0}.cashDayMain b,.cashDayMain strong,.cashDayMain small,.cashDayTime{display:block}.cashDayTime{font-size:12px;color:#64748b;font-weight:900}.cashAmountIn{color:#0967f2}.cashAmountOut{color:#c2410c;font-size:17px}.cashMoreBtn.expense{background:#fff1e8;color:#c2410c}.cashLogList{display:grid;gap:8px;margin:8px 0 12px}.cashLogItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fbff;border:1px solid #e2eaf3;border-radius:16px;padding:9px}.cashLogItem>button:first-child{border:0;background:transparent;text-align:left;color:inherit;font:inherit}.cashLogItem b,.cashLogItem span{display:block}.cashLogItem span{font-size:12px;color:#64748b;font-weight:800;margin-top:2px}.cashMoreBtn{border:0;border-radius:12px;background:#eef5ff;color:#0967f2;font-size:22px;font-weight:950;width:40px;height:40px}.cashModeTabs{display:flex;gap:8px;overflow:auto;margin:4px 0 12px}.cashModeTabs button{border:1px solid #dbe5f0;background:#fff;color:#334155;border-radius:16px;padding:11px 13px;font-weight:900;white-space:nowrap}.cashModeTabs button.active{background:#0967f2;color:#fff;border-color:#0967f2}.cashBigTabs{display:grid;grid-template-columns:1fr;overflow:visible}.cashFormula div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-weight:900}.cashFormula hr{border:0;border-top:1px solid #dbe5f0;margin:7px 0}.cashFormula .result{font-size:20px}.cashFormula .ok b,.stat.ok .metric,.cashExportResult.ok{color:#16a34a}.cashFormula .short b,.stat.short .metric,.cashExportResult.short{color:#dc2626}.cashFormula .over b,.stat.over .metric,.cashExportResult.over{color:#0967f2}.cashSync{border-radius:14px;padding:10px 12px;margin:8px 0;font-weight:900}.cashSync.ok{background:#eafaf0;color:#15803d}.cashSync.wait{background:#fff7d6;color:#a16207}.cashSync.error{background:#fee2e2;color:#b91c1c}.cashToastClose{border:0;background:transparent;color:#fff;font-size:18px;font-weight:950;margin-left:10px;line-height:1;cursor:pointer}.cashValidation{color:#dc2626;font-weight:900;margin-top:8px}.cashActionsV749{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.cashActionsV749 .btn{min-height:46px}.cashExportPreview{overflow:auto}.cashExportCard{background:#fff;border-radius:20px;border:1px solid #dbe5f0;padding:18px;margin:12px auto;color:#0f172a;max-width:780px}.cashExportCard.mobile{max-width:430px}.cashExportCard header h2{margin:0;font-size:22px;color:#0b3b80}.cashExportHero{border-radius:16px;padding:14px;margin:10px 0}.cashExportHero span,.cashExportGrid span{display:block;font-weight:900;font-size:13px}.cashExportHero b{font-size:28px}.cashExportHero.sales{background:#dcfce7;color:#166534}.cashExportHero.transfer{background:#fef3c7;color:#92400e}.cashExportGrid{display:grid;grid-template-columns:1fr;gap:8px}.cashExportGrid div{background:#eaf3ff;border-radius:14px;padding:11px;color:#0b3b80;font-weight:900}.cashExportResult{font-size:28px;font-weight:950;text-align:center;margin:12px 0;padding:13px;border-radius:16px;background:#f8fbff}.cashExportCard h3{color:#0b3b80;margin:12px 0 6px}.cashExportCard p{margin:4px 0;font-weight:800}.cashExportCard footer{border-top:1px solid #dbe5f0;margin-top:12px;padding-top:10px;color:#64748b;font-weight:900}.cashHistoryRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;margin:8px 0}.cashHistoryRow>button:first-child{border:0;background:transparent;text-align:left;color:inherit}.cashHistoryRow b,.cashHistoryRow span{display:block}.cashHistoryRow span{font-size:12px;color:#64748b;font-weight:800;margin-top:3px}.summaryPageGrid{display:grid;grid-template-columns:1fr;gap:10px}.miniItem{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0}.compact{padding:10px}.sectionTitle{font-weight:950;margin:12px 0 8px;color:#0b3b80}@media(max-width:360px){.cashQuickActions{grid-template-columns:1fr}}@media(min-width:720px){.cashDayCards{grid-template-columns:1fr 1fr}.cashMenuGridV749{grid-template-columns:1fr 1fr}.cashBigTabs{grid-template-columns:1fr 1fr}.cashActionsV749{grid-template-columns:repeat(4,1fr)}.cashExportGrid,.summaryPageGrid{grid-template-columns:repeat(2,1fr)}.cashExportCard.desktop .cashExportGrid{grid-template-columns:repeat(3,1fr)}}`;
+  style.textContent=`.cashHomeCardV749{width:100%;border:0;border-radius:22px;margin:14px 0 4px;padding:18px;display:flex;align-items:center;gap:14px;text-align:left;color:#fff;background:linear-gradient(135deg,#0f766e,#2563eb);box-shadow:0 14px 30px rgba(37,99,235,.24);font-family:inherit}.cashHomeCardV749 b{display:block;font-size:24px}.cashHomeCardV749 small{display:block;font-size:13px;font-weight:800;opacity:.92;margin-top:3px}.cashHomeIconV749{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:0 0 56px}.cashHomeCardV749 svg,.cashMenuCardV749 svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.cashMenuGridV749{display:grid;grid-template-columns:1fr;gap:14px;margin:12px 0 90px}.cashMenuCardV749{border:0;border-radius:22px;min-height:112px;padding:18px;color:#fff;text-align:left;display:flex;align-items:center;gap:14px;font:inherit;box-shadow:0 12px 26px rgba(15,23,42,.13)}.cashMenuCardV749 span{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.2);display:grid;place-items:center}.cashMenuCardV749 b{font-size:21px}.cashMenuCardV749.blue{background:linear-gradient(135deg,#0967f2,#38bdf8)}.cashMenuCardV749.green{background:linear-gradient(135deg,#0f9f6e,#7ddf95)}.cashMenuCardV749.purple{background:linear-gradient(135deg,#7c3aed,#c084fc)}.cashMenuCardV749.orange{background:linear-gradient(135deg,#f97316,#facc15);color:#382100}.cashBranchPanelV749{padding-bottom:92px}.cashBranchPanelV749.blue{--cash:#0967f2}.cashBranchPanelV749.green{--cash:#0f9f6e}.cashInputCard,.cashFormula,.cashExportCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:12px 0}.cashInputCard h3{margin:0 0 8px;color:var(--cash);font-size:18px}.cashInputCard p,.cashInputCard small{color:#64748b;font-weight:800}.cashQuickActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.cashQuickActions .btn{min-height:54px;width:100%;font-weight:950}.cashActionAdd{background:linear-gradient(135deg,#0967f2,#38bdf8)!important}.cashActionExpense{background:linear-gradient(135deg,#f97316,#fb7185)!important;color:#fff!important}.cashWideBtn{width:100%;min-height:52px;margin:10px 0}.cashWideBtn.expense{background:#7c3aed}.cashDayCards{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 0}.cashDayCard{border-radius:18px;padding:12px;border:1px solid #dbeafe;background:#eff6ff}.cashDayCard.expense{border-color:#fed7aa;background:#fff7ed}.cashDayCard header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}.cashDayCard h4{margin:0;font-size:16px;color:#0b3b80}.cashDayCard.expense h4{color:#9a3412}.cashDayCard header span{display:block;color:#64748b;font-size:12px;font-weight:900;margin-top:3px}.cashDayCard header>b{white-space:nowrap;color:#0967f2;font-size:17px}.cashDayCard.expense header>b{color:#c2410c}.cashDayList{display:grid;gap:8px}.cashDayItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border-radius:14px;border:1px solid rgba(37,99,235,.18);padding:10px}.cashExpenseItem{border-color:rgba(249,115,22,.24)}.cashDayMain{min-width:0}.cashDayMain b,.cashDayMain strong,.cashDayMain small,.cashDayTime{display:block}.cashDayTime{font-size:12px;color:#64748b;font-weight:900}.cashAmountIn{color:#0967f2}.cashAmountOut{color:#c2410c;font-size:17px}.cashMoreBtn.expense{background:#fff1e8;color:#c2410c}.cashLogList{display:grid;gap:8px;margin:8px 0 12px}.cashLogItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fbff;border:1px solid #e2eaf3;border-radius:16px;padding:9px}.cashLogItem>button:first-child{border:0;background:transparent;text-align:left;color:inherit;font:inherit}.cashLogItem b,.cashLogItem span{display:block}.cashLogItem span{font-size:12px;color:#64748b;font-weight:800;margin-top:2px}.cashMoreBtn{border:0;border-radius:12px;background:#eef5ff;color:#0967f2;font-size:22px;font-weight:950;width:40px;height:40px}.cashModeTabs{display:flex;gap:8px;overflow:auto;margin:4px 0 12px}.cashModeTabs button{border:1px solid #dbe5f0;background:#fff;color:#334155;border-radius:16px;padding:11px 13px;font-weight:900;white-space:nowrap}.cashModeTabs button.active{background:#0967f2;color:#fff;border-color:#0967f2}.cashBigTabs{display:grid;grid-template-columns:1fr;overflow:visible}.cashFormula div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-weight:900}.cashFormula hr{border:0;border-top:1px solid #dbe5f0;margin:7px 0}.cashFormula .result{font-size:20px}.cashFormula .ok b,.stat.ok .metric,.cashExportResult.ok{color:#16a34a}.cashFormula .short b,.stat.short .metric,.cashExportResult.short{color:#dc2626}.cashFormula .over b,.stat.over .metric,.cashExportResult.over{color:#0967f2}.cashSync{border-radius:14px;padding:10px 12px;margin:8px 0;font-weight:900}.cashSync.ok{background:#eafaf0;color:#15803d}.cashSync.wait{background:#fff7d6;color:#a16207}.cashSync.error{background:#fee2e2;color:#b91c1c}.cashToastClose{border:0;background:transparent;color:#fff;font-size:18px;font-weight:950;margin-left:10px;line-height:1;cursor:pointer}.cashValidation{color:#dc2626;font-weight:900;margin-top:8px}.cashActionsV749{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.cashActionsV749 .btn{min-height:46px}.cashExportPreview{overflow:auto}.cashExportCard{background:#fff;border-radius:20px;border:1px solid #dbe5f0;padding:18px;margin:12px auto;color:#0f172a;max-width:780px}.cashExportCard.mobile{max-width:430px}.cashExportCard header h2{margin:0;font-size:22px;color:#0b3b80}.cashExportHero{border-radius:16px;padding:14px;margin:10px 0}.cashExportHero span,.cashExportGrid span{display:block;font-weight:900;font-size:13px}.cashExportHero b{font-size:28px}.cashExportHero.sales{background:#dcfce7;color:#166534}.cashExportHero.transfer{background:#fef3c7;color:#92400e}.cashExportGrid{display:grid;grid-template-columns:1fr;gap:8px}.cashExportGrid div{background:#eaf3ff;border-radius:14px;padding:11px;color:#0b3b80;font-weight:900}.cashExportResult{font-size:28px;font-weight:950;text-align:center;margin:12px 0;padding:13px;border-radius:16px;background:#f8fbff}.cashExportCard h3{color:#0b3b80;margin:12px 0 6px}.cashExportCard p{margin:4px 0;font-weight:800}.cashExportCard footer{border-top:1px solid #dbe5f0;margin-top:12px;padding-top:10px;color:#64748b;font-weight:900}.cashPaper{box-sizing:border-box;width:min(100%,1080px);max-width:1080px;border:0!important;border-radius:0!important;padding:30px!important;margin:10px auto!important;background:#fff!important;color:#0f172a!important;box-shadow:0 1px 0 rgba(15,23,42,.06)}.cashPaper.mobile{max-width:430px;padding:18px!important}.cashPaper header{border-bottom:2px solid #dbe5f0;padding-bottom:10px;margin-bottom:8px}.cashPaper header h2{font-size:23px!important;margin:0 0 4px!important;color:#0b3b80!important}.cashPaper header p{margin:0!important;color:#64748b!important;font-weight:800!important;font-size:13px!important}.cashPaperTable{display:block;border:1px solid #dbe5f0;border-radius:10px;overflow:hidden}.cashPaperRow,.cashPaperLine,.cashPaperResult{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;min-height:34px;padding:7px 10px;border-bottom:1px solid #e8eef6;font-weight:900}.cashPaperRow:nth-child(even){background:#f8fbff}.cashPaperRow span,.cashPaperLine span{min-width:0;overflow-wrap:anywhere}.cashPaperRow b,.cashPaperLine b{white-space:nowrap;text-align:right}.cashPaperRow.sales span,.cashPaperRow.sales b{color:#15803d}.cashPaperRow.transfer span,.cashPaperRow.transfer b{color:#a16207}.cashPaperRow.expense span,.cashPaperRow.expense b,.cashPaperLine.expense b{color:#c2410c}.cashPaperRow.expected span,.cashPaperRow.expected b{color:#0b3b80}.cashPaperResult{border:0;border-radius:10px;margin:10px 0;font-size:18px}.cashPaperResult.ok{background:#dcfce7;color:#166534}.cashPaperResult.short{background:#fee2e2;color:#b91c1c}.cashPaperResult.over{background:#dbeafe;color:#1d4ed8}.cashPaperDetails h3{font-size:15px;color:#0b3b80;margin:10px 0 4px}.cashPaperLine{border:0;border-bottom:1px dashed #dbe5f0;min-height:30px;padding:5px 2px}.cashPaperLine.mutedLine{color:#64748b}.cashPaper footer{border-top:1px solid #dbe5f0;margin-top:10px;padding-top:8px;color:#64748b;font-weight:800;font-size:13px;display:grid;gap:3px}.cashHistoryRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;margin:8px 0}.cashHistoryRow>button:first-child{border:0;background:transparent;text-align:left;color:inherit}.cashHistoryRow b,.cashHistoryRow span{display:block}.cashHistoryRow span{font-size:12px;color:#64748b;font-weight:800;margin-top:3px}.summaryPageGrid{display:grid;grid-template-columns:1fr;gap:10px}.miniItem{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0}.compact{padding:10px}.sectionTitle{font-weight:950;margin:12px 0 8px;color:#0b3b80}@media(max-width:360px){.cashQuickActions{grid-template-columns:1fr}}@media(min-width:720px){.cashDayCards{grid-template-columns:1fr 1fr}.cashMenuGridV749{grid-template-columns:1fr 1fr}.cashBigTabs{grid-template-columns:1fr 1fr}.cashActionsV749{grid-template-columns:repeat(4,1fr)}.cashExportGrid,.summaryPageGrid{grid-template-columns:repeat(2,1fr)}.cashExportCard.desktop .cashExportGrid{grid-template-columns:repeat(3,1fr)}}`;
   document.head.appendChild(style);
-  function labels(){document.title='Stock Alert V7.54';const sub=document.getElementById('updateStatusSub');if(sub)sub.textContent=APP_VERSION;const b=document.querySelector('#updateModalVersionBox b');if(b)b.textContent=APP_VERSION;}
+  function labels(){document.title='Stock Alert V7.55';const sub=document.getElementById('updateStatusSub');if(sub)sub.textContent=APP_VERSION;const b=document.querySelector('#updateModalVersionBox b');if(b)b.textContent=APP_VERSION;}
   ensurePages();ensureHomeButton();labels();setTimeout(()=>{ensurePages();ensureHomeButton();labels();if(isCashPageActive())pollCashSync();},500);setTimeout(()=>{if(isCashPageActive())pollCashSync();refreshCashActive();},3600);
 })();

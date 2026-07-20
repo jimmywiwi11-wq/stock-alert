@@ -1,6 +1,6 @@
 {
-  "version": "7.54",
-  "label": "V7.54",
+  "version": "7.55",
+  "label": "V7.55",
   "releasedAt": "2026-07-20T00:00:00Z",
-  "message": "Limit local test warning to file protocol only."
+  "message": "Stabilize cash Firebase auth sync and compact cash export report."
 }
