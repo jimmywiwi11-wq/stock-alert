@@ -1,6 +1,6 @@
 {
-  "version": "7.45",
-  "label": "V7.45",
-  "releasedAt": "2026-07-17T00:00:00Z",
-  "message": "Add Firebase diagnostic instrumentation."
+  "version": "7.54",
+  "label": "V7.54",
+  "releasedAt": "2026-07-20T00:00:00Z",
+  "message": "Limit local test warning to file protocol only."
 }
