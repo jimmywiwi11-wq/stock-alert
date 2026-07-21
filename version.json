@@ -1,6 +1,6 @@
 {
-  "version": "7.55",
-  "label": "V7.55",
-  "releasedAt": "2026-07-20T00:00:00Z",
-  "message": "Stabilize cash Firebase auth sync and compact cash export report."
+  "version": "7.56",
+  "label": "V7.56",
+  "releasedAt": "2026-07-21T00:00:00Z",
+  "message": "Add cash exchange tracking and improve evening 1,000-bank input placeholder behavior."
 }
