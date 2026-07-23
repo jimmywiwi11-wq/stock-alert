@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.56</title>
+<title>Stock Alert V7.57</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.56</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.57</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,11 +169,12 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.56</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.57</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
-let db=null, online=false;try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);db=firebase.firestore();try{db.enablePersistence({synchronizeTabs:true}).catch(e=>console.info('[StockAlert] Firestore persistence fallback',e.code||e.message||e));}catch(_){ }online=true;}catch(e){console.warn(e)}
+let db=null, auth=null, online=false, stockAlertAuthReadyPromise=null, stockAlertAuthSignInPromise=null, stockAlertPersistenceEnabled=false;try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);auth=firebase.auth?firebase.auth():null;db=firebase.firestore();try{db.enablePersistence({synchronizeTabs:true}).then(()=>{stockAlertPersistenceEnabled=true;console.info('[StockAlert] Firestore persistence enabled');}).catch(e=>console.info('[StockAlert] Firestore persistence fallback',e.code||e.message||e));}catch(_){ }online=true;}catch(e){console.warn(e)}
+function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[StockAlert] anonymous auth failed',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[StockAlert] auth listener failed',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[StockAlert] auth ready failed',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 const COLLECTION='stock_alert_beta1_items';const ACT='stock_alert_beta1_activity';let items=[], activities=[], currentBranch=1, currentStatus='out', listMode='all', editId=null, transferTarget=null;let transferFrom=1, transferTo=2, statusFrom=1, statusTo=2;let currentPOSupplier='', poManualItems={};let purchaseOrders=JSON.parse(localStorage.getItem('stockAlertPurchaseOrders')||'[]');let deliveryHistory=JSON.parse(localStorage.getItem('stockAlertDeliveryHistory')||'[]');let currentOrderSupplier='', currentReceiveOrderId='', currentHistoryId='';let currentCategory='เบ็ดเตล็ด', selectedCategory='';let categories=JSON.parse(localStorage.getItem('stockAlertCategories')||'null')||['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด'];let suppliersMaster=JSON.parse(localStorage.getItem('stockAlertSuppliers')||'[]');let nickname=localStorage.getItem('stockAlertNickname')||'';
 const icons={pen:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg>',list:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',truck:'<svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',swap:'<svg viewBox="0 0 24 24"><path d="M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3"/></svg>',chart:'<svg viewBox="0 0 24 24"><path d="M4 19h16"/><path d="M7 16v-5M12 16V7M17 16v-9"/><path d="M6 10l5-4 4 3 4-5"/></svg>',category:'<svg viewBox="0 0 24 24"><path d="M4 6.5h7l2 2h7v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M7 12h10M7 16h7"/></svg>',box:'<svg viewBox="0 0 24 24"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>'};
 const menu=[['ลงของขาด<br>สาขา 1','b1','pen',()=>openForm(1)],['ลงของขาด<br>สาขา 2','b2','pen',()=>openForm(2)],['รายการของขาด<br>สาขา 1','p1','list',()=>openList('branch1')],['รายการของขาด<br>สาขา 2','p2','list',()=>openList('branch2')],['ต้องสั่งเข้าใหม่','r1','truck',()=>go('orderPage')],['แบ่งของ<br>ระหว่างสาขา','s1','swap',()=>go('transferMenuPage')],['ของมาส่งแล้ว','g1','box',()=>go('deliveredPage')],['ข้อมูล','p1','chart',()=>go('summaryPage')]];
@@ -297,8 +298,8 @@ function orderCompaniesForName(name){const n=norm(name);const set=new Set();purc
 function isOrderedName(name){return orderCompaniesForName(name).length>0}
 function saveCloudArray(coll, arr){localStorage.setItem(coll, JSON.stringify(arr)); if(online&&db){return db.collection(coll).doc('main').set({items:arr,updatedAt:Date.now()},{merge:true}).catch(()=>{})}}
 function persistOrders(){localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders));localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory));localStorage.setItem('stockAlertTransferHistory',JSON.stringify(transferHistory));if(online&&db){db.collection(ORDERS).doc('main').set({items:purchaseOrders,updatedAt:Date.now()},{merge:true}).catch(()=>{});db.collection(DELIVERIES).doc('main').set({items:deliveryHistory,updatedAt:Date.now()},{merge:true}).catch(()=>{});db.collection(TRANSFER_HISTORY).doc('main').set({items:transferHistory,updatedAt:Date.now()},{merge:true}).catch(()=>{});}renderAll()}
-let stockAlertListening=false;
-function listen(){if(online&&db){if(stockAlertListening)return;stockAlertListening=true;db.collection(COLLECTION).onSnapshot(s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));renderAll();document.getElementById('syncText').textContent='Sync Firebase พร้อมใช้งาน';},e=>{online=false;stockAlertListening=false;loadLocal();});db.collection(ACT).orderBy('time','desc').limit(80).onSnapshot(s=>{activities=s.docs.map(d=>({id:d.id,...d.data()}));renderActivity();});db.collection(ORDERS).doc('main').onSnapshot(d=>{if(d.exists){purchaseOrders=d.data().items||[];localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders));renderAll();}});db.collection(DELIVERIES).doc('main').onSnapshot(d=>{if(d.exists){deliveryHistory=d.data().items||[];localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory));renderAll();}});db.collection(CATEGORIES).doc('main').onSnapshot(d=>{if(d.exists){categories=d.data().items||categories;localStorage.setItem('stockAlertCategories',JSON.stringify(categories));renderAll();}});db.collection(SUPPLIERS).doc('main').onSnapshot(d=>{if(d.exists){const supplierData=d.data()||{};suppliersMaster=supplierData.items||suppliersMaster;if(Array.isArray(supplierData.details)){try{supplierDetails=supplierData.details;localStorage.setItem('stockAlertSupplierDetails',JSON.stringify(supplierDetails));}catch(e){}}localStorage.setItem('stockAlertSuppliers',JSON.stringify(suppliersMaster));renderAll();}});db.collection(TRANSFER_HISTORY).doc('main').onSnapshot(d=>{if(d.exists){transferHistory=d.data().items||[];localStorage.setItem('stockAlertTransferHistory',JSON.stringify(transferHistory));renderAll();}});}else loadLocal()}
+let stockAlertListening=false;window.StockAlertMainUnsubs=window.StockAlertMainUnsubs||[];
+async function listen(){if(!(online&&db)){loadLocal();return;}if(stockAlertListening)return;stockAlertListening=true;document.getElementById('syncText').textContent='กำลังเชื่อมต่อข้อมูล...';const authUser=await stockAlertAuthReady();if(auth&&!authUser){stockAlertListening=false;document.getElementById('syncText').textContent='กำลังเชื่อมต่ออีกครั้ง...';setTimeout(()=>listen(),1500+Math.floor(Math.random()*900));return;}try{while(window.StockAlertMainUnsubs.length){try{window.StockAlertMainUnsubs.pop()();}catch(e){}}const onError=e=>{online=false;stockAlertListening=false;console.error('[StockAlert Firebase listener]',e.code||e.name,e.message||e);document.getElementById('syncText').textContent='กำลังเชื่อมต่ออีกครั้ง...';setTimeout(()=>listen(),1500+Math.floor(Math.random()*900));};window.StockAlertMainUnsubs.push(db.collection(COLLECTION).onSnapshot({includeMetadataChanges:true},s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));localStorage.setItem(COLLECTION,JSON.stringify(items));renderAll();document.getElementById('syncText').textContent=s.metadata.hasPendingWrites?'กำลังซิงค์ข้อมูล...':(s.metadata.fromCache?'กำลังใช้ข้อมูลที่บันทึกไว้ในเครื่อง':'Sync Firebase พร้อมใช้งาน');online=true;},onError));window.StockAlertMainUnsubs.push(db.collection(ACT).orderBy('time','desc').limit(80).onSnapshot({includeMetadataChanges:true},s=>{activities=s.docs.map(d=>({id:d.id,...d.data()}));localStorage.setItem(ACT,JSON.stringify(activities));renderActivity();},onError));window.StockAlertMainUnsubs.push(db.collection(ORDERS).doc('main').onSnapshot({includeMetadataChanges:true},d=>{if(d.exists){purchaseOrders=d.data().items||[];localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders));renderAll();}},onError));window.StockAlertMainUnsubs.push(db.collection(DELIVERIES).doc('main').onSnapshot({includeMetadataChanges:true},d=>{if(d.exists){deliveryHistory=d.data().items||[];localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory));renderAll();}},onError));window.StockAlertMainUnsubs.push(db.collection(CATEGORIES).doc('main').onSnapshot({includeMetadataChanges:true},d=>{if(d.exists){categories=d.data().items||categories;localStorage.setItem('stockAlertCategories',JSON.stringify(categories));renderAll();}},onError));window.StockAlertMainUnsubs.push(db.collection(SUPPLIERS).doc('main').onSnapshot({includeMetadataChanges:true},d=>{if(d.exists){const supplierData=d.data()||{};suppliersMaster=supplierData.items||suppliersMaster;if(Array.isArray(supplierData.details)){try{supplierDetails=supplierData.details;localStorage.setItem('stockAlertSupplierDetails',JSON.stringify(supplierDetails));}catch(e){}}localStorage.setItem('stockAlertSuppliers',JSON.stringify(suppliersMaster));renderAll();}},onError));window.StockAlertMainUnsubs.push(db.collection(TRANSFER_HISTORY).doc('main').onSnapshot({includeMetadataChanges:true},d=>{if(d.exists){transferHistory=d.data().items||[];localStorage.setItem('stockAlertTransferHistory',JSON.stringify(transferHistory));renderAll();}},onError));}catch(e){stockAlertListening=false;console.error('[StockAlert listen failed]',e);loadLocal();}}
 function addCategory(){const v=document.getElementById('newCategoryInput').value.trim();if(!v)return toast('กรุณาใส่ชื่อหมวดหมู่');if(!categories.includes(v))categories.push(v);localStorage.setItem('stockAlertCategories',JSON.stringify(categories));if(online&&db)db.collection(CATEGORIES).doc('main').set({items:categories,updatedAt:Date.now()},{merge:true});document.getElementById('newCategoryInput').value='';currentCategory=v;renderManagePage();renderCategoryChips();toast('เพิ่มหมวดหมู่แล้ว')}
 function addSupplier(){const v=document.getElementById('newSupplierInput').value.trim();if(!v)return toast('กรุณาใส่ชื่อบริษัท');if(!suppliersMaster.includes(v))suppliersMaster.push(v);localStorage.setItem('stockAlertSuppliers',JSON.stringify(suppliersMaster));if(online&&db)db.collection(SUPPLIERS).doc('main').set({items:suppliersMaster,updatedAt:Date.now()},{merge:true});document.getElementById('newSupplierInput').value='';renderManagePage();renderSupplierOptions();toast('เพิ่มบริษัทแล้ว')}
 function renderAll(){const total=items.length, orders=orderGroups().length, transfers=transferTasks().length, unknown=items.filter(x=>(x.supplier||'ยังไม่ได้ระบุ')==='ยังไม่ได้ระบุ').length;if(typeof statShortage!='undefined'){statShortage.textContent=total;statOrder.textContent=orders;statTransfer.textContent=transfers;statSupplier.textContent=unknown;}bellBadge.textContent=activities.length||0;renderHomeSearch();renderAllShortage();renderTransferAlerts();try{renderList()}catch(e){};renderTransfers();renderTransferStatus();renderOrders();renderPOBuilder();renderOrderSupplier();renderDeliveredPage();renderDeliveryHistory();renderPending();renderCategoryPage();renderManagePage();renderBestSellers();renderSupplierOptions();}
@@ -1810,8 +1811,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.56';
-  const APP_VERSION_LABEL='V7.56';
+  const APP_VERSION='7.57';
+  const APP_VERSION_LABEL='V7.57';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3344,7 +3345,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.56';if(versionBox)versionBox.textContent='V7.56';
+  if(versionSub)versionSub.textContent='V7.57';if(versionBox)versionBox.textContent='V7.57';
 })();
 </script>
 <script>
@@ -4283,7 +4284,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.56';
+  const APP_VERSION='V7.57';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4621,7 +4622,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.56';
+    document.title='Stock Alert V7.57';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -5781,7 +5782,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 <script>
-/* === V7.56 Firebase sync recovery === */
+/* === V7.57 Firebase sync recovery === */
 (function(){
   const PENDING_KEY='stockAlertPendingFirebaseWritesV744';
   const MIGRATION_KEY='stockAlertLocalReconcileV744';
@@ -5979,6 +5980,160 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   window.addEventListener('offline',()=>setStatus('offline','ยังเชื่อมต่อ Firebase ไม่ได้'));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){started=false;start();}});
   setTimeout(start,0);
+})();
+</script>
+<script>
+/* === V7.57 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
+(function(){
+  const APP_VERSION='V7.57';
+  const SPECIAL_SUPPLIERS=new Set(['ยังไม่ได้ระบุ','ไม่มีที่สั่ง','ไม่ระบุบริษัท']);
+  let renameBusy=false;
+  function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  function enc(value){return encodeURIComponent(String(value??''));}
+  function dec(value){return decodeURIComponent(String(value??''));}
+  function cleanName(value){return String(value??'').trim().replace(/\s+/g,' ');}
+  function nameKey(value){return cleanName(value).toLocaleLowerCase('th-TH');}
+  function sameName(a,b){return nameKey(a)===nameKey(b);}
+  function supplierParts(value){
+    if(Array.isArray(value))return value.map(cleanName).filter(Boolean);
+    const text=cleanName(value);
+    if(!text)return [];
+    return text.split(/\s*[/,]\s*/).map(cleanName).filter(Boolean);
+  }
+  function hasSupplier(value,name){return supplierParts(value).some(part=>sameName(part,name));}
+  function replaceSupplierValue(value,oldName,newName){
+    const parts=supplierParts(value);
+    if(!parts.length)return value;
+    let changed=false;
+    const next=[];
+    parts.forEach(part=>{
+      const candidate=sameName(part,oldName)?newName:part;
+      if(candidate!==part)changed=true;
+      if(!next.some(existing=>sameName(existing,candidate)))next.push(candidate);
+    });
+    if(!changed)return value;
+    return Array.isArray(value)?next:next.join(' / ');
+  }
+  function allSupplierNames(){
+    const names=[];
+    function add(value){supplierParts(value).forEach(name=>{if(name&&!names.some(existing=>sameName(existing,name)))names.push(name);});}
+    (items||[]).forEach(item=>add(item.supplier));
+    (suppliersMaster||[]).forEach(add);
+    try{(JSON.parse(localStorage.getItem('stockAlertSupplierDetails')||'[]')||[]).forEach(row=>add(row?.name));}catch(e){}
+    return names.sort((a,b)=>a.localeCompare(b,'th'));
+  }
+  function supplierImpact(oldName){
+    const shortage=(items||[]).filter(item=>hasSupplier(item.supplier,oldName)||hasSupplier(item.orderedSupplier,oldName));
+    const orderCount=(purchaseOrders||[]).filter(order=>hasSupplier(order.supplier,oldName)).length;
+    const deliveryCount=(deliveryHistory||[]).filter(row=>hasSupplier(row.supplier,oldName)).length;
+    const branches=[...new Set(shortage.map(item=>item.branch).filter(Boolean))].sort();
+    return {shortage,orderCount,deliveryCount,branches,total:shortage.length+orderCount+deliveryCount};
+  }
+  function ensureModal(id){let modal=document.getElementById(id);if(!modal){modal=document.createElement('div');modal.id=id;modal.className='modal';document.body.appendChild(modal);}return modal;}
+  function progress(text){const el=document.getElementById('supplierRenameProgressV757');if(el)el.textContent=text||'';}
+  function isExistingSupplier(name,except=''){return allSupplierNames().some(existing=>sameName(existing,name)&&!sameName(existing,except));}
+  function updateLocalSupplierData(oldName,newName){
+    const touched={shortages:0,orders:0,deliveries:0,transferHistory:0,supplierList:0,details:0};
+    (items||[]).forEach(item=>{
+      const supplier=replaceSupplierValue(item.supplier,oldName,newName),orderedSupplier=replaceSupplierValue(item.orderedSupplier,oldName,newName);
+      if(supplier!==item.supplier){item.supplier=supplier;touched.shortages++;}
+      if(orderedSupplier!==item.orderedSupplier)item.orderedSupplier=orderedSupplier;
+    });
+    (purchaseOrders||[]).forEach(order=>{const supplier=replaceSupplierValue(order.supplier,oldName,newName);if(supplier!==order.supplier){order.supplier=supplier;touched.orders++;}});
+    (deliveryHistory||[]).forEach(row=>{const supplier=replaceSupplierValue(row.supplier,oldName,newName);if(supplier!==row.supplier){row.supplier=supplier;touched.deliveries++;}});
+    (transferHistory||[]).forEach(round=>(round.items||[]).forEach(line=>{const supplier=replaceSupplierValue(line.supplier,oldName,newName);if(supplier!==line.supplier){line.supplier=supplier;touched.transferHistory++;}}));
+    suppliersMaster=[...new Set((suppliersMaster||[]).map(name=>sameName(name,oldName)?newName:name).filter(Boolean))];
+    if(!suppliersMaster.some(name=>sameName(name,newName))&&!SPECIAL_SUPPLIERS.has(newName))suppliersMaster.push(newName);
+    touched.supplierList=1;
+    try{
+      const details=JSON.parse(localStorage.getItem('stockAlertSupplierDetails')||'[]');
+      const next=[];(Array.isArray(details)?details:[]).forEach(row=>{const copy={...row};if(sameName(copy.name,oldName)){copy.name=newName;copy.updatedAt=Date.now();copy.updatedBy=nickname||'ไม่ระบุ';touched.details++;}if(!next.some(existing=>sameName(existing.name,copy.name)))next.push(copy);});
+      localStorage.setItem('stockAlertSupplierDetails',JSON.stringify(next));
+    }catch(e){}
+    localStorage.setItem(COLLECTION,JSON.stringify(items||[]));
+    localStorage.setItem('stockAlertPurchaseOrders',JSON.stringify(purchaseOrders||[]));
+    localStorage.setItem('stockAlertDeliveryHistory',JSON.stringify(deliveryHistory||[]));
+    localStorage.setItem('stockAlertTransferHistory',JSON.stringify(transferHistory||[]));
+    localStorage.setItem('stockAlertSuppliers',JSON.stringify(suppliersMaster||[]));
+    return touched;
+  }
+  async function commitSupplierRename(oldName,newName){
+    const impacted=supplierImpact(oldName),ids=[...new Set(impacted.shortage.map(item=>String(item.id)).filter(Boolean))],now=Date.now(),by=nickname||'ไม่ระบุ';
+    const touched=updateLocalSupplierData(oldName,newName);
+    renderAll();
+    if(!(online&&db)){toast(`แก้ชื่อในเครื่องแล้ว รอซิงค์ ${impacted.shortage.length} รายการ`);return impacted.shortage.length;}
+    progress(`กำลังอัปเดต 0/${ids.length} รายการ`);
+    for(let start=0;start<ids.length;start+=430){
+      const batch=db.batch(),chunk=ids.slice(start,start+430);
+      chunk.forEach(id=>{
+        const local=(items||[]).find(item=>String(item.id)===String(id));if(!local)return;
+        batch.set(db.collection(COLLECTION).doc(id),{supplier:local.supplier||'',orderedSupplier:local.orderedSupplier||'',updatedAt:now,updatedBy:by},{merge:true});
+      });
+      await batch.commit();
+      progress(`กำลังอัปเดต ${Math.min(start+chunk.length,ids.length)}/${ids.length} รายการ`);
+    }
+    await db.runTransaction(async transaction=>{
+      const refs=[db.collection(ORDERS).doc('main'),db.collection(DELIVERIES).doc('main'),db.collection(TRANSFER_HISTORY).doc('main'),db.collection(SUPPLIERS).doc('main')];
+      const snaps=[];for(const ref of refs)snaps.push(await transaction.get(ref));
+      const orders=(snaps[0].exists&&Array.isArray(snaps[0].data().items)?snaps[0].data().items:purchaseOrders||[]).map(order=>({...order,supplier:replaceSupplierValue(order.supplier,oldName,newName)}));
+      const deliveries=(snaps[1].exists&&Array.isArray(snaps[1].data().items)?snaps[1].data().items:deliveryHistory||[]).map(row=>({...row,supplier:replaceSupplierValue(row.supplier,oldName,newName)}));
+      const transfers=(snaps[2].exists&&Array.isArray(snaps[2].data().items)?snaps[2].data().items:transferHistory||[]).map(round=>({...round,items:(round.items||[]).map(line=>({...line,supplier:replaceSupplierValue(line.supplier,oldName,newName)}))}));
+      const supplierDoc=snaps[3].exists?snaps[3].data()||{}:{};
+      const names=[...new Set([...(supplierDoc.items||suppliersMaster||[]).map(name=>sameName(name,oldName)?newName:name),newName].filter(Boolean))];
+      const details=(supplierDoc.details||JSON.parse(localStorage.getItem('stockAlertSupplierDetails')||'[]')||[]).map(row=>sameName(row?.name,oldName)?{...row,name:newName,updatedAt:now,updatedBy:by}:row).filter((row,index,arr)=>arr.findIndex(other=>sameName(other?.name,row?.name))===index);
+      transaction.set(refs[0],{items:orders,updatedAt:now},{merge:true});
+      transaction.set(refs[1],{items:deliveries,updatedAt:now},{merge:true});
+      transaction.set(refs[2],{items:transfers,updatedAt:now},{merge:true});
+      transaction.set(refs[3],{items:names,details,updatedAt:now},{merge:true});
+    });
+    try{
+      if(typeof PRODUCT_COLL!=='undefined'){
+        const snap=await db.collection(PRODUCT_COLL).where('supplier','==',oldName).limit(450).get();
+        if(!snap.empty){const batch=db.batch();snap.docs.forEach(doc=>batch.set(doc.ref,{supplier:newName,updatedAt:now,updatedBy:by},{merge:true}));await batch.commit();}
+      }
+    }catch(error){console.warn('[Supplier rename] product supplier update skipped',error.code||error.name,error.message||error);}
+    await log('แก้ไขชื่อบริษัท',`${oldName} -> ${newName} (${impacted.shortage.length} รายการ, สาขา ${impacted.branches.join(', ')||'-'})`);
+    progress('');
+    return impacted.shortage.length;
+  }
+  function openRenameEditor(encodedOld){
+    const oldName=dec(encodedOld),impact=supplierImpact(oldName),modal=ensureModal('supplierRenameModalV757'),special=SPECIAL_SUPPLIERS.has(oldName);
+    if(special){modal.innerHTML=`<div class="sheet"><h2>${esc(oldName)}</h2><p class="muted">รายการนี้เป็นค่าพิเศษที่ระบบใช้จัดกลุ่ม ไม่แก้ชื่อภายในข้อมูลเพื่อป้องกัน logic ของระบบเสีย</p><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('supplierRenameModalV757')">ปิด</button></div>`;modal.classList.add('show');return;}
+    modal.innerHTML=`<div class="sheet"><h2>แก้ไขชื่อบริษัท</h2><div class="statusRows"><div class="statusRow"><span>ชื่อเดิม</span><span>${esc(oldName)}</span></div><div class="statusRow"><span>พบสินค้าที่ใช้ชื่อนี้</span><span>${impact.shortage.length} รายการ</span></div><div class="statusRow"><span>สาขาที่กระทบ</span><span>${esc(impact.branches.join(', ')||'-')}</span></div></div><label>ชื่อใหม่</label><input class="input" id="supplierRenameInputV757" value="${esc(oldName)}" placeholder="ชื่อบริษัทใหม่"><p class="muted">เมื่อบันทึก ระบบจะแก้ชื่อบริษัทในรายการสินค้าของขาดที่ใช้ชื่อเดิมทั้งหมด คุณต้องการดำเนินการต่อหรือไม่?</p><div id="supplierRenameProgressV757" class="muted"></div><button class="btn primary" id="supplierRenameSaveV757" style="width:100%;margin-top:12px" onclick="saveSupplierRenameV757('${enc(oldName)}')">บันทึกการแก้ไข</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('supplierRenameModalV757')">ยกเลิก</button></div>`;
+    modal.classList.add('show');setTimeout(()=>document.getElementById('supplierRenameInputV757')?.focus(),50);
+  }
+  window.openSupplierRenameMenuV757=function(encodedName,event){if(event){event.preventDefault();event.stopPropagation();}const name=dec(encodedName),modal=ensureModal('supplierRenameMenuV757');modal.innerHTML=`<div class="sheet"><h2>${esc(name)}</h2><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('supplierRenameMenuV757');openSupplierRenameEditorV757('${enc(name)}')">แก้ไขชื่อ</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('supplierRenameMenuV757')">ยกเลิก</button></div>`;modal.classList.add('show');};
+  window.openSupplierRenameEditorV757=openRenameEditor;
+  window.saveSupplierRenameV757=async function(encodedOld){
+    if(renameBusy)return;
+    const oldName=dec(encodedOld),input=document.getElementById('supplierRenameInputV757'),newName=cleanName(input?.value||'');
+    if(!newName)return toast('กรุณาใส่ชื่อบริษัทใหม่');
+    if(sameName(oldName,newName)){closeModal('supplierRenameModalV757');return toast('ชื่อบริษัทเหมือนเดิม ไม่ต้องแก้ไข');}
+    const exists=isExistingSupplier(newName,oldName);
+    if(exists&&!confirm('มีบริษัทชื่อนี้อยู่แล้ว ต้องการรวมรายการจากชื่อเดิมเข้ากับบริษัทนี้หรือไม่?'))return;
+    if(!confirm('เมื่อบันทึก ระบบจะแก้ชื่อบริษัทในรายการสินค้าของขาดที่ใช้ชื่อเดิมทั้งหมด คุณต้องการดำเนินการต่อหรือไม่?'))return;
+    renameBusy=true;const button=document.getElementById('supplierRenameSaveV757');if(button){button.disabled=true;button.textContent='กำลังบันทึก...';}
+    try{const count=await commitSupplierRename(oldName,newName);closeModal('supplierRenameModalV757');toast(`แก้ไขชื่อบริษัทเรียบร้อยแล้ว อัปเดตทั้งหมด ${count} รายการ`);}
+    catch(error){console.error('[Supplier rename failed]',error);progress(`ล้มเหลว: ${error.code||error.message||error}`);toast('แก้ชื่อบริษัทไม่สำเร็จ กรุณาลองอีกครั้ง');}
+    finally{renameBusy=false;if(button){button.disabled=false;button.textContent='บันทึกการแก้ไข';}}
+  };
+  const baseRenderPOBuilder=window.renderPOBuilder||renderPOBuilder;
+  window.renderPOBuilder=renderPOBuilder=function(){
+    const result=baseRenderPOBuilder.apply(this,arguments),box=document.getElementById('poSupplierBox');
+    if(box){box.querySelectorAll('.supplierBtn').forEach(button=>{if(button.dataset.renameReady==='1')return;const name=(button.querySelector('span:not(.count)')?.textContent||'').trim();if(!name)return;button.dataset.renameReady='1';button.classList.add('supplierRenameCardV757');button.insertAdjacentHTML('afterbegin',`<span class="supplierRenameMoreV757" role="button" aria-label="เมนูแก้ไขชื่อบริษัท" onclick="openSupplierRenameMenuV757('${enc(name)}',event)">⋮</span>`);});}
+    return result;
+  };
+  const baseReload=window.reloadApp;
+  window.reloadApp=function(){if(typeof window.refreshStockAlertData==='function')return window.refreshStockAlertData();return baseReload?baseReload():renderAll();};
+  const oldDiagnostics=window.stockAlertFirebaseDiagnostics;
+  window.stockAlertFirebaseDiagnostics=function(){
+    const base=oldDiagnostics?oldDiagnostics():{};
+    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_57-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
+  };
+  const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
+  if(versionSub)versionSub.textContent=APP_VERSION;if(versionBox)versionBox.textContent=APP_VERSION;document.title='Stock Alert '+APP_VERSION;
+  const style=document.createElement('style');style.textContent='.supplierRenameCardV757{position:relative;gap:10px;padding-left:54px!important}.supplierRenameMoreV757{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#0b4ab8;font-size:24px;line-height:1;box-shadow:0 4px 12px rgba(17,44,84,.10);z-index:2}.supplierRenameMoreV757:active{transform:translateY(-50%) scale(.96)}';document.head.appendChild(style);
+  console.info('[StockAlert Debug]',window.stockAlertFirebaseDiagnostics());
 })();
 </script>
 <script src="cash-reconciliation.js"></script>

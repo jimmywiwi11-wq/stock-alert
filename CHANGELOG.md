@@ -4,6 +4,20 @@ All notable Stock Alert changes should be recorded here. Use one section per rel
 
 ## Unreleased
 
+## 7.57 - 2026-07-23
+
+### Added
+
+- Added a three-dot supplier menu on the purchase-order company cards for safe supplier renaming.
+- Renaming now updates active shortage supplier fields, ordered supplier markers, supplier directory records, purchase-order arrays, delivery history arrays, and supplier details without changing collection or field names.
+- Added Firebase diagnostics for app version, service-worker cache version, app/auth/firestore readiness, persistence state, and active listener count.
+
+### Fixed
+
+- Centralized the main Firebase listener startup behind one anonymous-auth readiness path and stored listener unsubscribe handles to prevent duplicate main listeners.
+- Changed the reload button to refresh data through the existing Firebase connection instead of creating more listeners or reloading the whole page.
+- Bumped the service-worker cache version so V7.57 HTML and assets are served as one app version.
+
 ## 7.27 - 2026-06-28
 
 ### Fixed
