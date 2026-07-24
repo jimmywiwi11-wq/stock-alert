@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.57</title>
+<title>Stock Alert V7.60</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,13 +131,13 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.57</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.60</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
 <section id="listPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 id="listTitle" style="margin:0">รายการ</h2><div class="smallTitle" id="listSub">ดู / แก้ไข / ลบ</div></div></div><div id="listTopActions"></div><div class="card searchCard"><input class="input" id="listSearch" placeholder="ค้นหาในหน้านี้..." oninput="renderList()"></div><div id="listBox"></div></section>
-<section id="transferMenuPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">แบ่งของระหว่างสาขา</h2><div class="smallTitle">เลือกฝั่งที่ต้องจัดของก่อน</div></div></div><div class="dirStack"><button class="dirCard green" onclick="openTransferDirection(1,2)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 1 แบ่งให้สาขา 2</b><span>กดเข้าไปเพื่อจัดของให้สาขา 2</span></div></button><button class="dirCard blue" onclick="openTransferDirection(2,1)"><div class="ico"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><div><b>สาขา 2 แบ่งให้สาขา 1</b><span>กดเข้าไปเพื่อจัดของให้สาขา 1</span></div></button></div><div class="archivedTransferSection"><h3>ของที่แบ่งไว้แล้ว</h3><button class="archivedTransferCard" onclick="openArchivedTransferRounds()"><span class="archivedTransferIcon">✓</span><span><b>เปิดรายการที่แบ่งไว้แล้ว</b><small>ดูแยกตามสาขา วันที่ และรอบ</small></span><span class="archivedTransferArrow">?</span></button></div></section>
-<section id="transferDetailPage" class="page"><div class="pageHeader"><button class="back" onclick="go('transferMenuPage')">?</button><div><h2 id="transferDetailTitle" style="margin:0">รายการแบ่งของ</h2><div class="smallTitle">กดแบ่งแล้วเมื่อจัดของจริงเท่านั้น</div></div></div><div id="transferBox"></div></section>
+<section id="transferMenuPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">แบ่งของ</h2><div class="smallTitle">เปิดตามสาขาปัจจุบันของเครื่อง</div></div></div><div class="archivedTransferSection"><h3>ของที่แบ่งไว้แล้ว</h3><button class="archivedTransferCard" onclick="openArchivedTransferRounds()"><span class="archivedTransferIcon">✓</span><span><b>เปิดรายการที่แบ่งไว้แล้ว</b><small>ดูแยกตามสาขา วันที่ และรอบ</small></span><span class="archivedTransferArrow">?</span></button></div></section>
+<section id="transferDetailPage" class="page"><div class="pageHeader transferDeviceHeaderV759"><button class="back" onclick="go('home')">?</button><div><h2 id="transferDetailTitle" style="margin:0">รายการแบ่งของ</h2><div class="smallTitle">กดแบ่งแล้วเมื่อจัดของจริงเท่านั้น</div></div></div><div id="transferBox"></div></section>
 <section id="transferStatusPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">สถานะการแบ่ง</h2><div class="smallTitle">เลือกสาขาที่ต้องการดูสถานะ</div></div></div><div class="grid directionGrid"><div class="tile" onclick="openStatusDirection(1,2)"><div class="ico v1"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><b>สาขา 1<br>แบ่งให้สาขา 2</b></div><div class="tile" onclick="openStatusDirection(2,1)"><div class="ico v1"><svg viewBox='0 0 24 24'><path d='M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3'/></svg></div><b>สาขา 2<br>แบ่งให้สาขา 1</b></div></div></section>
 <section id="transferStatusDetailPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 id="statusDetailTitle" style="margin:0">สถานะการแบ่ง</h2><div class="smallTitle">ดูสถานะอย่างเดียว ไม่มีปุ่มจัดของ</div></div></div><div id="transferStatusDetailBox"></div></section>
 <section id="archivedTransferBranchPage" class="page"><div class="pageHeader"><button class="back" onclick="go('transferMenuPage')">?</button><div><h2 style="margin:0">ของที่แบ่งไว้แล้ว</h2><div class="smallTitle">เลือกสาขาที่มีของขาด</div></div></div><div class="dirStack"><button class="dirCard green" onclick="openArchivedTransferBranch(1)"><div><b>ของขาดสาขา 1</b><span>ดูรอบที่สาขา 2 แบ่งให้สาขา 1</span></div></button><button class="dirCard blue" onclick="openArchivedTransferBranch(2)"><div><b>ของขาดสาขา 2</b><span>ดูรอบที่สาขา 1 แบ่งให้สาขา 2</span></div></button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.57</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.60</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -177,7 +177,7 @@ let db=null, auth=null, online=false, stockAlertAuthReadyPromise=null, stockAler
 function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[StockAlert] anonymous auth failed',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[StockAlert] auth listener failed',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[StockAlert] auth ready failed',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 const COLLECTION='stock_alert_beta1_items';const ACT='stock_alert_beta1_activity';let items=[], activities=[], currentBranch=1, currentStatus='out', listMode='all', editId=null, transferTarget=null;let transferFrom=1, transferTo=2, statusFrom=1, statusTo=2;let currentPOSupplier='', poManualItems={};let purchaseOrders=JSON.parse(localStorage.getItem('stockAlertPurchaseOrders')||'[]');let deliveryHistory=JSON.parse(localStorage.getItem('stockAlertDeliveryHistory')||'[]');let currentOrderSupplier='', currentReceiveOrderId='', currentHistoryId='';let currentCategory='เบ็ดเตล็ด', selectedCategory='';let categories=JSON.parse(localStorage.getItem('stockAlertCategories')||'null')||['ไฟฟ้า','ประปา','สี','เครื่องมือ','เบ็ดเตล็ด'];let suppliersMaster=JSON.parse(localStorage.getItem('stockAlertSuppliers')||'[]');let nickname=localStorage.getItem('stockAlertNickname')||'';
 const icons={pen:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg>',list:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',truck:'<svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',swap:'<svg viewBox="0 0 24 24"><path d="M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3"/></svg>',chart:'<svg viewBox="0 0 24 24"><path d="M4 19h16"/><path d="M7 16v-5M12 16V7M17 16v-9"/><path d="M6 10l5-4 4 3 4-5"/></svg>',category:'<svg viewBox="0 0 24 24"><path d="M4 6.5h7l2 2h7v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M7 12h10M7 16h7"/></svg>',box:'<svg viewBox="0 0 24 24"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>'};
-const menu=[['ลงของขาด<br>สาขา 1','b1','pen',()=>openForm(1)],['ลงของขาด<br>สาขา 2','b2','pen',()=>openForm(2)],['รายการของขาด<br>สาขา 1','p1','list',()=>openList('branch1')],['รายการของขาด<br>สาขา 2','p2','list',()=>openList('branch2')],['ต้องสั่งเข้าใหม่','r1','truck',()=>go('orderPage')],['แบ่งของ<br>ระหว่างสาขา','s1','swap',()=>go('transferMenuPage')],['ของมาส่งแล้ว','g1','box',()=>go('deliveredPage')],['ข้อมูล','p1','chart',()=>go('summaryPage')]];
+const menu=[['ลงของขาด<br>สาขา 1','b1','pen',()=>openForm(1)],['ลงของขาด<br>สาขา 2','b2','pen',()=>openForm(2)],['รายการของขาด<br>สาขา 1','p1','list',()=>openList('branch1')],['รายการของขาด<br>สาขา 2','p2','list',()=>openList('branch2')],['ต้องสั่งเข้าใหม่','r1','truck',()=>go('orderPage')],['แบ่งของ','s1','swap',()=>go('transferMenuPage')],['ของมาส่งแล้ว','g1','box',()=>go('deliveredPage')],['ข้อมูล','p1','chart',()=>go('summaryPage')]];
 function init(){document.getElementById('mainGrid').innerHTML=menu.map((m,i)=>`<div class="tile ${m[4]||''}" onclick="menu[${i}][3]()"><div class="ico ${m[1]}">${icons[m[2]]}</div><b>${m[0]}</b></div>`).join('');if(!nickname){const t=document.getElementById('nameModalTitle');if(t)t.textContent='ใส่ชื่อเล่นเครื่องนี้';const b=document.getElementById('nameModalSaveBtn');if(b)b.textContent='เริ่มใช้งาน';const c=document.getElementById('nameModalCancelBtn');if(c)c.style.display='none';document.getElementById('nameModal').classList.add('show');} else document.getElementById('syncText').textContent='ผู้ใช้งานเครื่องนี้: '+nickname;bindSearch();listen();setTimeout(()=>{if(typeof window.checkAppUpdate==='function')window.checkAppUpdate();},800);}
 function listen(){if(online&&db){db.collection(COLLECTION).onSnapshot(s=>{items=s.docs.map(d=>({id:d.id,...d.data()}));renderAll();document.getElementById('syncText').textContent='Sync Firebase พร้อมใช้งาน';},e=>{online=false;loadLocal();});db.collection(ACT).orderBy('time','desc').limit(80).onSnapshot(s=>{activities=s.docs.map(d=>({id:d.id,...d.data()}));renderActivity();});}else loadLocal()}
 function loadLocal(){items=JSON.parse(localStorage.getItem(COLLECTION)||'[]');activities=JSON.parse(localStorage.getItem(ACT)||'[]');document.getElementById('syncText').textContent='โหมดออฟไลน์ / ตัวอย่าง';renderAll();}
@@ -1811,8 +1811,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.57';
-  const APP_VERSION_LABEL='V7.57';
+  const APP_VERSION='7.60';
+  const APP_VERSION_LABEL='V7.60';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3345,7 +3345,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.57';if(versionBox)versionBox.textContent='V7.57';
+  if(versionSub)versionSub.textContent='V7.60';if(versionBox)versionBox.textContent='V7.60';
 })();
 </script>
 <script>
@@ -4284,7 +4284,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.57';
+  const APP_VERSION='V7.60';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4622,7 +4622,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.57';
+    document.title='Stock Alert V7.60';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -5782,7 +5782,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 <script>
-/* === V7.57 Firebase sync recovery === */
+/* === V7.60 Firebase sync recovery === */
 (function(){
   const PENDING_KEY='stockAlertPendingFirebaseWritesV744';
   const MIGRATION_KEY='stockAlertLocalReconcileV744';
@@ -5983,9 +5983,9 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 <script>
-/* === V7.57 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
+/* === V7.60 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
 (function(){
-  const APP_VERSION='V7.57';
+  const APP_VERSION='V7.60';
   const SPECIAL_SUPPLIERS=new Set(['ยังไม่ได้ระบุ','ไม่มีที่สั่ง','ไม่ระบุบริษัท']);
   let renameBusy=false;
   function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
@@ -6128,12 +6128,139 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const oldDiagnostics=window.stockAlertFirebaseDiagnostics;
   window.stockAlertFirebaseDiagnostics=function(){
     const base=oldDiagnostics?oldDiagnostics():{};
-    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_57-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
+    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_60-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
   };
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
   if(versionSub)versionSub.textContent=APP_VERSION;if(versionBox)versionBox.textContent=APP_VERSION;document.title='Stock Alert '+APP_VERSION;
   const style=document.createElement('style');style.textContent='.supplierRenameCardV757{position:relative;gap:10px;padding-left:54px!important}.supplierRenameMoreV757{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#0b4ab8;font-size:24px;line-height:1;box-shadow:0 4px 12px rgba(17,44,84,.10);z-index:2}.supplierRenameMoreV757:active{transform:translateY(-50%) scale(.96)}';document.head.appendChild(style);
   console.info('[StockAlert Debug]',window.stockAlertFirebaseDiagnostics());
+})();
+</script>
+<script>
+/* === V7.60 Device branch home context + transfer pending alert === */
+(function(){
+  const KEY='stockAlertCurrentDeviceBranch';
+  const BRANCHES={1:{name:'สาขา 1',theme:'deviceBranchOne',to:2},2:{name:'สาขา 2',theme:'deviceBranchTwo',to:1}};
+  function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  function branch(){const saved=Number(localStorage.getItem(KEY)||1);return saved===2?2:1;}
+  function setBranch(value,{silent=false}={}){
+    const next=Number(value)===2?2:1;
+    localStorage.setItem(KEY,String(next));
+    window.currentDeviceBranch=next;
+    if(!silent)toast(`เปลี่ยนสาขาปัจจุบันเป็นสาขา ${next} แล้ว`);
+    renderDeviceHome();
+  }
+  function formHasUnsavedShortage(){
+    if(!document.getElementById('formPage')?.classList.contains('active'))return false;
+    if(window.editId)return false;
+    return ['nameInput','qtyInput','unitInput','supplierInput','noteInput'].some(id=>(document.getElementById(id)?.value||'').trim());
+  }
+  function ensureBranchChangeModal(next){
+    let modal=document.getElementById('deviceBranchChangeModalV758');
+    if(!modal){modal=document.createElement('div');modal.id='deviceBranchChangeModalV758';modal.className='modal';document.body.appendChild(modal);}
+    modal.innerHTML=`<div class="sheet"><h2>มีข้อมูลที่ยังไม่ได้บันทึก</h2><p class="muted">กำลังกรอกข้อมูลของสาขา ${esc(window.currentBranch||branch())} อยู่ ต้องการทำอย่างไรก่อนเปลี่ยนเป็นสาขา ${next}?</p><button class="btn ok" style="width:100%;margin-top:10px" onclick="closeModal('deviceBranchChangeModalV758');saveItem().then(()=>StockAlertDeviceBranch.set(${next}))">บันทึกก่อน</button><button class="btn danger" style="width:100%;margin-top:8px" onclick="closeModal('deviceBranchChangeModalV758');StockAlertDeviceBranch.set(${next})">ทิ้งการเปลี่ยนแปลง</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('deviceBranchChangeModalV758')">ยกเลิกการเปลี่ยนสาขา</button></div>`;
+    modal.classList.add('show');
+  }
+  function toggleBranch(){const next=branch()===1?2:1;if(formHasUnsavedShortage())return ensureBranchChangeModal(next);setBranch(next);}
+  function transferState(item){
+    const status=String(item?.transferStatus||'').toLowerCase();
+    const split=String(item?.splitStatus||'').toLowerCase();
+    if(item?.transferDone===true||['confirmed','transfer_confirmed','completed','done','closed','cancelled','canceled'].includes(status)||['confirmed','transfer_confirmed','completed','done','closed','cancelled','canceled'].includes(split))return 'closed';
+    if(item?.transferPrepared===true||['split_done_waiting_confirm','divided','prepared'].includes(status)||['split_done_waiting_confirm','divided','prepared'].includes(split))return 'prepared';
+    return 'waiting';
+  }
+  function toNumber(value){const n=parseFloat(String(value??'').replace(/,/g,''));return Number.isFinite(n)?n:0;}
+  function hasRemainingQty(item){const need=toNumber(item?.qty),moved=toNumber(item?.transferBaseQty||item?.transferQty);return need>0&&moved>0&&moved<need;}
+  function pendingTransferTasks(from,to){
+    let tasks=[];try{tasks=typeof transferTasksByDirection==='function'?(transferTasksByDirection(from,to)||[]):[];}catch(e){tasks=[];}
+    return tasks.filter(task=>{const state=transferState(task.need);if(state==='closed')return false;if(state==='prepared'&&!hasRemainingQty(task.need))return false;return true;});
+  }
+  function transferCountForDevice(){const from=branch(),to=BRANCHES[from].to;return {from,to,tasks:pendingTransferTasks(from,to)};}
+  function incomingStatusForDevice(){
+    const to=branch(),from=BRANCHES[to].to;
+    let tasks=[];try{tasks=typeof transferTasksByDirection==='function'?(transferTasksByDirection(from,to)||[]):[];}catch(e){tasks=[];}
+    tasks=tasks.filter(task=>transferState(task.need)!=='closed');
+    const split=tasks.filter(task=>transferState(task.need)==='prepared');
+    const partial=split.filter(task=>hasRemainingQty(task.need));
+    const done=split.length-partial.length;
+    const total=tasks.length;
+    const remain=Math.max(0,total-done);
+    const pct=total?Math.round((done/total)*100):0;
+    return {from,to,total,done,partial:partial.length,started:split.length,remain,pct,complete:total>0&&done===total};
+  }
+  function openIncomingStatusAlert(){
+    const info=incomingStatusForDevice();
+    if(!info.started)return;
+    openStatusDirection(info.from,info.to);
+  }
+  function styleTransferDetailHeader(from,to){
+    const title=document.getElementById('transferDetailTitle');
+    if(title)title.textContent=`รายการที่ต้องแบ่งให้สาขา ${to}`;
+    const header=document.querySelector('#transferDetailPage .transferDeviceHeaderV759,#transferDetailPage .pageHeader');
+    if(header){
+      header.classList.add('transferDeviceHeaderV759');
+      header.classList.toggle('deviceBranchOne',Number(from)===1);
+      header.classList.toggle('deviceBranchTwo',Number(from)===2);
+    }
+  }
+  function openDeviceTransferPage(){
+    const from=branch(),to=BRANCHES[from].to;
+    if(typeof openTransferDirection==='function')openTransferDirection(from,to);
+    else{window.transferFrom=from;window.transferTo=to;go('transferDetailPage');}
+    styleTransferDetailHeader(from,to);
+  }
+  function openDeviceTransferAlert(){openDeviceTransferPage();}
+  function transferAlertHtml(){
+    const info=transferCountForDevice(),count=info.tasks.length;if(!count)return '';
+    const cacheText=(typeof navigator!=='undefined'&&!navigator.onLine)?'<small class="deviceTransferCache">ข้อมูลจากเครื่อง รอซิงค์</small>':'';
+    return `<button type="button" class="deviceTransferAlertV758" onclick="StockAlertDeviceBranch.openTransferAlert()"><span class="deviceTransferIconV758">${icons?.box||''}</span><span class="deviceTransferMainV758"><b>มีรายการของขาดที่ต้องแบ่งให้สาขา ${info.to}</b><strong>${count} รายการ</strong>${cacheText}<small>กดเพื่อตรวจสอบ</small></span><span class="deviceTransferArrowV758">›</span></button>`;
+  }
+  function incomingStatusHtml(){
+    const info=incomingStatusForDevice();
+    if(!info.started)return '';
+    const title=info.complete?`สาขา ${info.from} แบ่งของครบแล้ว`:`สาขา ${info.from} เริ่มแบ่งของบางส่วนแล้ว`;
+    const partialText=info.partial?` • แบ่งบางส่วน ${info.partial} รายการ`:'';
+    return `<button type="button" class="incomingTransferStatusV760 ${info.complete?'complete':''}" onclick="StockAlertDeviceBranch.openIncomingStatus()"><span class="incomingTransferBadgeV760">${info.complete?'ครบแล้ว':'กำลังดำเนินการ'}</span><b>${title}</b><span>แบ่งครบ ${info.done} จาก ${info.total} รายการ${partialText}</span><span>เหลือ ${info.remain} รายการ • ความคืบหน้า ${info.pct}%</span><i><em style="width:${info.pct}%"></em></i><small>กดดูรายละเอียดสถานะการแบ่ง</small></button>`;
+  }
+  function branchPanelHtml(){const current=branch(),meta=BRANCHES[current];return `<section class="deviceBranchPanelV758 ${meta.theme}"><div><small>กำลังใช้งานที่</small><b>${meta.name}</b></div><button type="button" onclick="StockAlertDeviceBranch.toggle()">เปลี่ยนสาขา</button></section>`;}
+  function tileHtml(label,cls,iconName,handler){return `<div class="tile" onclick="${handler}"><div class="ico ${cls}">${icons?.[iconName]||''}</div><b>${label}</b></div>`;}
+  function renderDeviceHomeMenu(){
+    const grid=document.getElementById('mainGrid');if(!grid)return;
+    const b=branch();
+    grid.innerHTML=[
+      tileHtml(`ลงของขาด<br>สาขา ${b}`,b===1?'b1':'b2','pen',`openForm(${b})`),
+      tileHtml(`รายการของขาด<br>สาขา ${b}`,b===1?'p1':'p2','list',`openList('branch${b}')`),
+      tileHtml('ต้องสั่งเข้าใหม่','r1','truck',`go('orderPage')`),
+      tileHtml('แบ่งของ','s1','swap',`StockAlertDeviceBranch.openTransferPage()`),
+      tileHtml('ของมาส่งแล้ว','g1','box',`go('deliveredPage')`),
+      tileHtml('ข้อมูล','p1','chart',`go('summaryPage')`)
+    ].join('');
+  }
+  function addFormBranchBadge(b){
+    const header=document.querySelector('#formPage .pageHeader');if(!header)return;
+    header.querySelector('.deviceFormBadgeV758')?.remove();
+    const badge=document.createElement('div');badge.className=`deviceFormBadgeV758 ${Number(b)===2?'deviceBranchTwo':'deviceBranchOne'}`;badge.textContent=`กำลังบันทึกข้อมูลของสาขา ${Number(b)===2?2:1}`;header.appendChild(badge);
+  }
+  function ensureDeviceHome(){
+    const home=document.getElementById('home'),hero=home?.querySelector('.hero'),alerts=document.getElementById('transferAlerts');if(!home||!hero||!alerts)return;
+    let panel=document.getElementById('deviceBranchMountV758');if(!panel){panel=document.createElement('div');panel.id='deviceBranchMountV758';hero.insertAdjacentElement('afterend',panel);}
+    panel.innerHTML=branchPanelHtml();alerts.innerHTML=transferAlertHtml()+incomingStatusHtml();renderDeviceHomeMenu();
+    const cashCard=document.querySelector('.cashHomeCardV749');if(cashCard){const b=branch();cashCard.classList.toggle('blue',b===1);cashCard.classList.toggle('green',b===2);const title=cashCard.querySelector('b'),sub=cashCard.querySelector('small');if(title)title.textContent=`ตรวจสอบเงิน สาขา ${b}`;if(sub)sub.textContent='เปิดหน้ากรอกข้อมูลของสาขาปัจจุบันทันที';}
+    if(document.getElementById('formPage')?.classList.contains('active'))addFormBranchBadge(Number(window.currentBranch||branch()));
+  }
+  function renderDeviceHome(){ensureDeviceHome();}
+  window.StockAlertDeviceBranch={get:branch,set:setBranch,toggle:toggleBranch,render:renderDeviceHome,openTransferPage:openDeviceTransferPage,openTransferAlert:openDeviceTransferAlert,openIncomingStatus:openIncomingStatusAlert,pendingTransferTasks,incomingStatus:incomingStatusForDevice};
+  window.currentDeviceBranch=branch();
+  const baseInit=window.init||init;window.init=init=function(){const result=baseInit.apply(this,arguments);renderDeviceHome();return result;};
+  const baseRenderAll=window.renderAll||renderAll;window.renderAll=renderAll=function(){const result=baseRenderAll.apply(this,arguments);renderDeviceHome();return result;};
+  const baseRenderTransferAlerts=window.renderTransferAlerts||renderTransferAlerts;window.renderTransferAlerts=renderTransferAlerts=function(){const result=baseRenderTransferAlerts?baseRenderTransferAlerts.apply(this,arguments):undefined;ensureDeviceHome();return result;};
+  const baseOpenForm=window.openForm||openForm;window.openForm=openForm=function(b,it=null){const fixed=Number(b)||branch();const result=baseOpenForm.call(this,fixed,it);setTimeout(()=>addFormBranchBadge(fixed),0);return result;};
+  const baseOpenTransferDirection=window.openTransferDirection||openTransferDirection;window.openTransferDirection=openTransferDirection=function(from,to){const result=baseOpenTransferDirection.call(this,from,to);styleTransferDetailHeader(Number(from)||branch(),Number(to)||BRANCHES[branch()].to);return result;};
+  const baseGo=window.go||go;window.go=go=function(id,options){if(id==='transferMenuPage'&&!options?.showTransferMenu)return openDeviceTransferPage();return baseGo.apply(this,arguments);};
+  const baseDiagnostics=window.stockAlertFirebaseDiagnostics;window.stockAlertFirebaseDiagnostics=function(){const base=baseDiagnostics?baseDiagnostics():{},incoming=incomingStatusForDevice();return {...base,deviceBranch:branch(),deviceBranchStorageKey:KEY,devicePendingTransferCount:transferCountForDevice().tasks.length,deviceIncomingTransferStarted:incoming.started,deviceIncomingTransferProgress:incoming.pct};};
+  const style=document.createElement('style');
+  style.textContent=`.deviceBranchPanelV758{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:18px;padding:13px 14px;margin:-4px 0 12px;color:#fff;box-shadow:0 10px 24px rgba(15,23,42,.14)}.deviceBranchPanelV758 small,.deviceBranchPanelV758 b{display:block}.deviceBranchPanelV758 small{font-size:12px;font-weight:900;opacity:.9}.deviceBranchPanelV758 b{font-size:22px}.deviceBranchPanelV758 button{border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:10px 13px;font-weight:950;white-space:nowrap}.deviceBranchOne{background:linear-gradient(135deg,#0967f2,#38bdf8)}.deviceBranchTwo{background:linear-gradient(135deg,#0f9f6e,#7ddf95)}.deviceTransferAlertV758{width:100%;border:2px solid #fb923c;border-radius:22px;margin:0 0 14px;padding:16px;display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;text-align:left;background:#fff7ed;color:#431407;box-shadow:0 15px 32px rgba(234,88,12,.2);font-family:inherit;animation:deviceTransferPulseV758 1.8s ease-in-out infinite}.deviceTransferIconV758{width:52px;height:52px;border-radius:16px;background:#ffedd5;color:#c2410c;display:grid;place-items:center}.deviceTransferIconV758 svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.4}.deviceTransferMainV758 b,.deviceTransferMainV758 strong,.deviceTransferMainV758 small{display:block}.deviceTransferMainV758 b{font-size:17px;line-height:1.25}.deviceTransferMainV758 strong{font-size:28px;color:#b91c1c;margin:3px 0}.deviceTransferMainV758 small{font-size:13px;font-weight:950;color:#9a3412}.deviceTransferCache{color:#7c2d12!important}.deviceTransferArrowV758{font-size:34px;font-weight:950;color:#c2410c}.incomingTransferStatusV760{width:100%;border:1px solid #bfdbfe;border-radius:20px;margin:0 0 14px;padding:14px;text-align:left;background:#eff6ff;color:#0f172a;box-shadow:0 8px 20px rgba(37,99,235,.12);font-family:inherit;display:grid;gap:5px}.incomingTransferStatusV760.complete{border-color:#bbf7d0;background:#f0fdf4}.incomingTransferStatusV760 b{font-size:18px;color:#0b3b80}.incomingTransferStatusV760.complete b{color:#166534}.incomingTransferStatusV760 span,.incomingTransferStatusV760 small{font-weight:900;color:#475569}.incomingTransferBadgeV760{justify-self:start;border-radius:999px;padding:5px 9px;background:#dbeafe!important;color:#1d4ed8!important;font-size:12px}.incomingTransferStatusV760.complete .incomingTransferBadgeV760{background:#dcfce7!important;color:#166534!important}.incomingTransferStatusV760 i{height:8px;border-radius:999px;background:#dbeafe;overflow:hidden;display:block;margin-top:4px}.incomingTransferStatusV760 em{height:100%;display:block;border-radius:999px;background:#2563eb}.incomingTransferStatusV760.complete em{background:#16a34a}.deviceFormBadgeV758{margin-left:auto;border-radius:999px;padding:8px 11px;color:#fff;font-size:12px;font-weight:950;white-space:nowrap}.cashDeviceBadgeV758{border-radius:999px;padding:8px 11px;color:#fff;font-size:12px;font-weight:950;display:inline-block;margin-top:4px}.transferDeviceHeaderV759{border-radius:18px;padding:12px;color:#fff;box-shadow:0 10px 24px rgba(15,23,42,.14)}.transferDeviceHeaderV759 .smallTitle{color:rgba(255,255,255,.9)}.transferDeviceHeaderV759 .back{background:rgba(255,255,255,.2);color:#fff}@keyframes deviceTransferPulseV758{0%,100%{transform:scale(1);box-shadow:0 15px 32px rgba(234,88,12,.2)}50%{transform:scale(1.01);box-shadow:0 18px 38px rgba(234,88,12,.32)}}@media(prefers-reduced-motion:reduce){.deviceTransferAlertV758{animation:none}}@media(min-width:720px){.deviceBranchPanelV758{padding:15px 18px}.deviceTransferAlertV758{grid-template-columns:auto 1fr auto;padding:18px}}`;
+  document.head.appendChild(style);setTimeout(renderDeviceHome,0);window.addEventListener('online',()=>setTimeout(renderDeviceHome,250));window.addEventListener('offline',()=>setTimeout(renderDeviceHome,250));
 })();
 </script>
 <script src="cash-reconciliation.js"></script>
