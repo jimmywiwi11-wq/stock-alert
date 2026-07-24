@@ -1,6 +1,6 @@
 {
-  "version": "7.61",
-  "label": "V7.61",
+  "version": "7.62",
+  "label": "V7.62",
   "releasedAt": "2026-07-24T00:00:00Z",
-  "message": "Make the current-branch transfer alert more urgent with siren-style CSS animations and reduced-motion support."
+  "message": "Render current-branch transfer alerts from the first data snapshot without requiring a branch change."
 }
