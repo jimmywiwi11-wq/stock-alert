@@ -1,6 +1,6 @@
 {
-  "version": "7.62",
-  "label": "V7.62",
+  "version": "7.65",
+  "label": "V7.65",
   "releasedAt": "2026-07-24T00:00:00Z",
-  "message": "Render current-branch transfer alerts from the first data snapshot without requiring a branch change."
+  "message": "Keep the transfer alert mounted on cold start and normalize saved branch values before transfer alert calculation."
 }
