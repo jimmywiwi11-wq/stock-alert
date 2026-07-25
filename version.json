@@ -1,6 +1,6 @@
 {
-  "version": "7.65",
-  "label": "V7.65",
-  "releasedAt": "2026-07-24T00:00:00Z",
-  "message": "Keep the transfer alert mounted on cold start and normalize saved branch values before transfer alert calculation."
+  "version": "7.66",
+  "label": "V7.66",
+  "releasedAt": "2026-07-25T00:00:00Z",
+  "message": "Fix the home global shortage search so it uses both branches, supports normalized partial and multi-word matching, and shows branch status details."
 }

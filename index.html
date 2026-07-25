@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.65</title>
+<title>Stock Alert V7.66</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.65</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.66</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.65</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.66</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1822,8 +1822,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.65';
-  const APP_VERSION_LABEL='V7.65';
+  const APP_VERSION='7.66';
+  const APP_VERSION_LABEL='V7.66';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3356,7 +3356,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.65';if(versionBox)versionBox.textContent='V7.65';
+  if(versionSub)versionSub.textContent='V7.66';if(versionBox)versionBox.textContent='V7.66';
 })();
 </script>
 <script>
@@ -4295,7 +4295,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.65';
+  const APP_VERSION='V7.66';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4633,7 +4633,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.65';
+    document.title='Stock Alert V7.66';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -5996,7 +5996,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.60 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
 (function(){
-  const APP_VERSION='V7.65';
+  const APP_VERSION='V7.66';
   const SPECIAL_SUPPLIERS=new Set(['ยังไม่ได้ระบุ','ไม่มีที่สั่ง','ไม่ระบุบริษัท']);
   let renameBusy=false;
   function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
@@ -6139,7 +6139,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const oldDiagnostics=window.stockAlertFirebaseDiagnostics;
   window.stockAlertFirebaseDiagnostics=function(){
     const base=oldDiagnostics?oldDiagnostics():{};
-    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_65-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
+    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_66-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
   };
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
   if(versionSub)versionSub.textContent=APP_VERSION;if(versionBox)versionBox.textContent=APP_VERSION;document.title='Stock Alert '+APP_VERSION;
@@ -6330,6 +6330,225 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   urgentStyle.textContent=`.alerts{overflow:visible;padding:4px 0 8px}.deviceTransferAlertV758{position:relative;isolation:isolate;width:calc(100% - 24px);border:3px solid #ff3b1f;border-radius:18px;margin:8px 12px 20px;padding:19px 14px 16px;display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;background:linear-gradient(135deg,#7f0f0f,#dc2626 54%,#ea580c);background-size:160% 160%;color:#fff;box-shadow:0 4px 12px rgba(220,0,0,.35),0 0 22px rgba(255,0,0,.42);font-family:inherit;overflow:hidden;cursor:pointer;transform-origin:center;scale:1;translate:0 0;will-change:scale,translate,box-shadow,background-position;animation:deviceTransferPulseV761 1s ease-in-out infinite,deviceTransferShakeV761 4s ease-in-out infinite,deviceTransferBgV761 1.05s ease-in-out infinite}.deviceTransferAlertV758:before{content:"";position:absolute;inset:0 0 auto;height:8px;background:linear-gradient(90deg,#ff1f1f 0%,#ff7a00 22%,#fff7d6 40%,#ff2a00 58%,#7f0000 100%);background-size:220% 100%;animation:deviceTransferSirenV761 1s linear infinite;z-index:0}.deviceTransferAlertV758>*{position:relative;z-index:1}.deviceTransferAlertV758:active{animation-play-state:paused;scale:.985;filter:saturate(1.08)}.deviceTransferIconV758{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.58);color:#fff;display:grid;place-items:center;font-size:30px;box-shadow:inset 0 0 18px rgba(255,255,255,.2),0 0 18px rgba(255,255,255,.24);animation:deviceTransferIconAlarmV761 .72s ease-in-out infinite}.deviceTransferIconV758 svg{display:none}.deviceTransferMainV758{min-width:0;display:grid;gap:5px}.deviceTransferMainV758 b,.deviceTransferMainV758 strong,.deviceTransferMainV758 small,.deviceTransferMainV758 em{display:block}.deviceTransferMainV758 b{font-size:16px;line-height:1.28;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);overflow-wrap:anywhere}.deviceTransferMainV758 em{font-style:normal;font-size:15px;font-weight:950;color:#fff7d6;text-shadow:0 1px 2px rgba(0,0,0,.32)}.deviceTransferMainV758 small{font-size:13px;font-weight:950;color:#fff;opacity:.96}.deviceTransferBadgeV761{justify-self:start;border-radius:999px;padding:5px 10px;background:#fff7d6;color:#7f1d1d;border:1px solid rgba(255,255,255,.8);font-size:12px;font-weight:950;box-shadow:0 3px 10px rgba(0,0,0,.2)}.deviceTransferCountV761{justify-self:start;border-radius:999px;padding:8px 14px;background:linear-gradient(180deg,#fff,#fff3c4);border:2px solid #fecaca;color:#7f0f0f!important;font-size:34px!important;line-height:1;margin:1px 0;text-shadow:none;box-shadow:0 8px 18px rgba(0,0,0,.24),0 0 18px rgba(255,255,255,.28);transform-origin:center;animation:deviceTransferCountBeatV761 .8s ease-in-out infinite}.deviceTransferArrowV758{font-size:34px;font-weight:950;color:#fff7d6;text-shadow:0 1px 2px rgba(0,0,0,.36)}.deviceTransferCache{color:#fff7d6!important}.deviceTransferUrgencyL1V761{border-color:#fb923c;background:linear-gradient(135deg,#9a3412,#ea580c 58%,#f97316);animation:deviceTransferPulseSoftV761 1.05s ease-in-out infinite,deviceTransferShakeV761 4.6s ease-in-out infinite,deviceTransferBgV761 1.12s ease-in-out infinite}.deviceTransferUrgencyL1V761 .deviceTransferCountV761{animation-duration:.9s}.deviceTransferUrgencyL3V761{border-width:4px;box-shadow:0 4px 12px rgba(220,0,0,.42),0 0 28px rgba(255,0,0,.62),0 0 44px rgba(255,80,0,.32)}.deviceTransferUrgencyL4V761{border-width:4px;background:linear-gradient(135deg,#3f0505,#991b1b 50%,#dc2626);box-shadow:0 5px 14px rgba(120,0,0,.55),0 0 32px rgba(255,0,0,.78),0 0 52px rgba(255,80,0,.46);animation:deviceTransferPulseMaxV761 .92s ease-in-out infinite,deviceTransferShakeMaxV761 3.4s ease-in-out infinite,deviceTransferBgV761 .95s ease-in-out infinite}.deviceTransferUrgencyL4V761 .deviceTransferCountV761{animation:deviceTransferCountBeatMaxV761 .72s ease-in-out infinite}.deviceTransferCountUpV761{animation:deviceTransferImpactV761 .7s ease-out 1,deviceTransferPulseV761 1s ease-in-out infinite,deviceTransferShakeV761 4s ease-in-out infinite,deviceTransferBgV761 1.05s ease-in-out infinite}.deviceTransferCountDownV761 .deviceTransferCountV761{animation:deviceTransferCountDropV761 .48s ease-out 1,deviceTransferCountBeatV761 .8s ease-in-out infinite}.deviceTransferCompleteV761{border-color:#22c55e!important;background:linear-gradient(135deg,#166534,#22c55e)!important;color:#fff!important;box-shadow:0 0 24px rgba(34,197,94,.55)!important;animation:deviceTransferCompleteV761 1.4s ease-out 1!important;cursor:default}.deviceTransferCompleteV761:before{display:none}.deviceTransferCompleteV761 .deviceTransferIconV758,.deviceTransferCompleteV761 .deviceTransferCountV761{animation:none;background:rgba(255,255,255,.18);color:#fff!important;border-color:rgba(255,255,255,.55)}@keyframes deviceTransferSirenV761{0%{background-position:180% 0}100%{background-position:-40% 0}}@keyframes deviceTransferPulseV761{0%,100%{scale:1;box-shadow:0 4px 12px rgba(220,0,0,.35),0 0 20px rgba(255,0,0,.44)}45%{scale:1.052;box-shadow:0 0 24px rgba(255,0,0,.9),0 0 42px rgba(255,80,0,.55)}70%{scale:.99;box-shadow:0 3px 12px rgba(190,0,0,.42)}}@keyframes deviceTransferPulseSoftV761{0%,100%{scale:1;box-shadow:0 4px 12px rgba(234,88,12,.32),0 0 16px rgba(249,115,22,.34)}45%{scale:1.032;box-shadow:0 0 20px rgba(249,115,22,.72),0 0 32px rgba(255,120,0,.36)}70%{scale:.995}}@keyframes deviceTransferPulseMaxV761{0%,100%{scale:1;box-shadow:0 5px 14px rgba(120,0,0,.55),0 0 28px rgba(255,0,0,.72)}45%{scale:1.06;box-shadow:0 0 25px rgba(255,0,0,.94),0 0 48px rgba(255,80,0,.58)}70%{scale:.99}}@keyframes deviceTransferShakeV761{0%,71%,100%{translate:0 0}74%{translate:-5px 0}77%{translate:5px 0}80%{translate:-4px 0}83%{translate:4px 0}86%{translate:0 0}}@keyframes deviceTransferShakeMaxV761{0%,68%,100%{translate:0 0}71%{translate:-6px 0}74%{translate:6px 0}77%{translate:-5px 0}80%{translate:5px 0}83%{translate:0 0}}@keyframes deviceTransferBgV761{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}@keyframes deviceTransferIconAlarmV761{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-11deg) scale(1.08)}50%{transform:rotate(10deg) scale(1.04)}75%{transform:rotate(-7deg) scale(1.08)}}@keyframes deviceTransferCountBeatV761{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}@keyframes deviceTransferCountBeatMaxV761{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}@keyframes deviceTransferImpactV761{0%{scale:1;translate:0 0}28%{scale:1.08;translate:0 -1px}44%{translate:-6px 0}58%{translate:6px 0}72%{translate:-4px 0}100%{scale:1;translate:0 0}}@keyframes deviceTransferCountDropV761{0%{transform:scale(1)}35%{transform:scale(.84)}100%{transform:scale(1)}}@keyframes deviceTransferCompleteV761{0%{scale:.98;opacity:.95}35%{scale:1.04}100%{scale:1;opacity:1}}@media(max-width:360px){.deviceTransferAlertV758{grid-template-columns:44px minmax(0,1fr) 18px;gap:9px;padding:18px 10px 14px}.deviceTransferIconV758{width:44px;height:44px;font-size:25px}.deviceTransferCountV761{font-size:28px!important;padding:7px 11px}.deviceTransferMainV758 b{font-size:15px}}@media(min-width:720px){.deviceTransferAlertV758{grid-template-columns:62px minmax(0,1fr) auto;padding:20px 18px;width:calc(100% - 28px);margin-left:14px;margin-right:14px}.deviceTransferIconV758{width:62px;height:62px;font-size:34px}.deviceTransferCountV761{font-size:38px!important}}@media(prefers-reduced-motion:reduce){.deviceTransferAlertV758,.deviceTransferAlertV758:before,.deviceTransferIconV758,.deviceTransferCountV761{animation:none!important;transition:none!important;will-change:auto!important}.deviceTransferAlertV758{scale:1!important;translate:0 0!important;background:#7f1d1d!important;border:4px solid #ff3b1f!important;box-shadow:0 0 24px rgba(220,38,38,.62)!important}.deviceTransferAlertV758:before{background:#ff3b1f!important}.deviceTransferAlertV758:active{scale:.985!important}}`;
   urgentStyle.textContent+=`.deviceTransferAlertV758{grid-template-columns:1fr!important;gap:0!important;text-align:center!important;padding:26px 18px 24px!important}.deviceTransferMainV758{justify-items:center;text-align:center;gap:13px!important}.deviceTransferMainV758 b{font-size:19px!important;line-height:1.35}.deviceTransferCountV761{justify-self:center!important;font-size:40px!important;padding:9px 17px!important}.deviceTransferIconV758,.deviceTransferBadgeV761,.deviceTransferArrowV758,.deviceTransferMainV758 em,.deviceTransferMainV758 small{display:none!important}.deviceTransferCompleteV761{min-height:96px}.deviceTransferCompleteV761 .deviceTransferMainV758 b{font-size:22px!important}@media(max-width:360px){.deviceTransferAlertV758{grid-template-columns:1fr!important;padding:23px 12px 21px!important}.deviceTransferMainV758 b{font-size:17px!important}.deviceTransferCountV761{font-size:32px!important}}@media(min-width:720px){.deviceTransferAlertV758{grid-template-columns:1fr!important;padding:28px 22px 26px!important}.deviceTransferCountV761{font-size:44px!important}}`;
   document.head.appendChild(urgentStyle);renderDeviceHome();window.addEventListener('online',()=>renderDeviceHome());window.addEventListener('offline',()=>renderDeviceHome());
+})();
+</script>
+<script>
+/* === V7.66 global home shortage search === */
+(function(){
+  let indexedSource=null,indexedRows=[],lastQuery='',lastResults=[];
+  const CLOSED_ORDER_STATES=new Set(['ordered','completed']);
+  const CLOSED_VALUES=new Set(['completed','complete','done','closed','cancelled','canceled','received','delivered']);
+  const CODE_FIELDS=['productId','productID','product_id','code','productCode','sku','barcode','barCode','itemCode'];
+  const ALIAS_FIELDS=['alias','aliases','alternateNames','otherNames','keywords'];
+  function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  function normalizeSearchText(value){
+    let text=String(value??'');
+    try{text=text.normalize('NFC');}catch(error){}
+    return text
+      .toLowerCase()
+      .replace(/[\u200b\u200c\u200d\ufeff]/g,'')
+      .replace(/[“”‘’`]/g,'')
+      .replace(/[|()[\]{}<>]/g,' ')
+      .replace(/[_.,;:]+/g,' ')
+      .replace(/\s*([\/\-+])\s*/g,'$1')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  function compact(value){return normalizeSearchText(value).replace(/\s+/g,'');}
+  function tokens(value){return normalizeSearchText(value).split(' ').filter(Boolean);}
+  function aliasesFor(value){
+    const base=[normalizeSearchText(value)];
+    const c=compact(value);
+    if(c.includes('พีวีซี'))base.push(normalizeSearchText(value).replace(/พีวีซี/g,'pvc'));
+    if(c.includes('pvc'))base.push(normalizeSearchText(value).replace(/pvc/g,'พีวีซี'));
+    return [...new Set(base.filter(Boolean))];
+  }
+  function fieldList(item,fields){
+    return fields.flatMap(field=>{
+      const value=item?.[field];
+      if(Array.isArray(value))return value;
+      return value?[value]:[];
+    }).filter(value=>String(value).trim());
+  }
+  function activeShortageItems(source){
+    return (Array.isArray(source)?source:[]).filter(item=>{
+      if(!item||!item.name)return false;
+      if(CLOSED_ORDER_STATES.has(String(item.orderState||'').toLowerCase()))return false;
+      const statusValues=[item.status,item.shortageStatus,item.state,item.itemStatus,item.transferStatus,item.splitStatus,item.archiveReason];
+      if(statusValues.some(value=>CLOSED_VALUES.has(normalizeSearchText(value))))return false;
+      if(item.closed===true||item.cancelled===true||item.canceled===true||item.completed===true||item.deleted===true)return false;
+      return true;
+    });
+  }
+  function itemCodes(item){return fieldList(item,CODE_FIELDS);}
+  function sameItemKey(item){
+    const productId=normalizeSearchText(item.productId||item.productID||item.product_id);
+    if(productId)return 'pid:'+productId;
+    const code=itemCodes(item).map(normalizeSearchText).find(Boolean);
+    if(code)return 'code:'+code;
+    return 'name:'+compact(item.name);
+  }
+  function branchNumber(item){return Number(item?.branch||item?.branchId||0)||0;}
+  function timeValue(value){
+    if(value&&typeof value.toMillis==='function')return value.toMillis();
+    if(value&&Number.isFinite(value.seconds))return value.seconds*1000;
+    const n=Number(value);
+    return Number.isFinite(n)?n:0;
+  }
+  function newer(a,b){return timeValue(a?.updatedAt||a?.createdAt)>=timeValue(b?.updatedAt||b?.createdAt)?a:b;}
+  function groupSearchItems(source){
+    const map=new Map();
+    activeShortageItems(source).forEach(item=>{
+      const key=sameItemKey(item);
+      const group=map.get(key)||{key,name:item.name,branches:[],b1:null,b2:null,codes:new Set(),searchParts:[]};
+      const branch=branchNumber(item);
+      group.name=group.name||item.name;
+      group.branches.push(item);
+      itemCodes(item).forEach(code=>group.codes.add(String(code)));
+      if(branch===1)group.b1=group.b1?newer(group.b1,item):item;
+      else if(branch===2)group.b2=group.b2?newer(group.b2,item):item;
+      else group.extra=item;
+      map.set(key,group);
+    });
+    return [...map.values()].map(group=>{
+      const fields=[
+        group.name,
+        ...group.branches.map(item=>item.name),
+        ...group.branches.flatMap(item=>itemCodes(item)),
+        ...group.branches.flatMap(item=>fieldList(item,ALIAS_FIELDS)),
+        ...group.branches.map(item=>item.unit),
+        ...group.branches.map(item=>item.category)
+      ];
+      const aliases=fields.flatMap(aliasesFor);
+      const searchText=normalizeSearchText(aliases.join(' '));
+      const searchCompact=compact(aliases.join(' '));
+      return {...group,codes:[...group.codes],searchText,searchCompact,nameNorm:normalizeSearchText(group.name),nameCompact:compact(group.name)};
+    });
+  }
+  function scoreGroup(group,query){
+    const q=normalizeSearchText(query),qc=compact(query),parts=tokens(q);
+    if(!q)return -1;
+    const name=group.nameNorm,namec=group.nameCompact,all=group.searchText,allc=group.searchCompact;
+    const codeHit=group.codes.some(code=>compact(code).includes(qc));
+    if(name===q||namec===qc)return 100;
+    if(name.startsWith(q)||namec.startsWith(qc))return 90;
+    if(parts.length&&parts.every(part=>all.includes(part)||allc.includes(compact(part))))return 80;
+    if(all.includes(q)||allc.includes(qc))return 70;
+    if(codeHit)return 65;
+    if(parts.some(part=>part.length>1&&(all.includes(part)||allc.includes(compact(part)))))return 45;
+    return -1;
+  }
+  function getSearchIndex(source){
+    const current=source||items||[];
+    if(current!==indexedSource){indexedSource=current;indexedRows=groupSearchItems(current);}
+    return indexedRows;
+  }
+  function searchShortages(query,source){
+    const rows=getSearchIndex(source);
+    return rows
+      .map(group=>({...group,_score:scoreGroup(group,query)}))
+      .filter(group=>group._score>=0)
+      .sort((a,b)=>b._score-a._score||a.name.localeCompare(b.name,'th'));
+  }
+  function branchLabel(item){
+    if(!item)return 'ไม่พบในรายการของขาด';
+    return item.status==='out'?'หมด':`เหลือน้อย${item.qty?` · คงเหลือ ${esc(item.qty)} ${esc(item.unit||'')}`:''}`;
+  }
+  function branchLine(branch,item){
+    const cls=item?.status==='out'?'red':item?'yellow':'blue';
+    const date=item?`<div class="homeSearchMetaV766">${esc(fmt(item.updatedAt||item.createdAt))}${item.createdBy?` · ${esc(item.createdBy)}`:''}</div>`:'';
+    return `<div class="homeSearchBranchV766"><span class="pill ${cls}">สาขา ${branch}</span><div><b>${esc(branchLabel(item))}</b>${date}</div></div>`;
+  }
+  function dataReady(){
+    try{
+      if(window.StockAlertHomeSearchReady)return true;
+      if((Array.isArray(items)&&items.length>0)||localStorage.getItem(COLLECTION)!==null)return true;
+      return false;
+    }catch(error){return Array.isArray(items);}
+  }
+  function ensurePanel(){
+    const card=document.getElementById('homeResultsCard'),home=document.getElementById('home'),hero=home?.querySelector('.hero');
+    if(card&&hero&&card.previousElementSibling!==hero)hero.insertAdjacentElement('afterend',card);
+    return card;
+  }
+  function renderGroup(group){
+    const first=group.b1||group.b2||group.extra||group.branches[0]||{};
+    const code=group.codes[0]?`<div class="homeSearchMetaV766">รหัส: ${esc(group.codes[0])}</div>`:'';
+    return `<button type="button" class="homeSearchResultV766" onclick="openList('all')"><strong>${esc(group.name)}</strong>${code}<div class="homeSearchBranchesV766">${branchLine(1,group.b1)}${branchLine(2,group.b2)}</div>${first.supplier?`<div class="homeSearchMetaV766">บริษัท: ${esc(first.supplier)}</div>`:''}</button>`;
+  }
+  window.normalizeSearchText=normalizeSearchText;
+  window.StockAlertHomeSearch={
+    normalizeSearchText,
+    search:(query,source)=>searchShortages(query,source),
+    buildIndex:source=>groupSearchItems(source),
+    lastResults:()=>lastResults.slice()
+  };
+  const baseRenderAllV766=window.renderAll||renderAll;
+  window.renderAll=renderAll=function(){
+    window.StockAlertHomeSearchReady=true;
+    indexedSource=null;
+    return baseRenderAllV766.apply(this,arguments);
+  };
+  window.renderHomeSearch=function(){
+    const input=document.getElementById('homeSearch'),box=document.getElementById('homeResults'),card=ensurePanel();
+    if(!input||!box||!card)return;
+    const query=input.value||'',q=normalizeSearchText(query);
+    lastQuery=query;
+    if(!q){card.style.display='none';box.className='empty';box.textContent='';return;}
+    card.style.display='block';
+    if(!dataReady()){
+      box.className='empty';
+      box.textContent='กำลังโหลดรายการของขาด...';
+      return;
+    }
+    lastResults=searchShortages(query,items||[]);
+    const shown=lastResults.slice(0,15);
+    box.className='homeSearchPanelV766';
+    box.innerHTML=shown.length
+      ? `<div class="homeSearchCountV766">พบทั้งหมด ${lastResults.length} รายการ</div>${shown.map(renderGroup).join('')}${lastResults.length>shown.length?`<button type="button" class="homeSearchMoreV766" onclick="openList('all')">ดูทั้งหมด</button>`:''}`
+      : '<div class="empty">ไม่พบสินค้านี้ในรายการของขาดทั้งสองสาขา</div>';
+  };
+  window.runHomeSearchSelfTestV766=function(){
+    const sample=[
+      {id:'a',name:'ก๊อกบอลพีวีซี 1/2 นิ้ว',branch:1,status:'out',unit:'อัน',createdBy:'A',createdAt:1},
+      {id:'b',name:'ก๊อกบอลพีวีซี 1/2 นิ้ว',branch:2,status:'low',qty:'3',unit:'อัน',createdBy:'B',createdAt:2},
+      {id:'c',name:'สีน้ำมัน TOA สีดำ',branch:2,status:'low',qty:'2',unit:'กระป๋อง',code:'TOA-BLACK'},
+      {id:'d',name:'ท่อ PVC 2 นิ้ว',branch:1,status:'out',sku:'PVC2'},
+      {id:'e',name:'กาวทาท่อ PVC 100 กรัม',branch:1,status:'out',orderState:'completed'},
+      {id:'f',name:'เทปพันเกลียว',branch:2,status:'out'}
+    ];
+    const find=(q)=>searchShortages(q,sample).map(row=>row.name);
+    const tests=[
+      ['exact match',()=>find('ก๊อกบอลพีวีซี 1/2 นิ้ว')[0]==='ก๊อกบอลพีวีซี 1/2 นิ้ว'],
+      ['partial match',()=>find('ก๊อก').includes('ก๊อกบอลพีวีซี 1/2 นิ้ว')],
+      ['middle word',()=>find('บอล').includes('ก๊อกบอลพีวีซี 1/2 นิ้ว')],
+      ['multi-word match',()=>find('บอล 1/2').includes('ก๊อกบอลพีวีซี 1/2 นิ้ว')],
+      ['case-insensitive English',()=>find('toa').includes('สีน้ำมัน TOA สีดำ')],
+      ['whitespace normalization',()=>find('  สีดำ   ').includes('สีน้ำมัน TOA สีดำ')],
+      ['branch 1 only',()=>find('PVC2').includes('ท่อ PVC 2 นิ้ว')],
+      ['branch 2 only',()=>find('เทป').includes('เทปพันเกลียว')],
+      ['same item both branches',()=>searchShortages('ก๊อกบอล',sample)[0].b1&&searchShortages('ก๊อกบอล',sample)[0].b2],
+      ['currentBranch ignored',()=>{const old=window.currentBranch;window.currentBranch=1;const ok=find('เทป').includes('เทปพันเกลียว');window.currentBranch=old;return ok;}],
+      ['empty query',()=>searchShortages('',sample).length===0],
+      ['no results',()=>find('ไม่มีรายการนี้').length===0],
+      ['closed item excluded',()=>!find('กาวทาท่อ').includes('กาวทาท่อ PVC 100 กรัม')],
+      ['partial status data fallback',()=>find('PVC').includes('ท่อ PVC 2 นิ้ว')]
+    ];
+    return tests.map(([name,fn])=>({name,ok:!!fn()}));
+  };
+  const css=document.createElement('style');
+  css.textContent=`#homeResultsCard{margin:-8px 0 12px;position:relative;z-index:12;padding:10px;max-height:58vh;overflow:auto}.homeSearchPanelV766{display:grid;gap:8px}.homeSearchCountV766{font-size:12px;font-weight:950;color:#53627a;padding:2px 4px 4px}.homeSearchResultV766{width:100%;border:1px solid #e3ebf6;background:#fff;border-radius:14px;padding:11px;text-align:left;color:#10213d;font-family:inherit;box-shadow:0 4px 12px rgba(17,44,84,.05)}.homeSearchResultV766 strong{display:block;font-size:16px;line-height:1.3;margin-bottom:6px}.homeSearchBranchesV766{display:grid;gap:6px;margin-top:7px}.homeSearchBranchV766{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start}.homeSearchBranchV766 .pill{font-size:12px;padding:5px 8px}.homeSearchBranchV766 b{font-size:13px;line-height:1.3}.homeSearchMetaV766{font-size:12px;color:#64748b;font-weight:800;margin-top:3px}.homeSearchMoreV766{border:0;border-radius:12px;background:#eef5ff;color:#075acb;font-weight:950;padding:10px;font-family:inherit}@media(max-width:370px){#homeResultsCard{max-height:52vh}.homeSearchBranchV766{grid-template-columns:1fr}.homeSearchBranchV766 .pill{justify-self:start}}`;
+  document.head.appendChild(css);
+  document.addEventListener('DOMContentLoaded',()=>{
+    ensurePanel();
+    const input=document.getElementById('homeSearch');
+    if(input&&!input.dataset.homeSearchV766){
+      input.dataset.homeSearchV766='1';
+      input.addEventListener('input',renderHomeSearch);
+      input.addEventListener('focus',()=>{if(input.value)renderHomeSearch();});
+      document.addEventListener('click',event=>{const card=document.getElementById('homeResultsCard');if(card&&input.value&&!card.contains(event.target)&&event.target!==input&&!event.target.closest('.search'))card.style.display='none';});
+    }
+  });
 })();
 </script>
 <script src="cash-reconciliation.js"></script>
