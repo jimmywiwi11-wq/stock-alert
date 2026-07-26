@@ -1,6 +1,6 @@
 {
-  "version": "7.66",
-  "label": "V7.66",
-  "releasedAt": "2026-07-25T00:00:00Z",
-  "message": "Fix the home global shortage search so it uses both branches, supports normalized partial and multi-word matching, and shows branch status details."
+  "version": "7.67",
+  "label": "V7.67",
+  "releasedAt": "2026-07-26T00:00:00Z",
+  "message": "Add a safe current-data clearing flow from the Data page with preview, branch/date scope, soft archive, operation logging, and short undo."
 }

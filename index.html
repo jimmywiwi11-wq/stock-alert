@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V7.66</title>
+<title>Stock Alert V7.67</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#073b92">
 <style>
@@ -131,7 +131,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.66</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V7.67</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -169,7 +169,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.66</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V7.67</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -1822,8 +1822,8 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 
 /* === V7.1 Controlled In-App Update System === */
 (function(){
-  const APP_VERSION='7.66';
-  const APP_VERSION_LABEL='V7.66';
+  const APP_VERSION='7.67';
+  const APP_VERSION_LABEL='V7.67';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   let latestInfo={version:APP_VERSION,label:APP_VERSION_LABEL,hasUpdate:false};
 
@@ -3356,7 +3356,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V7.66';if(versionBox)versionBox.textContent='V7.66';
+  if(versionSub)versionSub.textContent='V7.67';if(versionBox)versionBox.textContent='V7.67';
 })();
 </script>
 <script>
@@ -4295,7 +4295,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V7.66';
+  const APP_VERSION='V7.67';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4633,7 +4633,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V7.66';
+    document.title='Stock Alert V7.67';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -5996,7 +5996,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.60 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
 (function(){
-  const APP_VERSION='V7.66';
+  const APP_VERSION='V7.67';
   const SPECIAL_SUPPLIERS=new Set(['ยังไม่ได้ระบุ','ไม่มีที่สั่ง','ไม่ระบุบริษัท']);
   let renameBusy=false;
   function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
@@ -6139,7 +6139,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   const oldDiagnostics=window.stockAlertFirebaseDiagnostics;
   window.stockAlertFirebaseDiagnostics=function(){
     const base=oldDiagnostics?oldDiagnostics():{};
-    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_66-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
+    return {...base,appVersion:APP_VERSION,serviceWorkerVersion:'stock-alert-v7_67-controlled-update',firebaseAppCount:firebase?.apps?.length||0,authInitialized:!!auth,currentUserReady:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,firestoreInitialized:!!db,persistenceEnabled:!!stockAlertPersistenceEnabled,activeListenerCount:(window.StockAlertMainUnsubs||[]).length+(window.StockAlertCashActiveListeners||0),listenerKeys:['shortages','activity','orders/main','deliveries/main','transferHistory/main','categories/main','suppliers/main'],protocol:location.protocol,hostname:location.hostname};
   };
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
   if(versionSub)versionSub.textContent=APP_VERSION;if(versionBox)versionBox.textContent=APP_VERSION;document.title='Stock Alert '+APP_VERSION;
@@ -6333,7 +6333,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 <script>
-/* === V7.66 global home shortage search === */
+/* === V7.67 global home shortage search === */
 (function(){
   let indexedSource=null,indexedRows=[],lastQuery='',lastResults=[];
   const CLOSED_ORDER_STATES=new Set(['ordered','completed']);
@@ -6549,6 +6549,405 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
       document.addEventListener('click',event=>{const card=document.getElementById('homeResultsCard');if(card&&input.value&&!card.contains(event.target)&&event.target!==input&&!event.target.closest('.search'))card.style.display='none';});
     }
   });
+})();
+</script>
+<script>
+/* === V7.67 safe current-data clearing === */
+(function(){
+  const CLEAR_OPS='stock_alert_beta1_clear_operations';
+  const PRODUCT_COLL_SAFE='stock_alert_beta1_products';
+  const PRODUCT_CACHE='stockAlertProductsV730';
+  const PLACEHOLDER_SUPPLIER='ยังไม่ได้ระบุ';
+  const state={step:'home',dateMode:'date',dateKey:thaiDateKey(Date.now()),branchScope:'both',includeInProgress:false,preview:null,busy:false,lastUndo:null};
+
+  function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+  function txt(value){return String(value??'').trim();}
+  function userName(){try{return nickname||localStorage.getItem('stockAlertNickname')||'ไม่ระบุ';}catch(e){return 'ไม่ระบุ';}}
+  function deviceName(){try{return localStorage.getItem('stockAlertNickname')||navigator.userAgent.slice(0,80)||'unknown';}catch(e){return 'unknown';}}
+  function ready(){return typeof db!=='undefined'&&db&&typeof firebase!=='undefined';}
+  function clone(value){return JSON.parse(JSON.stringify(value));}
+  function timeMs(value){
+    if(value&&typeof value.toMillis==='function')return value.toMillis();
+    if(value&&Number.isFinite(value.seconds))return value.seconds*1000;
+    const n=Number(value);
+    return Number.isFinite(n)?n:0;
+  }
+  function thaiDateKey(value=Date.now()){
+    const date=new Date(timeMs(value)||Date.now());
+    const th=new Date(date.toLocaleString('en-US',{timeZone:'Asia/Bangkok'}));
+    return `${th.getFullYear()}-${String(th.getMonth()+1).padStart(2,'0')}-${String(th.getDate()).padStart(2,'0')}`;
+  }
+  function thaiLongDate(key){
+    const [y,m,d]=String(key||thaiDateKey()).split('-').map(Number);
+    return new Date(y,m-1,d).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+  }
+  function compact(value){
+    try{return (typeof norm==='function'?norm(value):String(value||'').toLowerCase().replace(/\s+/g,'')).trim();}
+    catch(e){return String(value||'').toLowerCase().replace(/\s+/g,'').trim();}
+  }
+  function isCleared(item){
+    return item?.active===false||item?.archived===true||item?.cleared===true||txt(item?.clearOperationId);
+  }
+  function currentItems(source=items){
+    return (Array.isArray(source)?source:[]).filter(item=>item&&item.name&&!isCleared(item));
+  }
+  function withCurrentItems(callback){
+    const all=items;
+    items=currentItems(items);
+    try{return callback();}
+    finally{items=all;}
+  }
+  function selectedBranches(){
+    if(state.branchScope==='1')return [1];
+    if(state.branchScope==='2')return [2];
+    return [1,2];
+  }
+  function rowDateKey(item){
+    const candidates=[item?.referenceDate,item?.dateKey,item?.createdAt,item?.orderAt,item?.transferAt,item?.updatedAt].filter(Boolean);
+    return candidates.length?thaiDateKey(candidates[0]):'';
+  }
+  function dateMatches(item){
+    if(state.dateMode==='all')return true;
+    return rowDateKey(item)===state.dateKey;
+  }
+  function hasKnownDate(item){return !!rowDateKey(item);}
+  function groupRows(rows=currentItems()){
+    const map={};
+    rows.forEach(item=>{
+      const k=compact(item.name);
+      if(!k)return;
+      map[k]=map[k]||{name:item.name,b1:null,b2:null};
+      map[k]['b'+Number(item.branch)]=item;
+    });
+    return Object.values(map);
+  }
+  function transferRows(rows=currentItems()){
+    return groupRows(rows).flatMap(group=>{
+      const out=[];
+      if(group.b1&&!group.b2)out.push({need:group.b1,from:2,to:1,key:compact(group.name)});
+      if(group.b2&&!group.b1)out.push({need:group.b2,from:1,to:2,key:compact(group.name)});
+      return out;
+    });
+  }
+  function transferState(item){
+    const status=txt(item?.transferStatus||item?.splitStatus).toLowerCase();
+    if(item?.transferDone===true||['confirmed','transfer_confirmed','completed','done','closed','cancelled','canceled'].includes(status))return 'closed';
+    if(item?.transferPrepared===true||['split_done_waiting_confirm','divided','prepared'].includes(status))return 'prepared';
+    return 'waiting';
+  }
+  function isOrdered(order){return order&&order.status!=='delivered'&&order.status!=='cleared'&&order.active!==false&&order.cleared!==true;}
+  function orderTouchesSelection(order,shortageIds,names){
+    return (order?.items||[]).some(line=>{
+      const ids=Array.isArray(line.shortageIds)?line.shortageIds.map(String):[];
+      return ids.some(id=>shortageIds.has(id))||names.has(compact(line.name));
+    });
+  }
+  function buildPreview(){
+    const branches=selectedBranches();
+    const rows=currentItems();
+    const noDate=state.dateMode==='date'?rows.filter(item=>!hasKnownDate(item)):[]; 
+    const branchShortages=rows.filter(item=>branches.includes(Number(item.branch))&&dateMatches(item));
+    const transferAll=transferRows(rows).filter(task=>branches.includes(Number(task.from))&&dateMatches(task.need));
+    const transferWaiting=transferAll.filter(task=>transferState(task.need)==='waiting');
+    const transferInProgress=transferAll.filter(task=>transferState(task.need)==='prepared');
+    const ids=new Set(branchShortages.map(item=>String(item.id)).filter(Boolean));
+    transferAll.forEach(task=>task.need?.id&&ids.add(String(task.need.id)));
+    const selectedNames=new Set([...ids].map(id=>rows.find(item=>String(item.id)===id)).filter(Boolean).map(item=>compact(item.name)));
+    const activeOrders=(purchaseOrders||[]).filter(isOrdered).filter(order=>orderTouchesSelection(order,ids,selectedNames));
+    const selectedRows=rows.filter(item=>ids.has(String(item.id)));
+    const branchCounts={1:{shortages:0,transfers:0,orders:0},2:{shortages:0,transfers:0,orders:0}};
+    branchShortages.forEach(item=>{if(branchCounts[item.branch])branchCounts[item.branch].shortages++;});
+    transferAll.forEach(task=>{if(branchCounts[task.from])branchCounts[task.from].transfers++;});
+    activeOrders.forEach(order=>{
+      const lineIds=new Set((order.items||[]).flatMap(line=>Array.isArray(line.shortageIds)?line.shortageIds.map(String):[]));
+      [1,2].forEach(branch=>{
+        if(selectedRows.some(item=>Number(item.branch)===branch&&(lineIds.has(String(item.id))||selectedNames.has(compact(item.name)))))branchCounts[branch].orders++;
+      });
+    });
+    const orderClearCount=state.includeInProgress?activeOrders.length:0;
+    return {
+      shortageIds:[...ids],
+      shortageRows:selectedRows,
+      branchShortages,
+      transfers:transferAll,
+      transferWaiting,
+      transferInProgress,
+      orders:activeOrders,
+      orderIds:state.includeInProgress?activeOrders.map(order=>String(order.id)).filter(Boolean):[],
+      noDate,
+      branchCounts,
+      counts:{
+        shortages:ids.size,
+        transfers:transferAll.length,
+        transferInProgress:transferInProgress.length,
+        orders:orderClearCount,
+        activeOrders:activeOrders.length,
+        other:noDate.length,
+        total:ids.size+transferAll.length+orderClearCount
+      }
+    };
+  }
+  function ensurePage(){
+    if(document.getElementById('clearDataPage'))return;
+    const page=document.createElement('section');
+    page.id='clearDataPage';
+    page.className='page';
+    page.innerHTML='<div class="pageHeader"><button class="back" onclick="go(\'summaryPage\')">‹</button><div><h2 style="margin:0">ล้างข้อมูล</h2><div class="smallTitle">เลือกประเภทข้อมูลที่ต้องการล้าง</div></div></div><div id="clearDataBox"></div>';
+    (document.querySelector('.phone')||document.body).appendChild(page);
+  }
+  function ensureEntry(){
+    const card=[...document.querySelectorAll('#summaryPage .card')].find(el=>/ข้อมูลอื่น/.test(el.textContent||''))||document.querySelector('#summaryPage .card:last-of-type');
+    if(!card||card.querySelector('.clearDataEntryV767'))return;
+    card.insertAdjacentHTML('beforeend','<div class="clearDataDangerZoneV767"><button type="button" class="btn danger clearDataEntryV767" onclick="openClearDataPage()" aria-label="ล้างข้อมูล"><span class="trashIconV767">⌫</span><span>ล้างข้อมูล</span></button><div class="muted">คำสั่งสำคัญสำหรับเริ่มรายการงานปัจจุบันใหม่ โดยไม่ลบประวัติหรือฐานข้อมูลสินค้า</div></div>');
+  }
+  function branchLabel(){return state.branchScope==='1'?'สาขา 1':state.branchScope==='2'?'สาขา 2':'ทั้งสองสาขา';}
+  function dateLabel(){return state.dateMode==='all'?'ทั้งหมด':`วันที่ ${thaiLongDate(state.dateKey)}`;}
+  function renderMain(){
+    const box=document.getElementById('clearDataBox'); if(!box)return;
+    box.innerHTML=`<div class="clearTypeGridV767">
+      <button type="button" class="clearTypeCardV767 danger" onclick="startClearProductsV767()"><b>ล้างข้อมูลสินค้า</b><span>นำรายการของขาด งานแบ่งของ และรายการที่ต้องสั่งออก เพื่อเริ่มลงข้อมูลใหม่ โดยยังเก็บชื่อสินค้า หมวดหมู่ หน่วย บริษัท และประวัติทั้งหมดไว้</span></button>
+      <button type="button" class="clearTypeCardV767 history" onclick="openHistoryClearInfoV767()"><b>ล้างข้อมูลประวัติ</b><span>ลบข้อมูลย้อนหลังที่เลือก เช่น ประวัติการแบ่งของและประวัติการสั่งสินค้า</span></button>
+    </div>`;
+  }
+  function renderScope(){
+    const box=document.getElementById('clearDataBox'); if(!box)return;
+    const today=thaiDateKey(Date.now());
+    box.innerHTML=`<div class="card"><h3>ล้างข้อมูลสินค้า</h3><p class="muted">ล้างเฉพาะรายการงานปัจจุบัน เช่น ของขาด รายการแบ่งของ และรายการที่ต้องสั่ง โดยยังเก็บชื่อสินค้า หมวดหมู่ หน่วย บริษัท และประวัติทั้งหมดไว้</p>
+      <label>ช่วงข้อมูล</label><div class="clearSegmentV767"><button class="${state.dateMode==='date'?'active':''}" onclick="setClearDateModeV767('date')">ล้างเฉพาะวันที่</button><button class="${state.dateMode==='all'?'active':''}" onclick="setClearDateModeV767('all')">ล้างทั้งหมด</button></div>
+      <div id="clearDatePickV767" style="${state.dateMode==='date'?'':'display:none'}"><label>วันที่</label><input class="input" type="date" id="clearDateInputV767" value="${esc(state.dateKey||today)}" onchange="setClearDateKeyV767(this.value)"><p class="muted">ล้างรายการงานปัจจุบันของวันที่ ${thaiLongDate(state.dateKey||today)}</p></div>
+      <label>สาขา</label><div class="clearSegmentV767 three"><button class="${state.branchScope==='1'?'active':''}" onclick="setClearBranchV767('1')">เฉพาะสาขา 1</button><button class="${state.branchScope==='2'?'active':''}" onclick="setClearBranchV767('2')">เฉพาะสาขา 2</button><button class="${state.branchScope==='both'?'active':''}" onclick="setClearBranchV767('both')">ทั้งสองสาขา</button></div>
+      <label class="clearCheckV767"><input type="checkbox" ${state.includeInProgress?'checked':''} onchange="setClearIncludeProgressV767(this.checked)"> รวมรายการที่สั่งแล้วหรือกำลังแบ่ง</label>
+      <p class="muted">ค่าเริ่มต้นจะไม่รวมรายการที่กำลังดำเนินการ หากต้องการเริ่มใหม่ทั้งหมดให้ติ๊กช่องนี้ก่อนดู Preview</p>
+      <button class="btn danger" style="width:100%;margin-top:12px" onclick="previewClearProductsV767()">ตรวจสอบรายการที่จะล้าง</button>
+      <button class="btn gray" style="width:100%;margin-top:8px" onclick="renderClearHomeV767()">ยกเลิก</button></div>`;
+  }
+  function branchCountRows(preview){
+    return [1,2].filter(branch=>state.branchScope==='both'||String(branch)===state.branchScope).map(branch=>{
+      const row=preview.branchCounts[branch];
+      return `<div class="clearPreviewBranchV767"><b>สาขา ${branch}</b><span>ของขาด ${row.shortages} รายการ</span><span>ต้องสั่ง ${row.orders} รายการ</span><span>งานแบ่งของ ${row.transfers} รายการ</span></div>`;
+    }).join('');
+  }
+  function renderPreview(){
+    state.preview=buildPreview();
+    const p=state.preview, box=document.getElementById('clearDataBox'); if(!box)return;
+    const warnings=[
+      p.counts.transferInProgress?`มี ${p.counts.transferInProgress} รายการที่กำลังแบ่งบางส่วน`:'',
+      p.counts.activeOrders?`มี ${p.counts.activeOrders} รายการที่สั่งไปแล้วหรือรอรับสินค้า`:'',
+      p.noDate.length&&state.dateMode==='date'?`มี ${p.noDate.length} รายการที่ไม่สามารถระบุวันที่ได้ จึงไม่รวมในการล้างเฉพาะวันที่`:''
+    ].filter(Boolean);
+    box.innerHTML=`<div class="card"><h3>ตรวจสอบก่อนล้างข้อมูล</h3>
+      <div class="statusRows">
+        <div class="statusRow"><span>ประเภท</span><span>ล้างข้อมูลสินค้า</span></div>
+        <div class="statusRow"><span>วันที่</span><span>${esc(dateLabel())}</span></div>
+        <div class="statusRow"><span>สาขา</span><span>${esc(branchLabel())}</span></div>
+        <div class="statusRow"><span>ของขาดที่จะล้าง</span><span>${p.counts.shortages} รายการ</span></div>
+        <div class="statusRow"><span>งานแบ่งของที่จะล้าง</span><span>${p.counts.transfers} รายการ</span></div>
+        <div class="statusRow"><span>รายการที่ต้องสั่งที่จะล้าง</span><span>${p.counts.orders} รายการ</span></div>
+        <div class="statusRow"><span>รายการอื่นที่เกี่ยวข้อง</span><span>${p.counts.other} รายการ</span></div>
+        <div class="statusRow"><span>รวม</span><span>${p.counts.total} รายการ</span></div>
+      </div>${branchCountRows(p)}
+      ${warnings.length?`<div class="clearWarningV767">${warnings.map(w=>`<div>${esc(w)}</div>`).join('')}</div>`:''}
+      <p class="muted">รายการงานปัจจุบันจะถูกนำออกจากหน้าของขาด หน้าแบ่งของ และหน้าต้องสั่ง แต่ชื่อสินค้า หมวดหมู่ หน่วย บริษัท และประวัติทั้งหมดจะยังคงอยู่</p>
+      <div class="rowBtns"><button class="btn gray" style="flex:1" onclick="renderClearScopeV767()">ยกเลิก</button><button class="btn danger" style="flex:1" onclick="renderFinalConfirmV767()">ยืนยันล้างข้อมูล</button></div></div>`;
+  }
+  function renderFinalConfirm(){
+    const p=state.preview||buildPreview(), box=document.getElementById('clearDataBox'); if(!box)return;
+    box.innerHTML=`<div class="card"><h3>ยืนยันขั้นสุดท้าย</h3><p class="muted">พิมพ์คำว่า <b>ล้างข้อมูล</b> เพื่อยืนยัน ระบบจะล้างเฉพาะรายการ ID ที่แสดงใน Preview นี้เท่านั้น รายการที่สร้างหลัง Preview จะไม่ถูกล้าง</p>
+      <div class="statusRows"><div class="statusRow"><span>รวมที่จะล้าง</span><span>${p.counts.total} รายการ</span></div><div class="statusRow"><span>ขอบเขต</span><span>${esc(dateLabel())} / ${esc(branchLabel())}</span></div></div>
+      <input class="input" id="clearFinalInputV767" placeholder="พิมพ์ ล้างข้อมูล" oninput="validateFinalClearV767()">
+      <button class="btn danger" id="clearFinalButtonV767" style="width:100%;margin-top:12px" disabled onclick="executeClearProductsV767()">ล้างข้อมูล</button>
+      <button class="btn gray" style="width:100%;margin-top:8px" onclick="renderClearPreviewV767()">ย้อนกลับ</button>
+      <div id="clearProgressV767" class="muted"></div></div>`;
+  }
+  function renderHistoryInfo(){
+    const box=document.getElementById('clearDataBox'); if(!box)return;
+    box.innerHTML=`<div class="card"><h3>ล้างข้อมูลประวัติ</h3><p class="muted">Flow สำหรับล้างประวัติถูกแยกจากการล้างข้อมูลสินค้าแล้ว แต่รอบนี้ยังไม่เปิดให้ล้างจริงเพื่อป้องกันการลบประวัติผิดประเภท</p>
+      <div class="clearHistoryChoicesV767"><label><input type="checkbox" disabled> ประวัติการแบ่งของ</label><label><input type="checkbox" disabled> ประวัติการสั่งสินค้า</label><label><input type="checkbox" disabled> ประวัติการส่งสินค้า/รับสินค้า</label><label><input type="checkbox" disabled> Activity Log หากอนุญาต</label><label><input type="checkbox" disabled> ทั้งหมด</label></div>
+      <p class="muted">ต้องมีเลือกวันที่หรือช่วงวันที่ เลือกสาขา Preview จำนวนรายการ และยืนยันหลายชั้นก่อนเปิดใช้งานจริง</p>
+      <button class="btn danger" style="width:100%;margin-top:12px" disabled>ยังไม่เปิดให้ล้างประวัติ</button>
+      <button class="btn gray" style="width:100%;margin-top:8px" onclick="renderClearHomeV767()">ย้อนกลับ</button></div>`;
+  }
+  async function preserveProductMemory(rows){
+    const cache=(()=>{try{return JSON.parse(localStorage.getItem(PRODUCT_CACHE)||'[]');}catch(e){return [];}})();
+    const byName=new Map(cache.map(product=>[compact(product.name),product]));
+    const writes=[];
+    rows.forEach(item=>{
+      const name=txt(item.name); if(!name)return;
+      const key=compact(name);
+      const old=byName.get(key)||{};
+      const supplier=txt(item.supplier)===PLACEHOLDER_SUPPLIER?'':txt(item.supplier);
+      const product={...old,id:old.id||('p_'+key.replace(/[^\u0E00-\u0E7Fa-z0-9]/gi,'').slice(0,120)),name,search:key,unit:old.unit||txt(item.unit),category:old.category||txt(item.category),supplier:old.supplier||supplier,source:old.source||'shortage-clear-preserve',createdAt:old.createdAt||item.createdAt||Date.now(),updatedAt:Date.now(),updatedBy:userName()};
+      byName.set(key,product); writes.push(product);
+    });
+    try{localStorage.setItem(PRODUCT_CACHE,JSON.stringify([...byName.values()].slice(0,5000)));}catch(e){}
+    if(ready()&&writes.length){
+      for(let i=0;i<writes.length;i+=450){
+        const batch=db.batch();
+        writes.slice(i,i+450).forEach(product=>batch.set(db.collection(PRODUCT_COLL_SAFE).doc(product.id),product,{merge:true}));
+        await batch.commit();
+      }
+    }
+  }
+  async function acquireLock(operationId,summary){
+    if(!ready())return true;
+    const ref=db.collection(CLEAR_OPS).doc('_current_lock');
+    const now=Date.now();
+    await db.runTransaction(async transaction=>{
+      const snap=await transaction.get(ref);
+      const data=snap.exists?snap.data():null;
+      if(data?.status==='processing'&&Number(data.expiresAt||0)>now)throw new Error('มีเครื่องอื่นกำลังล้างข้อมูลอยู่');
+      transaction.set(ref,{operationId,status:'processing',startedAt:now,expiresAt:now+120000,by:userName(),device:deviceName(),summary},{merge:true});
+    });
+    return true;
+  }
+  async function releaseLock(operationId,status,error=''){
+    if(!ready())return;
+    await db.collection(CLEAR_OPS).doc('_current_lock').set({operationId,status,finishedAt:Date.now(),error},{merge:true});
+  }
+  async function writeOperationLog(operationId,status,preview,error=''){
+    const payload={operationId,type:'clear-current-items',status,error,by:userName(),device:deviceName(),time:Date.now(),dateMode:state.dateMode,dateKey:state.dateMode==='all'?'all':state.dateKey,branchScope:state.branchScope,includeInProgress:state.includeInProgress,counts:preview.counts,shortageIds:preview.shortageIds,orderIds:preview.orderIds};
+    if(ready())await db.collection(CLEAR_OPS).doc(operationId).set(payload,{merge:true});
+    try{await log('ล้างข้อมูลสินค้า',`operationId=${operationId} / รวม ${preview.counts.total} รายการ / ${status}`);}catch(e){}
+  }
+  async function executeClear(){
+    if(state.busy)return;
+    const preview=state.preview||buildPreview();
+    if(!preview.counts.total)return toast('ไม่มีรายการให้ล้าง');
+    const button=document.getElementById('clearFinalButtonV767'), progress=document.getElementById('clearProgressV767');
+    state.busy=true; if(button)button.disabled=true;
+    const operationId='clear_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    try{
+      if(progress)progress.textContent='กำลังล็อกการทำงาน...';
+      await acquireLock(operationId,{dateMode:state.dateMode,dateKey:state.dateKey,branchScope:state.branchScope,counts:preview.counts});
+      await preserveProductMemory(preview.shortageRows);
+      const now=Date.now(), by=userName();
+      const update={active:false,archived:true,cleared:true,clearedAt:now,clearedBy:by,clearOperationId:operationId,clearType:'current-items',clearDateMode:state.dateMode,clearDateKey:state.dateMode==='all'?'all':state.dateKey,clearBranchScope:state.branchScope,updatedAt:now,updatedBy:by};
+      const ids=preview.shortageIds;
+      if(progress)progress.textContent=`กำลังล้างรายการของขาด 0/${ids.length}`;
+      if(ready()){
+        for(let i=0;i<ids.length;i+=450){
+          const batch=db.batch();
+          ids.slice(i,i+450).forEach(id=>batch.set(db.collection(COLLECTION).doc(id),update,{merge:true}));
+          await batch.commit();
+          if(progress)progress.textContent=`กำลังล้างรายการของขาด ${Math.min(i+450,ids.length)}/${ids.length}`;
+        }
+      }
+      items=(items||[]).map(item=>ids.includes(String(item.id))?{...item,...update}:item);
+      try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+      const previousOrders=[];
+      if(preview.orderIds.length){
+        purchaseOrders=(purchaseOrders||[]).map(order=>{
+          if(!preview.orderIds.includes(String(order.id)))return order;
+          previousOrders.push({id:order.id,status:order.status,active:order.active,cleared:order.cleared});
+          return {...order,status:'cleared',active:false,cleared:true,clearedAt:now,clearedBy:by,clearOperationId:operationId};
+        });
+        if(progress)progress.textContent='กำลังบันทึกรายการสั่งสินค้า...';
+        persistOrders();
+      }
+      await writeOperationLog(operationId,'success',preview);
+      await releaseLock(operationId,'success');
+      state.lastUndo={operationId,ids,previousOrders,expiresAt:Date.now()+30000};
+      renderAll();
+      showUndoToast(preview.counts.total,operationId);
+      renderMain();
+    }catch(error){
+      console.error('[clear current data]',error);
+      await writeOperationLog(operationId,'failed',preview,error.message||String(error)).catch(()=>{});
+      await releaseLock(operationId,'failed',error.message||String(error)).catch(()=>{});
+      toast(error.message||'ล้างข้อมูลไม่สำเร็จ');
+      if(progress)progress.textContent='ล้างข้อมูลไม่สำเร็จ';
+    }finally{
+      state.busy=false; if(button)button.disabled=false;
+    }
+  }
+  function showUndoToast(count,operationId){
+    let box=document.getElementById('clearUndoToastV767');
+    if(!box){box=document.createElement('div');box.id='clearUndoToastV767';document.body.appendChild(box);}
+    box.innerHTML=`<span>ล้างข้อมูลแล้ว ${count} รายการ</span><button type="button" onclick="undoClearDataV767('${esc(operationId)}')">เลิกทำ</button>`;
+    box.classList.add('show');
+    setTimeout(()=>{if(state.lastUndo?.operationId===operationId)box.classList.remove('show');},30000);
+  }
+  async function undoClear(operationId){
+    const undo=state.lastUndo;
+    if(!undo||undo.operationId!==operationId||Date.now()>undo.expiresAt)return toast('หมดเวลาสำหรับเลิกทำแล้ว');
+    const now=Date.now(), by=userName();
+    const restore={active:true,archived:false,cleared:false,clearUndoneAt:now,clearUndoneBy:by,updatedAt:now,updatedBy:by};
+    if(ready()){
+      for(let i=0;i<undo.ids.length;i+=450){
+        const batch=db.batch();
+        undo.ids.slice(i,i+450).forEach(id=>batch.set(db.collection(COLLECTION).doc(id),restore,{merge:true}));
+        await batch.commit();
+      }
+    }
+    items=(items||[]).map(item=>undo.ids.includes(String(item.id))?{...item,...restore}:item);
+    if(undo.previousOrders.length){
+      const map=new Map(undo.previousOrders.map(order=>[String(order.id),order]));
+      purchaseOrders=(purchaseOrders||[]).map(order=>map.has(String(order.id))?{...order,...map.get(String(order.id)),cleared:false,active:map.get(String(order.id)).active,clearUndoneAt:now,clearUndoneBy:by}:order);
+      persistOrders();
+    }
+    try{localStorage.setItem(COLLECTION,JSON.stringify(items));}catch(e){}
+    try{await log('เลิกทำล้างข้อมูลสินค้า',operationId);}catch(e){}
+    const box=document.getElementById('clearUndoToastV767'); if(box)box.classList.remove('show');
+    state.lastUndo=null; renderAll(); toast('เลิกทำแล้ว');
+  }
+
+  const baseGroups=window.groups||groups;
+  window.groups=groups=function(){return groupRows(currentItems());};
+  window.orderGroups=orderGroups=function(){return groupRows(currentItems()).filter(group=>group.b1&&group.b2);};
+  window.transferTasks=transferTasks=function(){return transferRows(currentItems()).filter(task=>transferState(task.need)!=='closed');};
+  window.transferTasksByDirection=transferTasksByDirection=function(from,to){return transferTasks().filter(task=>Number(task.from)===Number(from)&&Number(task.to)===Number(to));};
+  window.transferSummary=transferSummary=function(from,to){
+    const tasks=transferTasksByDirection(from,to),done=tasks.filter(task=>transferState(task.need)==='prepared').length;
+    return {from:Number(from),to:Number(to),total:tasks.length,done,remain:Math.max(0,tasks.length-done),complete:tasks.length>0&&done===tasks.length,started:done>0,splitPendingConfirm:done};
+  };
+  const wrapCurrent=(name)=>{
+    const fn=window[name];
+    if(typeof fn!=='function')return;
+    window[name]=function(){return withCurrentItems(()=>fn.apply(this,arguments));};
+  };
+  ['renderList','renderHomeSearch','renderAllShortage','renderOrders','renderPOBuilder','renderTransferAlerts','renderTransfers','renderTransferStatus','renderTransferStatusDetail','renderPending','renderCategoryPage','renderCategoryDetail','renderBestSellers'].forEach(wrapCurrent);
+  const baseActiveSupplierNames=window.activeSupplierNames;
+  if(typeof baseActiveSupplierNames==='function')window.activeSupplierNames=activeSupplierNames=function(){return [...new Set((purchaseOrders||[]).filter(isOrdered).map(o=>o.supplier||'ไม่ระบุบริษัท'))].sort((a,b)=>a.localeCompare(b,'th'));};
+  const baseRenderAll=window.renderAll||renderAll;
+  window.renderAll=renderAll=function(){
+    const result=baseRenderAll.apply(this,arguments);
+    const active=currentItems();
+    if(window.statShortage)statShortage.textContent=active.length;
+    if(window.statOrder)statOrder.textContent=orderGroups().length;
+    if(window.statTransfer)statTransfer.textContent=transferTasks().length;
+    if(window.statSupplier)statSupplier.textContent=active.filter(item=>(item.supplier||PLACEHOLDER_SUPPLIER)===PLACEHOLDER_SUPPLIER).length;
+    ensureEntry();
+    return result;
+  };
+  const baseGo=window.go||go;
+  window.go=go=function(id){
+    if(id==='clearDataPage')ensurePage();
+    const result=baseGo.apply(this,arguments);
+    if(id==='summaryPage')ensureEntry();
+    if(id==='clearDataPage')renderMain();
+    return result;
+  };
+
+  window.openClearDataPage=function(){ensurePage();go('clearDataPage');renderMain();};
+  window.renderClearHomeV767=renderMain;
+  window.startClearProductsV767=function(){state.step='scope';renderScope();};
+  window.renderClearScopeV767=renderScope;
+  window.renderClearPreviewV767=renderPreview;
+  window.renderFinalConfirmV767=renderFinalConfirm;
+  window.openHistoryClearInfoV767=renderHistoryInfo;
+  window.setClearDateModeV767=function(mode){state.dateMode=mode;renderScope();};
+  window.setClearDateKeyV767=function(value){state.dateKey=value||thaiDateKey(Date.now());renderScope();};
+  window.setClearBranchV767=function(value){state.branchScope=value;renderScope();};
+  window.setClearIncludeProgressV767=function(value){state.includeInProgress=!!value;renderScope();};
+  window.previewClearProductsV767=renderPreview;
+  window.validateFinalClearV767=function(){const btn=document.getElementById('clearFinalButtonV767'),input=document.getElementById('clearFinalInputV767');if(btn)btn.disabled=(input?.value||'').trim()!=='ล้างข้อมูล'||state.busy;};
+  window.executeClearProductsV767=executeClear;
+  window.undoClearDataV767=undoClear;
+
+  const style=document.createElement('style');
+  style.textContent=`.clearDataDangerZoneV767{margin-top:16px;padding-top:14px;border-top:1px solid #fee2e2}.clearDataEntryV767{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#fee2e2!important;color:#991b1b!important;border:1px solid #fecaca}.trashIconV767{font-size:20px;line-height:1}.clearTypeGridV767{display:grid;gap:12px}.clearTypeCardV767{border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;background:#fff;box-shadow:0 5px 16px rgba(17,44,84,.05);font-family:inherit}.clearTypeCardV767 b,.clearTypeCardV767 span{display:block}.clearTypeCardV767 b{font-size:19px}.clearTypeCardV767 span{font-size:13px;font-weight:850;color:#53627a;margin-top:6px;line-height:1.45}.clearTypeCardV767.danger{border-color:#fecaca;background:#fff1f2}.clearTypeCardV767.danger b{color:#b91c1c}.clearTypeCardV767.history{border-color:#dbeafe}.clearSegmentV767{display:grid;grid-template-columns:1fr 1fr;gap:8px}.clearSegmentV767.three{grid-template-columns:1fr 1fr 1fr}.clearSegmentV767 button{border:1px solid var(--line);border-radius:13px;background:#fff;padding:11px 8px;font-weight:950;color:#274060}.clearSegmentV767 button.active{background:#b91c1c;color:#fff;border-color:#b91c1c}.clearCheckV767{display:flex;align-items:flex-start;gap:9px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:14px;padding:12px}.clearCheckV767 input{width:18px;height:18px;flex:0 0 auto}.clearPreviewBranchV767{display:grid;grid-template-columns:1fr;gap:3px;border:1px solid #e2e8f0;border-radius:14px;padding:11px 12px;margin:8px 0;background:#f8fafc}.clearPreviewBranchV767 b{color:#0f172a}.clearPreviewBranchV767 span{font-size:13px;font-weight:850;color:#475569}.clearWarningV767{border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;border-radius:14px;padding:12px;margin:12px 0;font-weight:900}.clearHistoryChoicesV767{display:grid;gap:8px;margin:12px 0}.clearHistoryChoicesV767 label{display:flex;gap:8px;align-items:center;margin:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:#f8fafc;color:#64748b}#clearUndoToastV767{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:min(calc(100% - 28px),402px);z-index:90;display:none;align-items:center;justify-content:space-between;gap:12px;background:#0f172a;color:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 12px 28px rgba(15,23,42,.28);font-weight:900}#clearUndoToastV767.show{display:flex}#clearUndoToastV767 button{border:0;border-radius:999px;background:#fff;color:#0f172a;padding:8px 12px;font-weight:950}@media(max-width:370px){.clearSegmentV767.three{grid-template-columns:1fr}.clearTypeCardV767{padding:14px}}`;
+  document.head.appendChild(style);
+  ensurePage();ensureEntry();
 })();
 </script>
 <script src="cash-reconciliation.js"></script>
