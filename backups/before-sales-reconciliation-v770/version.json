@@ -1,0 +1,6 @@
+{
+  "version": "7.69",
+  "label": "V7.69",
+  "releasedAt": "2026-08-01T00:00:00Z",
+  "message": "Split sales into entry and dashboard report pages with shared cash reconciliation records."
+}

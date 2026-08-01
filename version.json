@@ -1,6 +1,6 @@
 {
-  "version": "7.67",
-  "label": "V7.67",
-  "releasedAt": "2026-07-26T00:00:00Z",
-  "message": "Add a safe current-data clearing flow from the Data page with preview, branch/date scope, soft archive, operation logging, and short undo."
+  "version": "7.70",
+  "label": "V7.70",
+  "releasedAt": "2026-08-01T00:00:00Z",
+  "message": "Link cash reconciliation into sales reports without duplicating daily branch sales."
 }
