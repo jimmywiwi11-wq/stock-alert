@@ -1,6 +1,6 @@
 {
-  "version": "7.70",
-  "label": "V7.70",
+  "version": "7.71",
+  "label": "V7.71",
   "releasedAt": "2026-08-01T00:00:00Z",
-  "message": "Link cash reconciliation into sales reports without duplicating daily branch sales."
+  "message": "Reset new sales entry forms on mobile, add row counts, and export sales images."
 }
