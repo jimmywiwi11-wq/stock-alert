@@ -188,14 +188,6 @@
 }
 .cmsInvoiceItemFieldsV42 { display: grid; grid-template-columns: minmax(76px, 1fr) minmax(64px, .8fr) minmax(96px, 1fr) minmax(86px, 1fr); gap: 8px; margin-top: 10px; }
 .cmsInvoiceItemFieldsV42 input { padding: 10px; border-radius: 11px; border: 1px solid var(--line, #e7edf5); font-size: 16px; min-width: 0; }
-.cmsInvoiceSelectedCustomerV42 .cmsInvoiceReadOnlyV42 {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  font-size: 17px;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
 .cmsInvoiceItemCodeV42,
 .cmsInvoiceItemUnitV42,
 .cmsInvoiceItemPriceV42,

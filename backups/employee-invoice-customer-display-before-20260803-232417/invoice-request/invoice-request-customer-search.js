@@ -40,16 +40,6 @@
     return [customer.address1, customer.address2].filter(Boolean).join(' ').trim();
   }
 
-  function shortTaxId(taxId){
-    const digits = String(taxId || '').replace(/\D/g, '');
-    if (!digits) return '';
-    return digits.length > 4 ? `เลขภาษี ...${digits.slice(-4)}` : `เลขภาษี ${digits}`;
-  }
-
-  function shortMeta(customer){
-    return [customer.customerCode, shortTaxId(customer.taxId)].filter(Boolean).join(' | ') || 'ลูกค้าในระบบ';
-  }
-
   function fields(customer){
     return [
       customer.customerCode,
@@ -100,9 +90,7 @@
     listCustomers,
     searchCustomers,
     fullName,
-    fullAddress,
-    shortTaxId,
-    shortMeta
+    fullAddress
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = root.CMSInvoiceCustomerSearch;

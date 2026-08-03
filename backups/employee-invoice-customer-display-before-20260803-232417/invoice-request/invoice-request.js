@@ -176,10 +176,18 @@
 
   function renderCustomerPanel(){
     const c = state.customer;
-    const selectedName = c ? (customerSearch.fullName(c) || c.customerName || '-') : '-';
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">ลูกค้า</h3>
       <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหา/เลือกลูกค้า</label><input class="cmsInvoiceInputV42" id="cmsCustomerSearchV42" placeholder="ค้นจากรหัส ชื่อ เลขภาษี หรือที่อยู่" oninput="CMSInvoiceRequest.searchCustomer(this.value)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsCustomerSuggestV42"></div></div>
-      <div class="cmsInvoiceSelectedCustomerV42" style="margin-top:10px"><label>ลูกค้าที่เลือก</label><div class="cmsInvoiceReadOnlyV42">${esc(selectedName)}</div></div>
+      <div class="cmsInvoiceGridV42 two" style="margin-top:10px">
+        <div><label>รหัสลูกค้า</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.customerCode || '-')}</div></div>
+        <div><label>คำนำหน้า</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.prefix || '-')}</div></div>
+        <div><label>ชื่อลูกค้า</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.customerName || '-')}</div></div>
+        <div><label>เลขภาษี</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.taxId || '-')}</div></div>
+        <div><label>โทรศัพท์</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.phone || '-')}</div></div>
+        <div><label>สำนักงานใหญ่/สาขา</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.branch || '-')}</div></div>
+        <div><label>ที่อยู่ 1</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.address1 || '-')}</div></div>
+        <div><label>ที่อยู่ 2</label><div class="cmsInvoiceReadOnlyV42">${esc(c?.address2 || '-')}</div></div>
+      </div>
     </div>`;
   }
 
@@ -389,7 +397,7 @@
     const box = document.getElementById('cmsCustomerSuggestV42');
     if (!box) return;
     const rows = customerSearch.searchCustomers(query, 12);
-    box.innerHTML = rows.length ? rows.map((customer, index) => `<button type="button" onmousedown="CMSInvoiceRequest.selectCustomer(${index})"><b>${esc(customerSearch.fullName(customer) || customer.customerName)}</b><small>${esc(customerSearch.shortMeta(customer))}</small></button>`).join('') : '<button type="button"><b>ไม่พบลูกค้า</b><small>อ่านจากฐานลูกค้า Tax Invoice แบบ read-only</small></button>';
+    box.innerHTML = rows.length ? rows.map((customer, index) => `<button type="button" onmousedown="CMSInvoiceRequest.selectCustomer(${index})"><b>${esc(customerSearch.fullName(customer) || customer.customerName)}</b><small>${esc(customer.customerCode || '-')} | ${esc(customer.taxId || '-')} | ${esc(customerSearch.fullAddress(customer) || '-')}</small></button>`).join('') : '<button type="button"><b>ไม่พบลูกค้า</b><small>อ่านจากฐานลูกค้า Tax Invoice แบบ read-only</small></button>';
     box.dataset.rows = JSON.stringify(rows);
     box.classList.add('show');
   }
