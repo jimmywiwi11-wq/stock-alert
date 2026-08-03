@@ -1,0 +1,6 @@
+{
+  "version": "7.77",
+  "label": "V7.77",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Fix invoice request and desktop tax invoice button visibility, order, labels, and icons."
+}

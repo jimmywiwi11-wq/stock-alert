@@ -1,6 +1,6 @@
 {
-  "version": "7.73",
-  "label": "V7.73",
+  "version": "7.79",
+  "label": "V7.79",
   "releasedAt": "2026-08-03T00:00:00Z",
-  "message": "Keep home sales and cash-check buttons from swapping labels after PWA refreshes."
+  "message": "Fix invoice request item row layout and sync customer master between Tax Invoice Desktop and employee invoice requests."
 }

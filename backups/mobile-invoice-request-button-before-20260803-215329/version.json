@@ -1,0 +1,6 @@
+{
+  "version": "7.75",
+  "label": "V7.75",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Complete Phase 5.2 automatic invoice generation, preview, print status, and final UAT readiness."
+}

@@ -1,0 +1,6 @@
+{
+  "version": "7.78",
+  "label": "V7.78",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Fix invoice request Thai text, Product / Price need-unit layout and navigation, and Branch 2 sales display."
+}

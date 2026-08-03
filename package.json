@@ -1,0 +1,17 @@
+{
+  "name": "chokanan-stock-alert-security-tests",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Local-only Firebase Emulator security tests for Stock Alert Phase 5.1.",
+  "scripts": {
+    "test:rules": "firebase emulators:exec --project check-chokanan-security-test --only firestore \"node tests/firestore-rules-security.test.js\"",
+    "test:schema": "node tests/database-schema-validation.test.js",
+    "test:invoice-generator": "node tests/invoice-generator.test.js && node tests/invoice-generator-e2e.test.js",
+    "test:final": "node tests/invoice-generator.test.js && node tests/invoice-generator-e2e.test.js && node tests/database-schema-validation.test.js && node tests/invoice-request.test.js && node tests/product-master.test.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^12.0.0",
+    "firebase-tools": "^14.0.0"
+  }
+}

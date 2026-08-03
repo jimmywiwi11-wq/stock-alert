@@ -1,0 +1,6 @@
+{
+  "version": "7.74",
+  "label": "V7.74",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Add Phase 5.1 production invoice request workflow without creating real invoices."
+}
