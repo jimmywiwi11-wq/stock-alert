@@ -1,6 +1,6 @@
 {
-  "version": "7.72",
-  "label": "V7.72",
-  "releasedAt": "2026-08-01T00:00:00Z",
-  "message": "Allow sales row counts to be saved as text and keep numeric summaries safe."
+  "version": "7.73",
+  "label": "V7.73",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Keep home sales and cash-check buttons from swapping labels after PWA refreshes."
 }
