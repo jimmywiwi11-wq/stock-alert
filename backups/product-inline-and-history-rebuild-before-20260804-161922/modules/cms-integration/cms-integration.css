@@ -1,0 +1,358 @@
+.cmsDesktopEntryV3 {
+  display: none;
+  margin: 18px 0 0;
+}
+
+.cmsDesktopButtonV3 {
+  width: 100%;
+  border: 1px solid #d8e4f2;
+  background: #ffffff;
+  color: #10213d;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-weight: 950;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(17, 44, 84, .06);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cmsDesktopButtonV3:hover {
+  border-color: #aac7ee;
+  box-shadow: 0 12px 26px rgba(17, 44, 84, .10);
+}
+
+.cmsDesktopButtonIconV3 {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #eef5ff;
+  color: #075acb;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.cmsDesktopButtonIconV3 svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cmsDesktopButtonTextV3 {
+  display: block;
+  min-width: 0;
+}
+
+.cmsDesktopButtonTextV3 b {
+  display: block;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.cmsDesktopButtonTextV3 small {
+  display: block;
+  margin-top: 4px;
+  color: #53627a;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+body.cmsDesktopAllowedV3 .cmsDesktopEntryV3 {
+  display: block;
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  body.cmsDesktopAllowedV3 {
+    background: #e8eef5 !important;
+    overflow-x: hidden !important;
+  }
+
+  body.cmsDesktopAllowedV3 .phone {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 20px 24px 116px !important;
+    overflow: visible !important;
+    background: #f3f7fb !important;
+  }
+
+  body.cmsDesktopAllowedV3 .hero {
+    margin: -20px -24px 18px !important;
+    border-radius: 0 0 24px 24px !important;
+    padding: 20px 24px 18px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1px !important;
+    margin-top: 14px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .tile {
+    min-height: 112px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .allShortage,
+  body.cmsDesktopAllowedV3 .alertCard,
+  body.cmsDesktopAllowedV3 .card,
+  body.cmsDesktopAllowedV3 .results,
+  body.cmsDesktopAllowedV3 .categoryShortcut,
+  body.cmsDesktopAllowedV3 .rankList,
+  body.cmsDesktopAllowedV3 .billList {
+    border-radius: 18px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .cmsDesktopEntryV3 {
+    margin-top: 28px !important;
+    padding-bottom: 104px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .cmsDesktopButtonV3 {
+    max-width: 560px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  body.cmsDesktopAllowedV3 .bottom {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 76px !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.cmsDesktopAllowedV3 .modal {
+    align-items: center !important;
+  }
+
+  body.cmsDesktopAllowedV3 .sheet {
+    width: min(100%, 620px) !important;
+    border-radius: 24px !important;
+  }
+}
+
+@media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+  body.cmsDesktopAllowedV3 .phone {
+    padding-left: 28px !important;
+    padding-right: 28px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .hero {
+    margin-left: -28px !important;
+    margin-right: -28px !important;
+    padding-left: 28px !important;
+    padding-right: 28px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 1680px) and (hover: hover) and (pointer: fine) {
+  body.cmsDesktopAllowedV3 .phone {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .hero {
+    margin-left: -32px !important;
+    margin-right: -32px !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  body.cmsDesktopAllowedV3 .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+.cmsModulePageV3 {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: #f6f8fb;
+  color: #10213d;
+}
+
+.cmsModulePageV3.show {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.cmsModuleHeaderV3 {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #dbe5f4;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, .08);
+}
+
+.cmsModuleHeaderV3 h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.cmsModuleHeaderV3 small {
+  display: block;
+  margin-top: 2px;
+  color: #64748b;
+  font-weight: 850;
+}
+
+.cmsBackButtonV3,
+.cmsOpenStandaloneV3 {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #10213d;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.cmsOpenStandaloneV3 {
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.cmsTestBadgeV3 {
+  justify-self: end;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.cmsModuleBodyV3 {
+  position: relative;
+  min-height: 0;
+}
+
+.cmsTaxFrameV3 {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
+}
+
+.cmsModuleStateV3 {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #f8fafc;
+  padding: 24px;
+  text-align: center;
+  z-index: 2;
+}
+
+.cmsModuleStateV3.hidden {
+  display: none;
+}
+
+.cmsGuardV3 {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  place-items: center;
+  padding: 20px;
+  background: #f6f8fb;
+}
+
+.cmsGuardV3.show {
+  display: grid;
+}
+
+.cmsGuardCardV3 {
+  width: min(100%, 420px);
+  background: #ffffff;
+  border: 1px solid #dbe5f4;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, .16);
+  text-align: center;
+}
+
+.cmsGuardCardV3 h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.cmsGuardCardV3 p {
+  margin: 0 0 14px;
+  color: #53627a;
+  font-weight: 850;
+  line-height: 1.5;
+}
+
+.cmsGuardCardV3 button {
+  border: 0;
+  background: #073b92;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-family: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+  .cmsDesktopEntryV3 {
+    display: none !important;
+  }
+}
+
+@media print {
+  .cmsModuleHeaderV3,
+  .cmsDesktopEntryV3,
+  .cmsGuardV3,
+  .cmsModuleStateV3,
+  nav.bottom {
+    display: none !important;
+  }
+
+  .cmsModulePageV3 {
+    position: static !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+
+  .cmsTaxFrameV3 {
+    border: 0 !important;
+  }
+}

@@ -1,0 +1,10 @@
+const assert = require('assert');
+const { loadUpdateContext } = require('./update-test-harness');
+const u = loadUpdateContext().StockAlertUpdate;
+assert.strictEqual(u.compareSemanticVersions('8.02', 'V8.02'), 0);
+assert.strictEqual(u.compareSemanticVersions('8.9', '8.10'), -1);
+assert.strictEqual(u.compareSemanticVersions('8.10', '8.9'), 1);
+assert.strictEqual(u.shouldPromptForUpdate('8.02', '8.03'), true);
+assert.strictEqual(u.shouldPromptForUpdate('8.03', '8.03'), false);
+assert.strictEqual(u.shouldPromptForUpdate('8.04', '8.03'), false);
+console.log('version comparison passed');

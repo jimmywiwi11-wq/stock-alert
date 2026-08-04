@@ -1,0 +1,10 @@
+{
+  "version": "8.04",
+  "label": "V8.04",
+  "build": "20260804-PRODUCT-INLINE-HISTORY-V2",
+  "marker": "V8.04-PRODUCT-INLINE-HISTORY-V2",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Product inline add flow and Tax Invoice History V2 repository rebuild.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-08-04T00:00:00+07:00"
+}

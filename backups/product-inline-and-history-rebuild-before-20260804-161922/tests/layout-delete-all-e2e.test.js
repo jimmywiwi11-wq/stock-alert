@@ -1,0 +1,44 @@
+const assert = require('assert');
+const { chromium } = require('C:/Users/Acer/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  const dialogs = [];
+  page.on('dialog', async dialog => { dialogs.push(dialog.message()); await dialog.accept(); });
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('layoutDeleteAllSeeded') === '1') return;
+    sessionStorage.setItem('layoutDeleteAllSeeded', '1');
+    localStorage.setItem('settings', JSON.stringify({ shopName: 'Shop', shopAddress: 'Address', shopTax: '001', shopPhone: '02' }));
+    localStorage.removeItem('fullTaxLayouts');
+    localStorage.removeItem('activeFullTaxTemplate');
+    localStorage.removeItem('lastFullTaxLayoutDeleteUndo');
+  });
+  await page.goto('http://127.0.0.1:8765/desktop/tax-invoice/tax_invoice_app.html?layoutDeleteAllE2E=1', { waitUntil: 'domcontentloaded' });
+  await page.click('nav button[onclick="showPage(\'layoutDesigner\');initLayoutDesigner()"]');
+  await page.waitForSelector('#layoutDesigner.active #layoutCanvas');
+  const initial = await page.locator('#layoutCanvas .print-object').count();
+  assert.ok(initial > 0);
+  await page.locator('#layoutObjectList button').first().click();
+  await page.locator('button[onclick="deleteSelectedObject()"]', { hasText: 'Delete' }).click();
+  const afterDelete = await page.locator('#layoutCanvas .print-object').count();
+  assert.strictEqual(afterDelete, initial - 1);
+  await page.locator('button[onclick="clearAllLayoutObjects()"]', { hasText: 'ล้างวัตถุทั้งหมด' }).click();
+  await page.waitForFunction(() => document.querySelectorAll('#layoutCanvas .print-object').length === 0);
+  assert.strictEqual(await page.locator('#layoutCanvas').count(), 1);
+  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('fullTaxLayouts') || '[]'));
+  let active = await page.evaluate(() => localStorage.getItem('activeFullTaxTemplate'));
+  let layout = saved.find(x => x.id === active) || saved[0];
+  assert.strictEqual(layout.objects.length, 0);
+  assert.strictEqual(layout.blankLayout, true);
+  assert.strictEqual(layout.allowMissingRequiredObjects, true);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.click('nav button[onclick="showPage(\'layoutDesigner\');initLayoutDesigner()"]');
+  await page.waitForSelector('#layoutDesigner.active #layoutCanvas');
+  assert.strictEqual(await page.locator('#layoutCanvas .print-object').count(), 0);
+  await page.locator('button[onclick="undoLastLayoutDelete()"]', { hasText: 'ย้อนกลับการลบล่าสุด' }).click();
+  await page.waitForFunction(() => document.querySelectorAll('#layoutCanvas .print-object').length > 0);
+  assert.ok((await page.locator('#layoutCanvas .print-object').count()) > 0);
+  await browser.close();
+  console.log('layout delete all e2e passed: dialogs=' + dialogs.length);
+})().catch(error => { console.error(error); process.exit(1); });
+

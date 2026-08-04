@@ -23,6 +23,7 @@
     productSearchTimer: null,
     customerSearchToken: 0,
     productSearchToken: 0,
+    productEntryErrors: {},
     composing: { customer: false, product: false, productName: false },
     realtimeBound: false,
     realtimeUnsubs: []
@@ -424,10 +425,15 @@
   function searchProduct(query){
     const box = document.getElementById('cmsProductSuggestV42');
     if (!box) return;
+    if (!normalizeUiText(query)) {
+      hideProductSuggestions();
+      return;
+    }
     const rows = productSearch.searchProducts(query, 16);
+    box.classList.toggle('inlineHint', !rows.length);
     box.innerHTML = rows.length ? rows.map((product, index) => {
       return `<button type="button" onmousedown="CMSInvoiceRequest.addExistingProduct(${index})"><b>${esc(product.productName)}</b><small>${esc(product.productCode || '-')} | หน่วย ${esc(product.unit || '-')} | ราคาขาย ${product.salePrice == null ? '-' : money(product.salePrice)}</small></button>`;
-    }).join('') : '<button type="button"><b>ไม่พบสินค้าเดิม</b><small>เพิ่มเป็นสินค้าใหม่เข้า Product Master ได้</small></button>';
+    }).join('') : '<div class="cmsInvoiceProductHintV42"><b>ไม่พบสินค้าเดิม</b><small>กรอกจำนวน หน่วย และราคา แล้วกดเพิ่มเพื่อสร้าง Product Master ใหม่</small></div>';
     box.dataset.rows = JSON.stringify(rows);
     box.classList.add('show');
   }
@@ -481,11 +487,12 @@
     const item = { productName: name, unit, salePrice, quantity, source: 'new-product', isNewProduct: true };
     const result = validation.validateItem(item);
     if (!result.valid) {
-      alert(Object.values(result.errors)[0]);
+      setProductEntryErrors(result.errors || {});
+      focusFirstProductError(result.errors || {});
       return;
     }
-    const similar = productSearch.similarProducts(name, 1)[0];
-    if (similar && confirm(`พบสินค้าใกล้เคียง: ${similar.productName}\nใช่สินค้าเดียวกันหรือไม่?`)) {
+    const similar = findExactProductByName(name);
+    if (similar) {
       state.items.push({
         requestItemId: newId('req-item'),
         productId: similar.productId,
@@ -494,7 +501,7 @@
         unit: unit || similar.unit,
         salePrice: salePrice || similar.salePrice,
         quantity,
-        source: similar.source || 'existing-product-fuzzy',
+        source: similar.source || 'existing-product-exact',
         isNewProduct: false,
         addedByUid: sender().requestedByUid,
         addedBy: sender().requestedByNickname,
@@ -504,9 +511,9 @@
       return;
     }
     const created = window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProductAsync === 'function'
-      ? await window.ChokAnanProductMaster.createProductAsync({ productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'invoice-request' }, { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch })
+      ? await window.ChokAnanProductMaster.createProductAsync({ productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'employee-invoice-request', source: 'employee-invoice-request', costPrice: null }, { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch })
       : (window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProduct === 'function'
-        ? window.ChokAnanProductMaster.createProduct({ productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'invoice-request' }, { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch })
+        ? window.ChokAnanProductMaster.createProduct({ productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'employee-invoice-request', source: 'employee-invoice-request', costPrice: null }, { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch })
         : null);
     state.items.push({
       requestItemId: newId('req-item'),
@@ -728,10 +735,10 @@
   function renderProductPanel(){
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
       <div class="cmsInvoiceProductEntryRowV42">
-        <div class="name cmsInvoiceSuggestWrapV42"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oncompositionstart="CMSInvoiceRequest.beginComposition('productName')" oncompositionend="CMSInvoiceRequest.endComposition('productName', this.value)" oninput="CMSInvoiceRequest.productNameChanged(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" placeholder="พิมพ์ชื่อสินค้า แล้วเลือกจากรายการ หรือพิมพ์สินค้าใหม่" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
-        <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="0"></div>
-        <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย"></div>
-        <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="0.00"></div>
+        <div class="name cmsInvoiceSuggestWrapV42"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oncompositionstart="CMSInvoiceRequest.beginComposition('productName')" oncompositionend="CMSInvoiceRequest.endComposition('productName', this.value)" oninput="CMSInvoiceRequest.productNameChanged(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" placeholder="พิมพ์ชื่อสินค้า แล้วเลือกจากรายการ หรือพิมพ์สินค้าใหม่" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductNameErrorV42">${esc(state.productEntryErrors.productName || '')}</div></div>
+        <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="0" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductQtyErrorV42">${esc(state.productEntryErrors.quantity || '')}</div></div>
+        <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductUnitErrorV42">${esc(state.productEntryErrors.unit || '')}</div></div>
+        <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="0.00" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductPriceErrorV42">${esc(state.productEntryErrors.salePrice || '')}</div></div>
         <button class="cmsInvoiceAddProductV42" onclick="CMSInvoiceRequest.addNewProduct()">เพิ่ม</button>
       </div>
       <div id="cmsSimilarBoxV42"></div>
@@ -815,6 +822,7 @@
 
   function productNameChanged(value){
     if (state.composing?.productName) return;
+    clearProductEntryErrors();
     if (!state.selectedProduct || normalizeUiText(value) !== normalizeUiText(state.selectedProduct.productName)) {
       state.selectedProduct = null;
     }
@@ -823,6 +831,7 @@
   }
 
   function fillProductEntry(product){
+    clearProductEntryErrors();
     state.selectedProduct = product || null;
     const name = document.getElementById('cmsNewProductNameV42');
     const unit = document.getElementById('cmsNewProductUnitV42');
@@ -839,13 +848,60 @@
 
   function clearProductEntry(){
     state.selectedProduct = null;
+    state.productEntryErrors = {};
     ['cmsNewProductNameV42', 'cmsNewProductQtyV42', 'cmsNewProductUnitV42', 'cmsNewProductPriceV42'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
-    hideSuggestionBox(document.getElementById('cmsProductSuggestV42'));
+    hideProductSuggestions();
     const similar = document.getElementById('cmsSimilarBoxV42');
     if (similar) similar.innerHTML = '';
+  }
+
+  function hideProductSuggestions(){
+    clearTimeout(state.productSearchTimer);
+    const box = document.getElementById('cmsProductSuggestV42');
+    if (!box) return;
+    box.classList.remove('show', 'inlineHint');
+    box.innerHTML = '';
+    box.dataset.rows = '[]';
+  }
+
+  function clearProductEntryErrors(){
+    if (!Object.keys(state.productEntryErrors || {}).length) return;
+    state.productEntryErrors = {};
+    setProductEntryErrors({});
+  }
+
+  function setProductEntryErrors(errors){
+    state.productEntryErrors = errors || {};
+    const map = {
+      productName: 'cmsNewProductNameErrorV42',
+      quantity: 'cmsNewProductQtyErrorV42',
+      unit: 'cmsNewProductUnitErrorV42',
+      salePrice: 'cmsNewProductPriceErrorV42'
+    };
+    Object.keys(map).forEach(key => {
+      const el = document.getElementById(map[key]);
+      if (el) el.textContent = state.productEntryErrors[key] || '';
+    });
+  }
+
+  function focusFirstProductError(errors){
+    const order = [
+      ['productName', 'cmsNewProductNameV42'],
+      ['quantity', 'cmsNewProductQtyV42'],
+      ['unit', 'cmsNewProductUnitV42'],
+      ['salePrice', 'cmsNewProductPriceV42']
+    ];
+    const pair = order.find(([key]) => errors && errors[key]);
+    if (pair) setTimeout(() => document.getElementById(pair[1])?.focus(), 20);
+  }
+
+  function findExactProductByName(name){
+    const key = normalizeUiText(name);
+    if (!key) return null;
+    return productSearch.searchProducts(name, 32).find(product => normalizeUiText(product.productName) === key || normalizeUiText(product.name) === key) || null;
   }
 
   function searchCustomer(query){
@@ -874,7 +930,7 @@
     if (state.composing?.product) return;
     if (!normalizeUiText(query)) {
       clearTimeout(state.productSearchTimer);
-      hideSuggestionBox(box);
+      hideProductSuggestions();
       return;
     }
     const token = ++state.productSearchToken;
@@ -882,9 +938,10 @@
     state.productSearchTimer = setTimeout(() => {
       if (token !== state.productSearchToken) return;
       const rows = productSearch.searchProducts(query, 24);
+      box.classList.toggle('inlineHint', !rows.length);
       box.innerHTML = rows.length ? rows.map((product, index) => {
         return `<button type="button" onmousedown="CMSInvoiceRequest.addExistingProduct(${index})"><b>${esc(product.productName)}</b><small>${esc(product.productCode || '-')} | หน่วย ${esc(product.unit || '-')} | ราคาขาย ${product.salePrice == null ? '-' : money(product.salePrice)}</small></button>`;
-      }).join('') : '<button type="button"><b>ไม่พบสินค้าเดิม</b><small>พิมพ์ชื่อในแถวเพิ่มสินค้าเพื่อสร้าง Product Master ใหม่</small></button>';
+      }).join('') : '<div class="cmsInvoiceProductHintV42"><b>ไม่พบสินค้าเดิม</b><small>กรอกจำนวน หน่วย และราคา แล้วกดเพิ่มเพื่อสร้าง Product Master ใหม่</small></div>';
       box.dataset.rows = JSON.stringify(rows);
       box.classList.toggle('show', !!normalizeUiText(query));
     }, 160);
@@ -895,7 +952,7 @@
     const rows = JSON.parse(box?.dataset.rows || '[]');
     const product = rows[index];
     if (!product) return;
-    if (box) box.classList.remove('show');
+    hideProductSuggestions();
     fillProductEntry(product);
   }
 
@@ -917,24 +974,25 @@
     };
     const result = validation.validateItem(item);
     if (!result.valid) {
-      alert(Object.values(result.errors)[0]);
+      setProductEntryErrors(result.errors || {});
+      focusFirstProductError(result.errors || {});
       return;
     }
     let product = selected;
     if (!product) {
-      const similar = productSearch.similarProducts(name, 1)[0];
-      if (similar && confirm(`พบสินค้าใกล้เคียง: ${similar.productName}\nใช่สินค้าเดียวกันหรือไม่?`)) {
-        product = similar;
-        item.productId = similar.productId;
-        item.productCode = similar.productCode;
-        item.productName = similar.productName;
-        item.unit = unit || similar.unit;
-        item.salePrice = salePrice || similar.salePrice;
-        item.source = similar.source || 'existing-product-fuzzy';
+      const exact = findExactProductByName(name);
+      if (exact) {
+        product = exact;
+        item.productId = exact.productId;
+        item.productCode = exact.productCode;
+        item.productName = exact.productName;
+        item.unit = unit || exact.unit;
+        item.salePrice = salePrice || exact.salePrice;
+        item.source = exact.source || 'existing-product-exact';
         item.isNewProduct = false;
       } else {
         const actor = { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch };
-        const payload = { productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'invoice-request', costPrice: null };
+        const payload = { productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'employee-invoice-request', source: 'employee-invoice-request', costPrice: null };
         product = window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProductAsync === 'function'
           ? await window.ChokAnanProductMaster.createProductAsync(payload, actor)
           : (window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProduct === 'function'
@@ -944,6 +1002,7 @@
         item.productCode = product?.productCode || product?.code || '';
         item.productName = product?.productName || name;
         item.source = product ? 'live-product-master-new' : 'new-product-local-fallback';
+        try { window.dispatchEvent(new CustomEvent('chokanan-product-master-updated', { detail: { product, source: 'employee-invoice-request' } })); } catch (error) {}
       }
     }
     state.items.push({
@@ -959,6 +1018,10 @@
   }
 
   function productSearchKey(event){
+    if (event.key === 'Escape') {
+      hideProductSuggestions();
+      return;
+    }
     if (event.key !== 'Enter' && event.key !== 'Tab') return;
     const box = document.getElementById('cmsProductSuggestV42');
     const rows = JSON.parse(box?.dataset.rows || '[]');
@@ -966,6 +1029,22 @@
       event.preventDefault();
       addExistingProduct(0);
     }
+  }
+
+  function productEntryDismissHandler(event){
+    const target = event && event.target;
+    if (!target) return;
+    const wrap = document.getElementById('cmsProductSuggestV42')?.closest('.cmsInvoiceSuggestWrapV42');
+    if (wrap && wrap.contains(target)) return;
+    hideProductSuggestions();
+  }
+
+  function bindProductEntryDismiss(){
+    if (state.productEntryDismissBound) return;
+    state.productEntryDismissBound = true;
+    document.addEventListener('click', productEntryDismissHandler, true);
+    document.addEventListener('touchstart', productEntryDismissHandler, true);
+    document.addEventListener('focusin', productEntryDismissHandler, true);
   }
 
   function requestIsReady(row){
@@ -1038,6 +1117,63 @@
     return status === 'ready_to_print' || status === 'printed' || status === 'partially_printed';
   }
 
+  function invoiceRecordKey(row){
+    return String(row?.invoiceId || row?.historyId || row?.id || row?.invoiceNumber || row?.no || '').trim();
+  }
+
+  function invoiceRequestKey(row){
+    return String(row?.sourceRequestId || row?.requestId || '').trim();
+  }
+
+  function invoiceIndex(row){
+    return Number(row?.pageIndex || row?.invoiceIndex || row?.batchIndex || row?.sequenceInBatch || row?.chunkIndex || 1) || 1;
+  }
+
+  function invoiceTotalInRequest(row, request){
+    return Number(row?.totalInvoicesInRequest || row?.totalInvoicesInBatch || row?.batchTotal || request?.expectedInvoiceCount || generatedInvoiceCount(request) || 1) || 1;
+  }
+
+  function invoiceItemCount(row){
+    if (Array.isArray(row?.itemsSnapshot)) return row.itemsSnapshot.length;
+    if (Array.isArray(row?.items)) return row.items.length;
+    return Number(row?.itemsInThisInvoice || row?.itemCount || 0) || 0;
+  }
+
+  function invoiceCustomerName(row, request){
+    return row?.customerName || row?.buyerName || row?.customerSnapshot?.customerName || request?.customerDisplayName || request?.customerSnapshot?.customerName || '-';
+  }
+
+  function invoiceStatusClass(row){
+    const status = normalizedStatus(row);
+    if (status === 'printed') return 'printed';
+    if (status === 'ready_to_print') return 'ready';
+    return status === 'partially_printed' ? 'partial' : '';
+  }
+
+  function invoiceStatusText(row){
+    return normalizedStatus(row) === 'printed' ? 'สั่งพิมพ์แล้ว' : 'พร้อมพิมพ์';
+  }
+
+  function requestSortStamp(request){
+    return String(request?.requestedAt || request?.createdAt || request?.updatedAt || '');
+  }
+
+  function mobileStatusInvoiceRows(){
+    const requests = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
+    return readMobileHistory()
+      .filter(row => {
+        const status = normalizedStatus(row);
+        if (status === 'printed') return thaiDateKey(printedTimestamp(row)) === currentThaiDateKey();
+        return status === 'ready_to_print' || status === 'partially_printed';
+      })
+      .map(row => ({ invoice: row, request: requests.get(invoiceRequestKey(row)) || {} }))
+      .sort((a, b) =>
+        requestSortStamp(b.request).localeCompare(requestSortStamp(a.request)) ||
+        invoiceIndex(a.invoice) - invoiceIndex(b.invoice) ||
+        String(a.invoice.invoiceNumber || a.invoice.no || '').localeCompare(String(b.invoice.invoiceNumber || b.invoice.no || ''))
+      );
+  }
+
   function statusClass(row){
     const status = normalizedStatus(row);
     if (status === 'printed') return 'printed';
@@ -1076,7 +1212,9 @@
       rerender();
     }, error => console.warn('[invoice-request] request listener failed', error)));
     state.realtimeUnsubs.push(window.db.collection('taxInvoices').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
-      snapshot.forEach(doc => saveMobileHistory({ ...(doc.data() || {}), historyId: doc.id }));
+      const rows = [];
+      snapshot.forEach(doc => rows.push({ ...(doc.data() || {}), historyId: doc.id }));
+      localStorage.setItem(TAX_INVOICE_HISTORY_KEY, JSON.stringify(rows));
       rerender();
     }, error => console.warn('[invoice-request] taxInvoices listener failed', error)));
   }
@@ -1106,6 +1244,27 @@
     return `<div class="cmsInvoiceListRowV42"><b>${esc(row.requestNumber || row.requestId)}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerDisplayName || row.customerSnapshot?.customerName || '-')}<br>เวลา: ${esc(row.requestedAt || row.sender?.requestedAt || '-')}<br>รายการ: ${row.itemCount || 0} | คาดว่า ${row.expectedInvoiceCount || 0} ใบ | ยอด ${money(row.grandTotal || row.subtotalPreview)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${statusClass(row)}">${esc(statusText(row))}</strong>${generated}</span>${preview}${action}</div>`;
   }
 
+  function statusInvoiceRowHtml(invoice, request){
+    const key = invoiceRecordKey(invoice);
+    const index = invoiceIndex(invoice);
+    const total = invoiceTotalInRequest(invoice, request);
+    const requestNumber = invoice.requestNumber || invoice.sourceRequestNumber || request.requestNumber || invoice.sourceRequestId || invoice.requestId || '-';
+    return `<div class="cmsInvoiceListRowV42"><b>${esc(requestNumber)}</b><span class="cmsInvoiceListMetaV42">เลขใบกำกับภาษี: ${esc(invoice.invoiceNumber || invoice.no || key || '-')}<br>ใบที่ ${index}/${total}<br>ลูกค้า: ${esc(invoiceCustomerName(invoice, request))}<br>รายการในใบนี้: ${invoiceItemCount(invoice)} | ยอด ${money(invoice.grandTotal || invoice.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${invoiceStatusClass(invoice)}">${esc(invoiceStatusText(invoice))}</strong></span><button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(key)}', 'invoice')">ดูตัวอย่างใบกำกับภาษี</button></div>`;
+  }
+
+  function renderStatus(){
+    ensurePages();
+    bindRealtime();
+    const invoiceRows = mobileStatusInvoiceRows();
+    const rows = invoiceRows.length ? [] : (isTestMode() ? store.listRequests() : store.listProductionRequests()).filter(requestVisibleInCurrentStatus);
+    document.getElementById('cmsInvoiceRequestStatusPageV42').innerHTML = [
+      header('สถานะใบกำกับภาษี', isTestMode() ? 'Test Mode' : 'อัปเดตจาก taxInvoices แบบ realtime'),
+      '<div class="cmsInvoiceListV42">',
+      invoiceRows.length ? invoiceRows.map(pair => statusInvoiceRowHtml(pair.invoice, pair.request)).join('') : (rows.length ? rows.map(row => statusRowHtml(row)).join('') : '<div class="empty">ยังไม่มีใบกำกับภาษีในสถานะปัจจุบัน</div>'),
+      '</div>'
+    ].join('');
+  }
+
   function renderHistory(){
     ensurePages();
     bindRealtime();
@@ -1114,6 +1273,21 @@
       header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
       '<div class="cmsInvoiceListV42">',
       rows.length ? rows.map(row => `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 printed">สั่งพิมพ์แล้ว</strong></span></div>`).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function renderHistory(){
+    ensurePages();
+    bindRealtime();
+    const rows = readMobileHistory().filter(isFullyPrinted).sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
+    document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
+      header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
+      '<div class="cmsInvoiceListV42">',
+      rows.length ? rows.map(row => {
+        const key = invoiceRecordKey(row);
+        return `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 printed">สั่งพิมพ์แล้ว</strong></span><button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(key)}', 'invoice')">ดูตัวอย่างใบกำกับภาษี</button></div>`;
+      }).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
       '</div>'
     ].join('');
   }
@@ -1219,6 +1393,29 @@
     }
   }
 
+  async function openPreview(requestId, mode='request'){
+    const row = mode === 'invoice'
+      ? readMobileHistory().find(item => invoiceRecordKey(item) === String(requestId))
+      : store.listProductionRequests().find(item => item.requestId === requestId);
+    if (!row) return alert('ไม่พบข้อมูลใบกำกับภาษี');
+    if (mode !== 'invoice' && !requestCanPreview(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
+    try {
+      const invoices = mode === 'invoice' ? [row] : await fetchPreviewInvoices(row);
+      const previewRequest = mode === 'invoice' ? { requestId: invoiceRequestKey(row), requestNumber: row.requestNumber || row.sourceRequestNumber || '' } : row;
+      const payload = window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.requestPreviewPayload === 'function'
+        ? window.ChokAnanInvoicePreviewService.requestPreviewPayload(previewRequest, invoices)
+        : { invoices };
+      const modal = document.getElementById('cmsInvoicePreviewModalV42') || document.createElement('div');
+      modal.id = 'cmsInvoicePreviewModalV42';
+      modal.className = 'cmsInvoicePreviewModalV42';
+      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map((invoice, index) => previewInvoiceHtml(invoice, index, payload.invoices.length)).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
+      if (!modal.parentElement) document.body.appendChild(modal);
+      document.documentElement.classList.add('cmsInvoicePreviewOpenV42');
+    } catch (error) {
+      alert(`เปิด Preview ไม่สำเร็จ: ${error.message || error}`);
+    }
+  }
+
   function closePreview(){
     document.getElementById('cmsInvoicePreviewModalV42')?.remove();
     document.documentElement.classList.remove('cmsInvoicePreviewOpenV42');
@@ -1272,6 +1469,7 @@
   function init(){
     ensurePages();
     ensureHomeButton();
+    bindProductEntryDismiss();
   }
 
   window.CMSInvoiceRequest = {
@@ -1293,6 +1491,7 @@
     selectCustomer,
     searchProduct,
     productSearchKey,
+    hideProductSuggestions,
     addExistingProduct,
     productNameChanged,
     showSimilar,

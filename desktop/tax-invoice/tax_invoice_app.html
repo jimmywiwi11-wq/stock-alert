@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tax Invoice App V32</title>
+<title>Tax Invoice App V33</title>
 <link rel="icon" href="./assets/icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
@@ -631,14 +631,15 @@ button[onclick^="deleteProduct"]:hover,button[onclick^="deleteInvoice"]:hover,bu
   :where(.tax-short) table th,:where(.tax-short) table td{padding:2px 3px!important}
 }
 </style>
+<link rel="stylesheet" href="history-v2.css?v=8.05">
 </head>
 <body>
 <header class="app-brand">
   <img class="app-logo" src="./assets/icons/icon-64.png" alt="Tax Invoice App logo">
   <div class="app-title">
     <strong>Tax Invoice App</strong>
-    <span>โชคอนันต์ ฮาร์ดแวร์ • V32</span>
-    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V32-SAVE-HISTORY-PRINT-STATUS</small>
+    <span>โชคอนันต์ ฮาร์ดแวร์ • V33</span>
+    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V34-VERIFY-PER-INVOICE-IV000110</small>
   </div>
 </header>
 <nav class="hidden-print">
@@ -1112,14 +1113,15 @@ try{if(window.firebase&&!firebase.apps.length)firebase.initializeApp(firebaseCon
 function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[TaxInvoice auth]',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[TaxInvoice auth listener]',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[TaxInvoice auth ready]',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 window.stockAlertAuthReady=stockAlertAuthReady;
 </script>
-<script src="../../modules/customer-master/customer-master.js?v=8.03"></script>
-<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.03"></script>
-<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.03"></script>
-<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.03"></script>
-<script src="../../modules/invoice-generator/invoice-history-adapter.js?v=8.03"></script>
+<script src="../../modules/customer-master/customer-master.js?v=8.05"></script>
+<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.05"></script>
+<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.05"></script>
+<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.05"></script>
+<script src="../../modules/invoice-generator/invoice-history-adapter.js?v=8.05"></script>
+<script src="../../modules/invoice-generator/native-invoice-repository.js?v=8.05"></script>
 <script>
 const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], lastEmployeeNativeSyncPromise=null, productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[], employeeInvoiceRequestRows=[], employeeNativeImportContext=null, employeeRequestImportWaiters={};
-window.DESKTOP_TAX_INVOICE_BUILD='V32-SAVE-HISTORY-PRINT-STATUS';
+window.DESKTOP_TAX_INVOICE_BUILD='V34-VERIFY-PER-INVOICE-IV000110';
 let productBulkSelectMode=false,customerBulkSelectMode=false,selectedProductIds=new Set(),selectedCustomerIds=new Set(),visibleProductIds=[],visibleCustomerIds=[];
 const THAI_PRINT_FONT_STACK='"TH Sarabun New","Sarabun","Noto Sans Thai","Tahoma","Leelawadee UI",sans-serif';
 function nextFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
@@ -1935,6 +1937,12 @@ function markRecordsPrintedAfterConfirmation(records){
           .catch(e=>console.warn('[TaxInvoice parent bridge print sync]',e));
         return;
       }
+      if(window.NativeInvoiceRepository&&typeof NativeInvoiceRepository.markPrinted==='function'){
+        NativeInvoiceRepository.markPrinted(x,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})
+          .then(done)
+          .catch(e=>console.warn('[TaxInvoice print sync]',e));
+        return;
+      }
       if(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.markPrinted==='function'){
         ChokAnanInvoiceHistoryAdapter.markPrinted(x,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})
           .then(done)
@@ -1961,7 +1969,7 @@ async function printInvoiceRecordsClean(records,afterPrintDone=null){
   let qs=new URLSearchParams(location.search);if(qs.get('cmsTest')==='1'||qs.get('e2eNativeImport')==='1')setTimeout(cleanup,800);
 }
 function renderInvoicePreview(){if(typeof shouldUseFullTaxLayout==='function'&&shouldUseFullTaxLayout()&&typeof renderFullTaxLayoutPreview==='function')return renderFullTaxLayoutPreview();let s=store.get('settings',{}),c=calc(),isShort=invType.value==='ใบกำกับภาษีย่อ',ps=getPrintSettings();let paperTxt=ps.hidePaper==='no'?`<div><b>กระดาษ:</b> ${paperSize.value}</div>`:'';let shopLine=`${s.shopAddress||'ที่อยู่ร้าน'} โทร ${s.shopPhone||'-'} เลขภาษี ${s.shopTax||'-'}`;let head=`<div class="invoice-head"><div class="shop-title">${s.shopName||'ชื่อร้าน/บริษัท'}</div><div class="doc-title-block"><div class="doc-title">${invType.value}${isShort?' <span class="doc-copy-inline">(ต้นฉบับ)</span>':''}</div></div><div class="head-spacer"></div><div class="shop-address-line">${shopLine}</div></div>`;let meta=`<div class="mini-meta"><div><b>เลขที่:</b> ${invNo.value}</div><div><b>วันที่:</b> ${invDate.value}</div><div><b>VAT:</b> ${vatMode.value==='included'?'รวมภาษี':'แยกภาษี'}</div>${paperTxt}</div>`;let buyer=isShort?'':`<div class="invoice-meta"><div><b>ลูกค้า:</b> ${htmlLines(buyerName.value||'-')}<br><b>ที่อยู่:</b> ${htmlLines(buyerAddress.value||'-')}<br><b>เลขภาษี:</b> ${htmlLines(buyerTax.value||'-')}</div><div><b>เลขที่:</b> ${invNo.value}<br><b>วันที่:</b> ${invDate.value}<br><b>VAT:</b> ${vatMode.value==='included'?'ราคารวมภาษี':'ราคาแยกภาษี'}</div></div>`;let paperClass=paperSize.value==='9x11'?'paper-9x11':'paper-9x55';invoicePreview.innerHTML=`<div class="invoice-box ${paperClass} ${isShort?'tax-short':''}">${head}${isShort?meta:'<hr>'+buyer}<div class="invoice-lines"><table><tr><th>ลำดับ</th><th>รหัส</th><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา</th><th>จำนวนเงิน</th></tr>${invoiceItems.map((x,i)=>`<tr><td class=center>${i+1}</td><td>${escapeHtml(x.code||'')}</td><td>${escapeHtml(x.name||'')}</td><td class=right>${invoiceQtyIsBlank(x)?'':escapeHtml(x.qty)}</td><td>${escapeHtml(x.unit||'')}</td><td class=right>${money(x.price)}</td><td class=right>${money(invoiceLineAmount(x))}</td></tr>`).join('')}</table></div><div class="invoice-footer"><div class="invoice-summary-row"><p class="invoice-amount-words"><b>จำนวนเงินตัวอักษร:</b> ${thaiBahtText(c.total)}</p><div class="invoice-total"><table><tr><td>มูลค่าก่อนภาษี</td><td class=right>${money(c.beforeVat)}</td></tr><tr><td>VAT 7%</td><td class=right>${money(c.vat)}</td></tr><tr><th>ยอดรวมสุทธิ</th><th class=right>${money(c.total)}</th></tr></table></div></div><div class="invoice-meta signature-row"><div>ผู้รับสินค้า/บริการ ____________________</div><div>ผู้รับเงิน/ผู้ขาย ____________________</div></div></div></div>`}
-function saveInvoice(silent=false, keepFormAfterSave=false){
+async function saveInvoice(silent=false, keepFormAfterSave=false){
   if(invoiceItems.length===0){alert('กรุณาเพิ่มสินค้าในบิล');return false}
   if(!validateInvoiceItemQuantities())return false;
   lastSavedInvoiceRecords=[];
@@ -1970,7 +1978,10 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
     if(dups.length){alert('เลขที่บิลซ้ำ กรุณาตรวจเลขที่บิลก่อนบันทึก\n'+dups.join(', '));return false}
     if(editInvoiceId&&!confirm(`บิลนี้เป็นส่วนหนึ่งของการแก้ไขรายการ และรายการเกิน 10 รายการ\nระบบจะบันทึกใหม่เป็นชุด ${plan.totalInvoices} ใบตามกฎใบกำกับภาษีเต็ม 9 × 11 นิ้ว\nต้องการดำเนินการต่อหรือไม่?`))return false;
     if(!confirm(fullTaxSplitSummary(plan)))return false;
-    let created=createSplitFullTaxInvoices(plan);lastSavedInvoiceRecords=created;lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(created,{force:!silent});
+    let created=createSplitFullTaxInvoices(plan);lastSavedInvoiceRecords=created;lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(created,{force:true});
+    try{let synced=await lastEmployeeNativeSyncPromise;if(synced&&synced.length){created=synced;lastSavedInvoiceRecords=synced;}}catch(e){console.warn('[TaxInvoice desktop history sync]',e)}
+    let missing=created.filter(x=>!(window.NativeInvoiceRepository&&NativeInvoiceRepository.getById(String(x.invoiceId||x.id||x.no||x.invoiceNumber||''))));
+    if(window.NativeInvoiceRepository&&missing.length)console.warn('[TaxInvoice history verify] split records not found in repository',missing.map(x=>x.no||x.invoiceNumber||x.id));
     if(!silent)alert(`บันทึกใบกำกับภาษีเต็มแล้ว ${created.length} ใบ\nจำนวนรายการทั้งหมด ${plan.totalItems} รายการ`);
     if(!keepFormAfterSave&&!employeeNativeImportContext?.sourceRequestId)newInvoice();
     else{invoiceItems=JSON.parse(JSON.stringify(created[0]?.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}
@@ -1984,7 +1995,12 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
   if(idx>=0){let old=a[idx];['invoiceId','historyId','sourceRequestId','requestId','sourceRequestNumber','requestedByUid','ownerUid','syncedFromTaxInvoiceHistory'].forEach(k=>{if(old&&old[k]!==undefined&&inv[k]===undefined)inv[k]=old[k]})}
   if(idx>=0){a[idx]=inv}else{a.push(inv);advanceInvoiceCounterFromNo(inv.no);editInvoiceId=inv.id}
   store.set('invoices',a);
-  lastSavedInvoiceRecords=[inv];lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(lastSavedInvoiceRecords,{force:!silent}).then(rows=>{if(rows&&rows.length&&editInvoiceId===inv.id){let synced=rows[0];invNo.value=synced.no||invNo.value;invoiceItems=JSON.parse(JSON.stringify(synced.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}return rows}).catch(e=>{console.warn('[TaxInvoice desktop history sync]',e);return lastSavedInvoiceRecords});
+  lastSavedInvoiceRecords=[inv];lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(lastSavedInvoiceRecords,{force:true}).then(rows=>{if(rows&&rows.length&&editInvoiceId===inv.id){let synced=rows[0];invNo.value=synced.no||invNo.value;invoiceItems=JSON.parse(JSON.stringify(synced.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}return rows}).catch(e=>{console.warn('[TaxInvoice desktop history sync]',e);return lastSavedInvoiceRecords});
+  try{let syncedRows=await lastEmployeeNativeSyncPromise;if(syncedRows&&syncedRows.length)lastSavedInvoiceRecords=syncedRows;}catch(e){console.warn('[TaxInvoice desktop history sync wait]',e)}
+  if(window.NativeInvoiceRepository){
+    let verifyKey=String((lastSavedInvoiceRecords[0]||inv).invoiceId||(lastSavedInvoiceRecords[0]||inv).id||(lastSavedInvoiceRecords[0]||inv).no||(lastSavedInvoiceRecords[0]||inv).invoiceNumber||'');
+    if(verifyKey&&!NativeInvoiceRepository.getById(verifyKey)&&!NativeInvoiceRepository.getByInvoiceNumber(verifyKey))console.warn('[TaxInvoice history verify] saved invoice not found in repository',verifyKey);
+  }
   renderHistory();
   if(!silent)alert('บันทึกบิลแล้ว');
   if(!keepFormAfterSave&&!employeeNativeImportContext?.sourceRequestId){newInvoice();}
@@ -1992,7 +2008,7 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
   return true;
 }
 async function printAndSaveInvoice(){
-  let ok=saveInvoice(true,true);
+  let ok=await saveInvoice(true,true);
   if(!ok)return;
   let records=Array.isArray(ok)?ok:(lastSavedInvoiceRecords.length?lastSavedInvoiceRecords:[]);
   if(!records.length){alert('บันทึกแล้ว แต่ไม่พบข้อมูลบิลสำหรับพิมพ์');return;}
@@ -2042,6 +2058,9 @@ async function syncSavedInvoiceRecordsToCentral(records,{force=false}={}){
   if(!rows.length)return [];
   let latest=rows;
   let jobs=[];
+  if(window.NativeInvoiceRepository&&typeof NativeInvoiceRepository.save==='function'){
+    jobs.push(Promise.all(rows.map(row=>NativeInvoiceRepository.save(row,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''}))).then(r=>{if(r?.length)latest=r;}));
+  }
   if(employeeNativeImportContext?.sourceRequestId)jobs.push(syncEmployeeRequestNativeSave(rows).then(r=>{if(r?.length)latest=r;}));
   if((force||!employeeNativeImportContext?.sourceRequestId)&&window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function'){
     jobs.push(ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices(rows,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''}).then(r=>{if(r?.length)latest=r;}));
@@ -2890,7 +2909,9 @@ window.onload=()=>{initFullTaxLayoutSystem();migrateCustomers();clearProductForm
   window.TaxInvoiceCMSBridge={getSharedProducts:()=>sharedProducts.slice(),isReadOnly:true,hasUnsavedChanges:()=>hasUnsavedInvoiceChanges,markPrinted:markPrintedViaParentBridge,markRequestOpened:markRequestOpenedViaParentBridge,markRequestImported:markRequestImportedViaParentBridge,requestEmployeeRequests:()=>post('REQUEST_EMPLOYEE_INVOICE_REQUESTS',{reason:'manual'}),requestRefresh:()=>post('REQUEST_REFRESH_TAX_HISTORY',{reason:'manual'}),diagnostics:()=>({bridgeReceivedCount:bridgeHistoryCount,desktopRenderedCount:bridgeRenderedCount,employeeRequestCount,lastBridgeUpdate,lastBridgeError,iframeBuild:window.DESKTOP_TAX_INVOICE_BUILD||''})};
 })();
 </script>
-<script src="../../modules/product-master/product-master.js?v=8.03"></script>
-<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.03"></script>
+<script src="./history-v2.js?v=8.05"></script>
+<script src="../../modules/product-master/product-master.js?v=8.05"></script>
+<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.05"></script>
 </body>
 </html>
+
