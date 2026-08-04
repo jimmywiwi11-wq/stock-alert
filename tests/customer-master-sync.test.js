@@ -40,5 +40,34 @@ assert.strictEqual(updated.customerCode, created.customerCode, 'editing should p
 assert.strictEqual(master.getCustomerMaster({ includeLegacy: true }).filter(row => row.taxId === '0012345678901').length, 1, 'editing must not duplicate customer');
 
 assert.ok(memory.has(master.PENDING_KEY), 'offline pending queue should be created for later sync');
+assert.strictEqual(master.FIRESTORE_COLLECTION, 'customers', 'shared Firestore Customer Master collection should be customers');
 
-console.log('customer master sync checks passed');
+const remoteWrites = [];
+global.db = {
+  collection(name){
+    return {
+      doc(id){
+        return {
+          set(payload, options){
+            remoteWrites.push({ name, id, payload, options });
+            return Promise.resolve();
+          }
+        };
+      },
+      onSnapshot(){ return () => {}; }
+    };
+  }
+};
+
+(async () => {
+  const sync = await master.syncPendingCustomers();
+  assert.strictEqual(sync.synced >= 1, true, 'pending customers should sync when Firestore is available');
+  assert.strictEqual(remoteWrites[0].name, 'customers', 'pending sync should write customers collection');
+  assert.strictEqual(remoteWrites[0].payload.taxId, '0012345678901', 'remote payload should preserve taxId as string');
+  assert.strictEqual(localStorage.getItem(master.PENDING_KEY), '[]', 'successful sync should clear pending customers');
+
+  console.log('customer master sync checks passed');
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

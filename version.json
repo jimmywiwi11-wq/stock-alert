@@ -1,6 +1,6 @@
 {
-  "version": "7.80",
-  "label": "V7.80",
+  "version": "7.81",
+  "label": "V7.81",
   "releasedAt": "2026-08-03T00:00:00Z",
-  "message": "Simplify employee invoice request customer display while preserving full customerSnapshot."
+  "message": "Sync Tax Invoice Customer Master through shared Firestore customers collection with legacy migration preview."
 }

@@ -733,6 +733,13 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
     <div id="customerImportPreview"></div>
   </div>
   <div class="card">
+    <h3>ซิงก์ลูกค้าเดิมเข้าฐานกลาง</h3>
+    <div class="notice">ตรวจลูกค้าเดิมในเครื่องนี้ก่อนนำเข้า Firestore collection customers โดยไม่ลบ localStorage หรือ IndexedDB เดิม และจะไม่ import รายการซ้ำจากรหัสลูกค้า เลขภาษี หรือชื่อที่ normalize แล้ว</div>
+    <button class="btn green" onclick="previewLegacyCustomerMigration()">ดู preview ก่อนซิงก์</button>
+    <button class="btn secondary" onclick="syncPendingCustomerMaster()">ลองซิงก์รายการที่รอส่งอีกครั้ง</button>
+    <div id="customerLegacyMigrationPreview"></div>
+  </div>
+  <div class="card">
     <label>ค้นหาลูกค้า</label><input id="customerSearch" oninput="renderCustomers()" placeholder="พิมพ์รหัส คำนำหน้า ชื่อ ที่อยู่ หรือเลขภาษี" />
     <div class="toolbar" style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button type="button" id="customerBulkModeButton" onclick="toggleCustomerBulkSelectMode()">เลือกหลายรายการ</button>
@@ -1072,6 +1079,16 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
   <div id="trainingPrintArea"></div>
 </section>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
+let db=null,auth=null,stockAlertAuthReadyPromise=null,stockAlertAuthSignInPromise=null;
+try{if(window.firebase&&!firebase.apps.length)firebase.initializeApp(firebaseConfig);auth=firebase.auth?firebase.auth():null;db=firebase.firestore();window.db=db;window.auth=auth;}catch(e){console.warn('[TaxInvoice Firebase]',e)}
+function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[TaxInvoice auth]',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[TaxInvoice auth listener]',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[TaxInvoice auth ready]',error);resolve(null);}});return stockAlertAuthReadyPromise;}
+window.stockAlertAuthReady=stockAlertAuthReady;
+</script>
 <script src="../../modules/customer-master/customer-master.js"></script>
 <script>
 const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[];
@@ -1534,6 +1551,36 @@ function confirmCustomerImport(){
   alert('นำเข้าลูกค้าแล้ว '+added.length+' รายการ');
 }
 function cancelCustomerImport(){customerImportPreviewRows=[];customerImportPreview.innerHTML=''}
+function renderLegacyCustomerMigrationPreview(preview, syncing=false, result=null){
+  if(!window.customerLegacyMigrationPreview)return;
+  let p=preview||{},conflicts=p.conflicts||[],duplicates=p.duplicates||[],creates=p.creates||[];
+  let conflictHtml=conflicts.length?`<h4>รายการขัดแย้ง</h4><table><tr><th>Legacy ID</th><th>ซ้ำกับ</th><th>สาเหตุ</th></tr>${conflicts.slice(0,80).map(x=>`<tr><td>${escapeHtml(x.legacyId||'')}</td><td>${escapeHtml(x.duplicateCustomerId||'')}</td><td>${escapeHtml((x.reasons||[]).join(', ')||x.reason||'')}</td></tr>`).join('')}</table>${conflicts.length>80?`<div class="small">แสดง 80 รายการแรกจาก ${conflicts.length} รายการ</div>`:''}`:'';
+  let duplicateHtml=duplicates.length?`<h4>รายการที่มีอยู่แล้วและจะข้าม</h4><table><tr><th>Legacy ID</th><th>ซ้ำกับ</th><th>เงื่อนไข</th></tr>${duplicates.slice(0,80).map(x=>`<tr><td>${escapeHtml(x.legacyId||'')}</td><td>${escapeHtml(x.duplicateCustomerId||'')}</td><td>${escapeHtml(x.reason||'')}</td></tr>`).join('')}</table>${duplicates.length>80?`<div class="small">แสดง 80 รายการแรกจาก ${duplicates.length} รายการ</div>`:''}`:'';
+  let createHtml=creates.length?`<h4>ตัวอย่างลูกค้าใหม่ที่จะเพิ่ม</h4><table class="customer-table"><tr><th>รหัส</th><th>ชื่อ</th><th>เลขภาษี</th><th>ที่อยู่</th></tr>${creates.slice(0,80).map(x=>`<tr><td>${escapeHtml(x.customerCode||x.code||'')}</td><td>${escapeHtml([x.prefix,x.customerName].filter(Boolean).join(' ')||x.name||'')}</td><td>${escapeHtml(x.taxId||'')}</td><td>${escapeHtml([x.address1,x.address2].filter(Boolean).join(' '))}</td></tr>`).join('')}</table>${creates.length>80?`<div class="small">แสดง 80 รายการแรกจาก ${creates.length} รายการ</div>`:''}`:'';
+  let syncText=result?`<div class="notice">ผลซิงก์: ส่งสำเร็จ ${result.syncResult?.synced||0} รายการ / ค้างส่ง ${result.syncResult?.failed||0} รายการ ${result.syncResult?.failed?'(ตรวจสิทธิ์ admin/owner หรือกฎ Firestore)':''}</div>`:'';
+  customerLegacyMigrationPreview.innerHTML=`<div class="import-preview-panel"><div class="import-preview-summary"><span class="pill">ลูกค้าต้นทาง ${p.legacyCount||0} รายการ</span><span class="pill">มีอยู่แล้ว ${p.duplicateCount||0} รายการ</span><span class="pill">ลูกค้าใหม่ที่จะเพิ่ม ${p.createCount||0} รายการ</span><span class="pill">รายการขัดแย้ง ${p.conflictCount||0} รายการ</span><span class="pill">Customer Master ปัจจุบัน ${p.masterCount||0} รายการ</span></div>${syncText}${conflictHtml}${duplicateHtml}${createHtml}<div class="btn-row">${creates.length&&!conflicts.length&&!result?`<button class="btn green" ${syncing?'disabled':''} onclick="confirmLegacyCustomerMigration()">ยืนยันซิงก์ลูกค้าใหม่ ${creates.length} รายการเข้าฐานกลาง</button>`:''}<button class="btn secondary" onclick="customerLegacyMigrationPreview.innerHTML=''">ปิด preview</button></div></div>`;
+}
+function previewLegacyCustomerMigration(){
+  if(!window.ChokAnanCustomerMaster||typeof ChokAnanCustomerMaster.previewLegacyMigration!=='function')return alert('ยังโหลด Customer Master ไม่ครบ');
+  renderLegacyCustomerMigrationPreview(ChokAnanCustomerMaster.previewLegacyMigration());
+}
+async function confirmLegacyCustomerMigration(){
+  if(!window.ChokAnanCustomerMaster||typeof ChokAnanCustomerMaster.applyLegacyMigration!=='function')return alert('ยังโหลด Customer Master ไม่ครบ');
+  let preview=ChokAnanCustomerMaster.previewLegacyMigration();
+  if(preview.conflictCount)return renderLegacyCustomerMigrationPreview(preview);
+  if(!preview.createCount)return alert('ไม่มีลูกค้าใหม่ที่ต้องซิงก์');
+  if(!confirm(`ยืนยันซิงก์ลูกค้าเดิม ${preview.createCount} รายการเข้าฐานกลาง Firestore?\nระบบจะไม่ลบข้อมูลเดิมในเครื่องนี้`))return;
+  renderLegacyCustomerMigrationPreview(preview,true);
+  try{
+    let result=await ChokAnanCustomerMaster.applyLegacyMigration({createdFrom:'tax-invoice-legacy-migration',source:'tax-invoice-legacy-migration'});
+    renderLegacyCustomerMigrationPreview(result,false,result);
+    renderCustomers();refreshInvoiceSelects();
+  }catch(e){alert('ซิงก์ลูกค้าเดิมไม่สำเร็จ: '+(e.message||e));renderLegacyCustomerMigrationPreview(preview);}
+}
+async function syncPendingCustomerMaster(){
+  if(!window.ChokAnanCustomerMaster||typeof ChokAnanCustomerMaster.syncPendingCustomers!=='function')return alert('ยังโหลด Customer Master ไม่ครบ');
+  try{let r=await ChokAnanCustomerMaster.syncPendingCustomers();alert(`ผลซิงก์รายการค้างส่ง\nสำเร็จ ${r.synced||0}\nค้างส่ง ${r.failed||0}`)}catch(e){alert('ซิงก์รายการค้างส่งไม่สำเร็จ: '+(e.message||e))}
+}
 
 function invoicePrefix(){return 'IV'}
 function normalizeDocumentNumberSettings(s){

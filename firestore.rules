@@ -242,6 +242,39 @@ service cloud.firestore {
         && data.at is string;
     }
 
+    function validCustomerData() {
+      let data = request.resource.data;
+      return data.keys().hasOnly([
+          'customerId', 'customerCode', 'code', 'prefix', 'customerName', 'name',
+          'normalizedName', 'search', 'address1', 'address2', 'address', 'taxId',
+          'tax', 'phone', 'tel', 'branch', 'headOffice', 'branchNumber', 'active',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'createdAtServer',
+          'updatedAtServer', 'source', 'createdFrom', 'legacyIds', 'firestoreDocId'
+        ])
+        && isOptionalString(data.customerId)
+        && isOptionalString(data.customerCode)
+        && isOptionalString(data.code)
+        && isOptionalString(data.prefix)
+        && isString(data.customerName)
+        && isOptionalString(data.name)
+        && isOptionalString(data.normalizedName)
+        && isOptionalString(data.search)
+        && isOptionalString(data.address1)
+        && isOptionalString(data.address2)
+        && isOptionalString(data.address)
+        && isOptionalString(data.taxId)
+        && isOptionalString(data.tax)
+        && isOptionalString(data.phone)
+        && isOptionalString(data.tel)
+        && isOptionalString(data.branch)
+        && isOptionalString(data.branchNumber)
+        && data.active is bool
+        && isOptionalDateLike(data.createdAt)
+        && isOptionalDateLike(data.updatedAt)
+        && (!('headOffice' in data) || data.headOffice is bool)
+        && (!('legacyIds' in data) || data.legacyIds is list);
+    }
+
     match /users/{uid} {
       allow read: if signedIn() && (uid == request.auth.uid || isAdmin());
       allow write: if false;
@@ -258,6 +291,12 @@ service cloud.firestore {
       allow read: if isEmployee();
       allow create: if validProductCreate(productId);
       allow update: if isAdmin() || validProductEmployeeUpdate();
+      allow delete: if false;
+    }
+
+    match /customers/{customerId} {
+      allow read: if isEmployee();
+      allow create, update: if isAdmin() && validCustomerData();
       allow delete: if false;
     }
 
