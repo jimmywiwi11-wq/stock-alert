@@ -972,9 +972,70 @@
     return normalizedStatus(row) === 'ready_to_print';
   }
 
-  function requestIsPrinted(row){
+  function thaiDateKey(value){
+    if (!value) return '';
+    let date = value;
+    if (value && typeof value.toDate === 'function') date = value.toDate();
+    if (!(date instanceof Date)) date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+  }
+
+  function currentThaiDateKey(){
+    return thaiDateKey(new Date());
+  }
+
+  function countArrayValue(row, keys){
+    return keys.reduce((max, key) => {
+      const value = row?.[key];
+      return Math.max(max, Array.isArray(value) ? value.filter(Boolean).length : 0);
+    }, 0);
+  }
+
+  function generatedInvoiceCount(row){
+    return Math.max(
+      countArrayValue(row, ['generatedInvoiceIds', 'nativeInvoiceIds', 'generatedInvoiceNumbers', 'invoiceIds', 'invoiceNumbers']),
+      Number(row?.expectedInvoiceCount || 0),
+      row?.invoiceNumber || row?.invoiceId || row?.no || row?.historyId ? 1 : 0
+    );
+  }
+
+  function printedInvoiceCount(row){
+    const explicit = Number(row?.printedInvoiceCount || row?.printedCount || row?.printCount || 0);
+    if (explicit > 0) return explicit;
+    const printedArray = countArrayValue(row, ['printedInvoiceIds', 'printedInvoiceNumbers']);
+    if (printedArray > 0) return printedArray;
     const status = normalizedStatus(row);
-    return status === 'printed' || status === 'partially_printed';
+    return row?.printed === true || status === 'printed' ? Math.max(generatedInvoiceCount(row), 1) : 0;
+  }
+
+  function printedTimestamp(row){
+    return row?.printedAt || row?.printConfirmedAt || row?.trainingPrintedAt || row?.lastPrintedAt || row?.completedAt || '';
+  }
+
+  function isFullyPrinted(row){
+    if (!row) return false;
+    const status = normalizedStatus(row);
+    if (status === 'partially_printed') return false;
+    if (status !== 'printed' && row.printed !== true) return false;
+    if (!printedTimestamp(row)) return false;
+    const generated = generatedInvoiceCount(row);
+    if (generated <= 0) return false;
+    return printedInvoiceCount(row) >= generated;
+  }
+
+  function requestIsPrinted(row){
+    return isFullyPrinted(row);
+  }
+
+  function requestVisibleInCurrentStatus(row){
+    if (!isFullyPrinted(row)) return true;
+    return thaiDateKey(printedTimestamp(row)) === currentThaiDateKey();
+  }
+
+  function requestCanPreview(row){
+    const status = normalizedStatus(row);
+    return status === 'ready_to_print' || status === 'printed' || status === 'partially_printed';
   }
 
   function statusClass(row){
@@ -1023,7 +1084,7 @@
   function renderStatus(){
     ensurePages();
     bindRealtime();
-    const rows = isTestMode() ? store.listRequests() : store.listProductionRequests();
+    const rows = (isTestMode() ? store.listRequests() : store.listProductionRequests()).filter(requestVisibleInCurrentStatus);
     document.getElementById('cmsInvoiceRequestStatusPageV42').innerHTML = [
       header('สถานะใบกำกับภาษี', isTestMode() ? 'Test Mode' : 'อัปเดตจากฐานข้อมูลกลางแบบ realtime'),
       '<div class="cmsInvoiceListV42">',
@@ -1036,7 +1097,7 @@
     const generated = Array.isArray(row.generatedInvoiceNumbers) && row.generatedInvoiceNumbers.length
       ? `<br>เลขที่ใบกำกับ: ${row.generatedInvoiceNumbers.map(esc).join(', ')}`
       : '';
-    const preview = (requestIsReady(row) || requestIsPrinted(row)) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
+    const preview = requestCanPreview(row) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
       ? `<button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(row.requestId)}')">ดูตัวอย่างใบกำกับภาษี</button>`
       : '';
     const action = canGenerateInvoice(row)
@@ -1048,11 +1109,11 @@
   function renderHistory(){
     ensurePages();
     bindRealtime();
-    const rows = readMobileHistory();
+    const rows = readMobileHistory().filter(isFullyPrinted).sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
       header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
       '<div class="cmsInvoiceListV42">',
-      rows.length ? rows.map(row => `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${row.printed ? 'printed' : 'ready'}">${row.printed ? 'สั่งพิมพ์แล้ว' : 'พร้อมพิมพ์'}</strong></span></div>`).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
+      rows.length ? rows.map(row => `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 printed">สั่งพิมพ์แล้ว</strong></span></div>`).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
       '</div>'
     ].join('');
   }
@@ -1141,7 +1202,7 @@
 
   async function openPreview(requestId){
     const row = store.listProductionRequests().find(item => item.requestId === requestId);
-    if (!requestIsReady(row) && !requestIsPrinted(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
+    if (!requestCanPreview(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
     try {
       const invoices = await fetchPreviewInvoices(row);
       const payload = window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.requestPreviewPayload === 'function'

@@ -1,4 +1,4 @@
-const assert = require('assert');
+﻿const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,11 +10,11 @@ assert.ok(desktop.includes('id="employeeInvoicePrintQueue"'));
 assert.ok(desktop.includes('function renderEmployeeInvoicePrintQueue'));
 assert.ok(desktop.includes('function employeeInvoiceRows'));
 assert.ok(desktop.includes('function printHistoryInvoice'));
-assert.ok(desktop.includes('Tax Invoice App V28'));
-assert.ok(desktop.includes('invoice-history-adapter.js?v=7.97'));
-assert.ok(index.includes('cms-tax-invoice-history-bridge.js?v=7.97'));
-assert.ok(index.includes('cms-integration.js?v=7.97'));
-assert.ok(index.includes('invoice-generator.js?v=7.97'));
+assert.ok(desktop.includes('Tax Invoice App V31'));
+assert.ok(desktop.includes('invoice-history-adapter.js?v=8.01'));
+assert.ok(index.includes('cms-tax-invoice-history-bridge.js?v=8.01'));
+assert.ok(index.includes('cms-integration.js?v=8.01'));
+assert.ok(index.includes('invoice-generator.js?v=8.01'));
 assert.ok(desktop.includes('function invoiceActionArg'));
 assert.ok(desktop.includes('JSON.stringify(invoiceRecordKey(x))'));
 assert.ok(desktop.includes('historyActionButtons(x)'));

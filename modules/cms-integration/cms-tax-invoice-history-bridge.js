@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
 
-  const BRIDGE_BUILD = 'V28-NATIVE-PRINT-CUSTOMER-FIX';
+  const BRIDGE_BUILD = 'V102-SAVE-HISTORY-PRINT-STATUS';
   const SOURCE_PARENT = 'chokanan-cms';
   const SOURCE_IFRAME = 'tax-invoice-app';
   const PRIMARY_COLLECTION = 'taxInvoices';
@@ -307,14 +307,21 @@
       const requestSnap = await requestRef.get();
       const requestData = requestSnap.exists ? (requestSnap.data() || {}) : {};
       const alreadyIds = Array.isArray(requestData.nativeInvoiceIds) ? requestData.nativeInvoiceIds.filter(Boolean) : [];
-      if (requestData.importedToNativeHistory === true && alreadyIds.length) {
-        return { ok: true, requestId, nativeInvoiceIds: alreadyIds, duplicate: true };
-      }
 
       const nativeInvoiceIds = [];
       const generatedInvoiceNumbers = [];
       for (const invoice of invoices) {
         const payload = invoiceDocPayload(invoice, requestId, requestNumber || requestData.requestNumber || '', now, actorName, user);
+        const existingSnap = await root.db.collection(PRIMARY_COLLECTION).doc(payload.invoiceId).get().catch(() => null);
+        const existing = existingSnap && existingSnap.exists ? (existingSnap.data() || {}) : {};
+        if (existing.printed === true || existing.printStatus === 'printed') {
+          payload.printed = true;
+          payload.status = 'printed';
+          payload.printStatus = 'printed';
+          payload.printedAt = existing.printedAt || payload.printedAt || null;
+          payload.printedBy = existing.printedBy || payload.printedBy || '';
+          payload.printedByUid = existing.printedByUid || payload.printedByUid || '';
+        }
         nativeInvoiceIds.push(payload.invoiceId);
         generatedInvoiceNumbers.push(payload.invoiceNumber);
         await root.db.collection(PRIMARY_COLLECTION).doc(payload.invoiceId).set(payload, { merge: true });
@@ -337,7 +344,7 @@
 
       await refresh();
       await refreshRequests();
-      return { ok: true, requestId, nativeInvoiceIds, generatedInvoiceIds: nativeInvoiceIds, generatedInvoiceNumbers };
+      return { ok: true, requestId, nativeInvoiceIds, generatedInvoiceIds: nativeInvoiceIds, generatedInvoiceNumbers, duplicate: alreadyIds.length > 0 };
     } catch (error) {
       setError(error, 'markRequestImportedNative');
       return { ok: false, requestId, error: error && (error.code || error.message) || String(error) };
@@ -392,14 +399,18 @@
         const requestSnap = await requestRef.get();
         if (requestSnap.exists) {
           const request = requestSnap.data() || {};
-          const ids = Array.isArray(request.generatedInvoiceIds) ? request.generatedInvoiceIds : [];
+          const ids = (Array.isArray(request.generatedInvoiceIds) && request.generatedInvoiceIds.length ? request.generatedInvoiceIds : request.nativeInvoiceIds) || [];
           const snaps = await Promise.all(ids.map(id => root.db.collection(PRIMARY_COLLECTION).doc(id).get()));
           const printedCount = snaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).length;
           const allPrinted = ids.length > 0 ? printedCount >= ids.length : true;
+          const printedIds = snaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).map(snap => snap.id);
+          const printedNumbers = snaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).map(snap => (snap.data() || {}).invoiceNumber || (snap.data() || {}).no || snap.id).filter(Boolean);
           await requestRef.set({
             status: allPrinted ? 'printed' : 'partially_printed',
             printStatus: allPrinted ? 'printed' : 'partially_printed',
             printedInvoiceCount: printedCount,
+            printedInvoiceIds: printedIds,
+            printedInvoiceNumbers: printedNumbers,
             printedAt: allPrinted ? now : (request.printedAt || null),
             printedBy: allPrinted ? actorName : (request.printedBy || ''),
             printedByUid: allPrinted ? (user && user.uid || '') : (request.printedByUid || ''),

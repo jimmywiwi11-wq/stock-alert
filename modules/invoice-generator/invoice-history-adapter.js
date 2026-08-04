@@ -11,7 +11,7 @@
     LEGACY_INVOICE_COLLECTION,
     LEGACY_HISTORY_COLLECTION
   ]);
-  const DESKTOP_HISTORY_BUILD = 'V28-NATIVE-PRINT-CUSTOMER-FIX';
+  const DESKTOP_HISTORY_BUILD = 'V32-SAVE-HISTORY-PRINT-STATUS';
   const FULL_TAX_TYPE = '\u0e43\u0e1a\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e20\u0e32\u0e29\u0e35\u0e40\u0e15\u0e47\u0e21';
 
   let unifiedHistoryCache = [];
@@ -391,17 +391,23 @@
       const requestSnap = await requestRef.get();
       if (requestSnap.exists) {
         const data = requestSnap.data() || {};
-        const ids = Array.isArray(data.generatedInvoiceIds) ? data.generatedInvoiceIds : [];
+        const ids = (Array.isArray(data.generatedInvoiceIds) && data.generatedInvoiceIds.length ? data.generatedInvoiceIds : data.nativeInvoiceIds) || [];
         let printedCount = Math.max(Number(data.printedInvoiceCount || 0), invoiceId ? 1 : 0);
         if (ids.length) {
           const invoiceSnaps = await Promise.all(ids.map(id => root.db.collection(PRIMARY_INVOICE_COLLECTION).doc(id).get()));
           printedCount = invoiceSnaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).length;
+          const printedIds = invoiceSnaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).map(snap => snap.id);
+          const printedNumbers = invoiceSnaps.filter(snap => snap.exists && (snap.data() || {}).printed === true).map(snap => (snap.data() || {}).invoiceNumber || (snap.data() || {}).no || snap.id).filter(Boolean);
+          data.printedInvoiceIds = printedIds;
+          data.printedInvoiceNumbers = printedNumbers;
         }
         const allPrinted = ids.length > 0 ? printedCount >= ids.length : true;
         await requestRef.set({
           status: allPrinted ? 'printed' : 'partially_printed',
           printStatus: allPrinted ? 'printed' : 'partially_printed',
           printedInvoiceCount: printedCount,
+          printedInvoiceIds: data.printedInvoiceIds || [],
+          printedInvoiceNumbers: data.printedInvoiceNumbers || [],
           printedAt: allPrinted ? now : (data.printedAt || null),
           printedBy: allPrinted ? (actor.by || 'tax-invoice-desktop') : (data.printedBy || ''),
           printedByUid: allPrinted ? (actor.uid || '') : (data.printedByUid || ''),

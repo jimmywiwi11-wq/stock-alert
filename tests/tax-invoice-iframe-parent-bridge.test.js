@@ -6,9 +6,9 @@ const desktop = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'tax-invoi
 const adapter = fs.readFileSync(path.join(__dirname, '..', 'modules', 'invoice-generator', 'invoice-history-adapter.js'), 'utf8');
 const parent = fs.readFileSync(path.join(__dirname, '..', 'modules', 'cms-integration', 'cms-integration.js'), 'utf8');
 
-assert.ok(parent.includes('V28-NATIVE-PRINT-CUSTOMER-FIX'));
+assert.ok(parent.includes('V101-LAYOUT-DELETE-ALL'));
 assert.ok(parent.includes('ChokAnanCMSTaxInvoiceHistoryBridge.init'));
-assert.ok(desktop.includes('V28-NATIVE-PRINT-CUSTOMER-FIX'));
+assert.ok(desktop.includes('V31-LAYOUT-DELETE-ALL'));
 assert.ok(desktop.includes('TAX_HISTORY_BRIDGE_READY'));
 assert.ok(desktop.includes('REQUEST_TAX_INVOICE_HISTORY'));
 assert.ok(desktop.includes('TAX_INVOICE_HISTORY_RESPONSE'));

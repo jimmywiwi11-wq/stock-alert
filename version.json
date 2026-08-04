@@ -1,6 +1,10 @@
 {
-  "version": "7.97",
-  "label": "V7.97",
+  "version": "8.03",
+  "label": "V8.03",
+  "build": "20260804-UPDATE-MODAL-FIX",
+  "marker": "V8.03-UPDATE-LOOP-FIX",
   "releasedAt": "2026-08-04T00:00:00Z",
-  "message": "Employee invoice requests now open in the native Tax Invoice editor before save, preview, and print."
+  "message": "Fix update modal loop when current and latest versions are equal; add guarded Service Worker update flow.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-08-04T00:00:00+07:00"
 }
