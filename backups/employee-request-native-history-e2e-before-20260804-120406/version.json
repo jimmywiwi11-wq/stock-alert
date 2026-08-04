@@ -1,0 +1,6 @@
+{
+  "version": "7.93",
+  "label": "V7.93",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "CMS parent bridges taxInvoices history into the Tax Invoice iframe."
+}

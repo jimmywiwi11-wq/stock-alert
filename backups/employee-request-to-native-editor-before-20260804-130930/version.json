@@ -1,0 +1,6 @@
+{
+  "version": "7.96",
+  "label": "V7.96",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Employee invoice requests stay in the desktop request queue until review and print, then move into native Tax Invoice history."
+}
