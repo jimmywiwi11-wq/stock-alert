@@ -8,8 +8,6 @@ const assert = require('assert');
     removeItem(key){ memory.delete(key); }
   };
 
-  require('../modules/invoice-generator/invoice-number-format.js');
-  require('../modules/invoice-generator/invoice-number-service.js');
   require('../modules/invoice-generator/invoice-print-service.js');
   const adapter = require('../modules/invoice-generator/invoice-history-adapter.js');
 
@@ -68,55 +66,6 @@ const assert = require('assert');
   const requestWrite = writes.find(row => row.collectionName === 'invoiceRequests' && row.id === 'req-1');
   assert.strictEqual(requestWrite.payload.status, 'พิมพ์แล้ว');
   assert.strictEqual(requestWrite.payload.printedInvoiceCount, 1);
-
-  docs.set('invoiceNumberCounters/IV', { lastSequence: 115 });
-  global.db.runTransaction = async callback => callback({
-    async get(ref){
-      const key = `${ref.collectionName}/${ref.id}`;
-      return { exists: docs.has(key), data: () => docs.get(key) };
-    },
-    set(ref, payload, options){
-      const key = `${ref.collectionName}/${ref.id}`;
-      writes.push({ collectionName: ref.collectionName, id: ref.id, payload, options });
-      docs.set(key, { ...(docs.get(key) || {}), ...payload });
-    }
-  });
-  global.db.collection = function(collectionName){
-    return {
-      doc(id){
-        return {
-          collectionName,
-          id,
-          async get(){
-            const key = `${collectionName}/${id}`;
-            return { exists: docs.has(key), data: () => docs.get(key) };
-          },
-          async set(payload, options){
-            writes.push({ collectionName, id, payload, options });
-            docs.set(`${collectionName}/${id}`, { ...(docs.get(`${collectionName}/${id}`) || {}), ...payload });
-          }
-        };
-      }
-    };
-  };
-  const manualRows = await adapter.syncDesktopManualInvoices([{
-    id: 'local-1',
-    no: 'LOCAL-OLD',
-    buyerName: 'Manual Buyer',
-    buyerTax: '1111111111111',
-    items: [{ code: 'M1', name: 'Manual Product', qty: 1, unit: 'pc', price: 50 }],
-    beforeVat: 50,
-    vat: 3.5,
-    total: 53.5,
-    date: '2026-08-04',
-    type: 'ใบกำกับภาษีเต็ม',
-    vatMode: 'excluded',
-    paperSize: '9x11'
-  }], { by: 'desktop', uid: 'admin-1' });
-  assert.strictEqual(manualRows[0].no, 'IV000116');
-  assert.strictEqual(docs.get('invoiceNumberCounters/IV').lastSequence, 116);
-  assert.ok(writes.some(row => row.collectionName === 'taxInvoices' && row.payload.source === 'desktop-manual'));
-  assert.ok(writes.some(row => row.collectionName === 'taxInvoiceHistory' && row.payload.invoiceNumber === 'IV000116'));
 
   console.log('invoice history adapter checks passed');
 })().catch(error => {

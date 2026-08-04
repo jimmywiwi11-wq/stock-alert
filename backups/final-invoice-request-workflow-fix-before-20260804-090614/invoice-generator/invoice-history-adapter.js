@@ -84,10 +84,6 @@
     return !!(root.db && typeof root.db.collection === 'function');
   }
 
-  function firestoreTransactionReady(){
-    return firestoreReady() && typeof root.db.runTransaction === 'function';
-  }
-
   let historyUnsubscribe = null;
 
   function bindFirestoreHistory(options={}){
@@ -139,104 +135,6 @@
     return { ok: true, invoiceId, requestId };
   }
 
-  function desktopInvoiceToCentral(invoice, options={}){
-    const row = invoice || {};
-    const now = options.now || new Date().toISOString();
-    const invoiceId = row.invoiceId || options.invoiceId || `desktop-${row.id || Date.now()}`;
-    const invoiceNumber = options.invoiceNumber || row.invoiceNumber || row.no || '';
-    const customerSnapshot = row.customerSnapshot || {
-      customerId: row.customerId || '',
-      customerName: row.buyerName || '',
-      taxId: row.buyerTax || '',
-      address1: row.buyerAddress || ''
-    };
-    const itemsSnapshot = Array.isArray(row.itemsSnapshot) ? row.itemsSnapshot : (Array.isArray(row.items) ? row.items.map(item => ({
-      productCode: item.productCode || item.code || '',
-      productName: item.productName || item.name || '',
-      quantity: item.quantity || item.qty || '',
-      unit: item.unit || '',
-      salePrice: item.salePrice ?? item.price ?? '',
-      costPrice: item.costPrice ?? item.cost ?? '',
-      lineSubtotal: Number(item.lineSubtotal ?? ((Number(item.price || item.salePrice || 0) || 0) * (Number(item.qty || item.quantity || 0) || 0)))
-    })) : []);
-    return {
-      ...row,
-      id: row.id || invoiceId,
-      invoiceId,
-      historyId: invoiceId,
-      invoiceNumber,
-      no: invoiceNumber,
-      source: row.source || (row.sourceRequestId || row.requestId ? 'employee-request' : 'desktop-manual'),
-      sourceRequestId: row.sourceRequestId || row.requestId || '',
-      sourceRequestNumber: row.sourceRequestNumber || row.requestNumber || '',
-      customerSnapshot,
-      itemsSnapshot,
-      items: itemsSnapshot,
-      invoiceDate: row.invoiceDate || row.date || now.slice(0, 10),
-      date: row.date || now.slice(0, 10),
-      time: row.time || now.slice(11, 16),
-      subtotal: row.subtotal ?? row.beforeVat ?? 0,
-      beforeVat: row.beforeVat ?? row.subtotal ?? 0,
-      vatAmount: row.vatAmount ?? row.vat ?? 0,
-      vat: row.vat ?? row.vatAmount ?? 0,
-      grandTotal: row.grandTotal ?? row.total ?? 0,
-      total: row.total ?? row.grandTotal ?? 0,
-      status: row.status || (row.printed ? 'พิมพ์แล้ว' : 'พร้อมพิมพ์'),
-      printStatus: row.printStatus || (row.printed ? 'printed' : 'unprinted'),
-      printed: row.printed === true,
-      printedAt: row.printedAt || null,
-      printedBy: row.printedBy || '',
-      paperSize: row.paperSize || '9x11',
-      invoiceType: row.invoiceType || row.type || 'ใบกำกับภาษีเต็ม',
-      type: row.type || row.invoiceType || 'ใบกำกับภาษีเต็ม',
-      vatMode: row.vatMode || 'excluded',
-      createdAt: row.createdAt || now,
-      createdBy: row.createdBy || options.by || 'tax-invoice-desktop',
-      createdByUid: row.createdByUid || options.uid || '',
-      updatedAt: now,
-      updatedBy: options.by || row.updatedBy || 'tax-invoice-desktop',
-      updatedByUid: options.uid || row.updatedByUid || ''
-    };
-  }
-
-  async function syncDesktopManualInvoices(invoices, actor={}){
-    const rows = Array.isArray(invoices) ? invoices : [];
-    if (!rows.length) return [];
-    if (!firestoreTransactionReady()) return rows.map(row => ({ ...row, centralSyncStatus: 'skipped-firestore-not-ready' }));
-    const now = new Date().toISOString();
-    const db = root.db;
-    const counterRef = db.collection('invoiceNumberCounters').doc('IV');
-    const result = await db.runTransaction(async transaction => {
-      const missing = rows.filter(row => !(row.invoiceId || '').trim());
-      let reserved = [];
-      if (missing.length) {
-        const counterSnap = await transaction.get(counterRef);
-        const last = counterSnap.exists ? Number((counterSnap.data() || {}).lastSequence || 0) : 0;
-        if (!root.ChokAnanInvoiceNumberService || typeof root.ChokAnanInvoiceNumberService.reserveRange !== 'function') throw new Error('invoice-number-service-not-loaded');
-        const range = root.ChokAnanInvoiceNumberService.reserveRange(last, missing.length);
-        reserved = range.invoiceNumbers;
-        transaction.set(counterRef, {
-          prefix: 'IV',
-          lastSequence: range.endSequence,
-          updatedAt: now
-        }, { merge: true });
-      }
-      let reserveIndex = 0;
-      const synced = rows.map(row => {
-        const needsNumber = !(row.invoiceId || '').trim();
-        const invoiceId = row.invoiceId || `desktop-${now.replace(/\D/g, '')}-${reserveIndex + 1}`;
-        const invoiceNumber = needsNumber ? reserved[reserveIndex++] : (row.no || row.invoiceNumber || '');
-        const central = desktopInvoiceToCentral(row, { ...actor, invoiceId, invoiceNumber, now });
-        transaction.set(db.collection('taxInvoices').doc(invoiceId), central, { merge: true });
-        transaction.set(db.collection('taxInvoiceHistory').doc(invoiceId), central, { merge: true });
-        return historyToDesktopInvoice(central);
-      });
-      return synced;
-    });
-    mergeLocalInvoices(result);
-    return result;
-  }
-
   function manualHistorySummary(){
     const rows = readLocalInvoices();
     let latestSequence = 0;
@@ -247,7 +145,7 @@
     return { source: 'localStorage:invoices', count: rows.length, latestSequence };
   }
 
-  const api = { HISTORY_COLLECTIONS, readLocalInvoices, writeLocalInvoices, mergeLocalInvoices, historyToDesktopInvoice, desktopInvoiceToCentral, bindFirestoreHistory, markPrinted, syncDesktopManualInvoices, manualHistorySummary };
+  const api = { HISTORY_COLLECTIONS, readLocalInvoices, writeLocalInvoices, mergeLocalInvoices, historyToDesktopInvoice, bindFirestoreHistory, markPrinted, manualHistorySummary };
   root.ChokAnanInvoiceHistoryAdapter = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

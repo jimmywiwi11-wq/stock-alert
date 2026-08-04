@@ -1,0 +1,6 @@
+{
+  "version": "7.82",
+  "label": "V7.82",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Improve mobile Tax Invoice UI, shared customer/product search, realtime status, and read-only invoice preview."
+}
