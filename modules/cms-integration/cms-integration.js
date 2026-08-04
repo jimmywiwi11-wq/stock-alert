@@ -1,4 +1,4 @@
-﻿(function(){
+(function(){
   'use strict';
 
   const CMS_ORIGIN = window.location.origin === 'null' ? '*' : window.location.origin;
@@ -14,7 +14,24 @@
     'REQUEST_CLOSE',
     'UNSAVED_CHANGES',
     'OPEN_TAX_INVOICE',
-    'RETURN_TO_STOCK_ALERT'
+    'RETURN_TO_STOCK_ALERT',
+    'TAX_HISTORY_BRIDGE_READY',
+    'REQUEST_TAX_INVOICE_HISTORY',
+    'TAX_INVOICE_HISTORY_RESPONSE',
+    'TAX_INVOICE_HISTORY_UPDATE',
+    'REQUEST_TAX_INVOICE_DETAIL',
+    'TAX_INVOICE_DETAIL_RESPONSE',
+    'REQUEST_MARK_INVOICE_PRINTED',
+    'MARK_INVOICE_PRINTED_RESULT',
+    'REQUEST_REFRESH_TAX_HISTORY',
+    'TAX_HISTORY_BRIDGE_ERROR',
+    'REQUEST_EMPLOYEE_INVOICE_REQUESTS',
+    'EMPLOYEE_INVOICE_REQUESTS_RESPONSE',
+    'EMPLOYEE_INVOICE_REQUESTS_UPDATE',
+    'REQUEST_MARK_REQUEST_OPENED',
+    'MARK_REQUEST_OPENED_RESULT',
+    'REQUEST_MARK_REQUEST_IMPORTED_NATIVE',
+    'MARK_REQUEST_IMPORTED_NATIVE_RESULT'
   ]);
 
   let modulePage;
@@ -165,6 +182,7 @@
       '<button type="button" class="cmsBackButtonV3" id="cmsBackToStockAlertV3">กลับสู่ระบบสินค้าขาด</button>',
       '<div><h1>ChokAnan Management System (CMS)</h1><small>ใบกำกับภาษี - โหมดทดสอบข้อมูลสินค้าแบบอ่านอย่างเดียว</small></div>',
       '<span class="cmsTestBadgeV3" id="cmsBridgeStatusV3">กำลังเชื่อมต่อ</span>',
+      '<small class="cmsTestBadgeV3" id="cmsParentTaxBridgeMarkerV27">V28-NATIVE-PRINT-CUSTOMER-FIX</small>',
       '</div>',
       '<div class="cmsModuleBodyV3">',
       '<div class="cmsModuleStateV3" id="cmsModuleStateV3"><div><b>กำลังโหลดใบกำกับภาษี</b><br><small>ระบบจะแยกหน้าจอและ CSS ผ่าน iframe</small></div></div>',
@@ -174,10 +192,14 @@
     document.body.appendChild(modulePage);
     frame = document.getElementById('cmsTaxInvoiceFrameV3');
     stateBox = document.getElementById('cmsModuleStateV3');
+    if (window.ChokAnanCMSTaxInvoiceHistoryBridge && typeof window.ChokAnanCMSTaxInvoiceHistoryBridge.init === 'function') {
+      window.ChokAnanCMSTaxInvoiceHistoryBridge.init({ getFrame: () => frame, origin: CMS_ORIGIN });
+    }
     document.getElementById('cmsBackToStockAlertV3').addEventListener('click', requestClose);
     frame.addEventListener('load', () => {
       markFrameReady();
       if (!bridgeReady) postToFrame('CMS_READY', productsPayload());
+      window.ChokAnanCMSTaxInvoiceHistoryBridge?.refresh?.();
     });
   }
 
@@ -244,6 +266,7 @@
     if (data.type === 'TAX_INVOICE_READY') {
       markFrameReady();
       postToFrame('PRODUCTS_RESPONSE', productsPayload());
+      window.ChokAnanCMSTaxInvoiceHistoryBridge?.refresh?.();
     }
     if (data.type === 'GET_PRODUCTS') postToFrame('PRODUCTS_RESPONSE', productsPayload());
     if (data.type === 'UNSAVED_CHANGES') {

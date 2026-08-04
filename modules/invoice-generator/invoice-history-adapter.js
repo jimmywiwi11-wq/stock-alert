@@ -11,10 +11,12 @@
     LEGACY_INVOICE_COLLECTION,
     LEGACY_HISTORY_COLLECTION
   ]);
-  const DESKTOP_HISTORY_BUILD = 'V24-TAXINVOICES-SINGLE-SOURCE';
+  const DESKTOP_HISTORY_BUILD = 'V28-NATIVE-PRINT-CUSTOMER-FIX';
   const FULL_TAX_TYPE = '\u0e43\u0e1a\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e20\u0e32\u0e29\u0e35\u0e40\u0e15\u0e47\u0e21';
 
   let unifiedHistoryCache = [];
+  let bridgeHistoryCache = [];
+  let bridgeHistoryMeta = { connected: false, count: 0, receivedAt: null, lastError: '' };
   let unifiedHistoryMeta = { counts: {}, duplicates: 0, duplicateRows: [], filtered: [], updatedAt: null };
   let historyUnsubscribes = [];
   let historyRetryTimer = null;
@@ -156,6 +158,7 @@
   }
 
   function recordPriority(row){
+    if (row.sourceCollection === 'parentBridge:taxInvoices') return 5;
     if (row.sourceCollection === PRIMARY_INVOICE_COLLECTION) return 4;
     if (row.sourceCollection === HISTORY_INDEX_COLLECTION) return 3;
     if (row.sourceCollection === LEGACY_INVOICE_COLLECTION) return 2;
@@ -208,13 +211,39 @@
 
   function getUnifiedHistoryRows(options={}){
     const localRows = options.includeLocal === false ? [] : readLocalInvoices().map(row => ({ ...row, sourceCollection: row.sourceCollection || 'localStorage:invoices' }));
-    if (!unifiedHistoryCache.length) return mergeInvoiceHistorySources({ 'localStorage:invoices': localRows }).rows;
-    if (!localRows.length) return unifiedHistoryCache.slice();
-    return mergeInvoiceHistorySources({ unifiedCache: unifiedHistoryCache, 'localStorage:invoices': localRows }).rows;
+    if (!unifiedHistoryCache.length && !bridgeHistoryCache.length) return mergeInvoiceHistorySources({ 'localStorage:invoices': localRows }).rows;
+    return mergeInvoiceHistorySources({
+      unifiedCache: unifiedHistoryCache,
+      'parentBridge:taxInvoices': bridgeHistoryCache,
+      'localStorage:invoices': localRows
+    }).rows;
   }
 
   function getUnifiedHistoryMeta(){
-    return { ...unifiedHistoryMeta };
+    return { ...unifiedHistoryMeta, bridge: { ...bridgeHistoryMeta } };
+  }
+
+  function receiveBridgeHistory(payload={}){
+    const rows = Array.isArray(payload.invoices) ? payload.invoices : (Array.isArray(payload.rows) ? payload.rows : []);
+    bridgeHistoryCache = rows.map(row => normalizeInvoiceRecord({ ...row, sourceCollection: 'parentBridge:taxInvoices' }, 'parentBridge:taxInvoices'));
+    bridgeHistoryMeta = {
+      connected: true,
+      count: bridgeHistoryCache.length,
+      receivedAt: payload.receivedAt || payload.updatedAt || new Date().toISOString(),
+      lastError: ''
+    };
+    const merged = mergeInvoiceHistorySources({
+      unifiedCache: unifiedHistoryCache,
+      'parentBridge:taxInvoices': bridgeHistoryCache,
+      'localStorage:invoices': readLocalInvoices().map(row => ({ ...row, sourceCollection: 'localStorage:invoices' }))
+    });
+    mergeLocalInvoices(merged.rows);
+    return { ok: true, count: bridgeHistoryCache.length, rendered: merged.rows.length, rows: merged.rows };
+  }
+
+  function setBridgeError(error){
+    bridgeHistoryMeta = { ...bridgeHistoryMeta, connected: false, lastError: error && (error.code || error.message) || String(error || 'bridge-error') };
+    return { ...bridgeHistoryMeta };
   }
 
   function snapshotRows(snapshot, collectionName='unknown'){
@@ -501,6 +530,8 @@
     mergeLocalInvoices,
     normalizeInvoiceRecord,
     normalizeTaxInvoiceForDesktop,
+    receiveBridgeHistory,
+    setBridgeError,
     historyToDesktopInvoice,
     mergeInvoiceHistorySources,
     mergeLegacyAndFirestoreInvoices,
