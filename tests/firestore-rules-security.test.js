@@ -111,6 +111,37 @@ function productPayload(uid, id = 'pm_5_1_security_1', code = 'PM01001'){
   };
 }
 
+function customerPayload(){
+  return {
+    customerId: 'customer-security-1',
+    customerCode: 'CU90001',
+    code: 'CU90001',
+    prefix: 'Company',
+    customerName: 'Security Customer Co Ltd',
+    name: 'Security Customer Co Ltd',
+    normalizedName: 'company security customer co ltd',
+    search: 'cu90001 company security customer co ltd 0100000000001',
+    address1: '1 Main Road',
+    address2: 'Bangkok',
+    address: '1 Main Road Bangkok',
+    taxId: '0100000000001',
+    tax: '0100000000001',
+    phone: '0811111111',
+    tel: '0811111111',
+    branch: '',
+    headOffice: false,
+    branchNumber: '',
+    active: true,
+    createdAt: 1785763600000,
+    createdBy: 'admin-owner',
+    updatedAt: 1785763600000,
+    updatedBy: 'admin-owner',
+    source: 'tax-invoice-desktop',
+    createdFrom: 'tax-invoice-desktop',
+    legacyIds: ['CU90001']
+  };
+}
+
 function draftPayload(uid, branch = 'สาขา 1'){
   return {
     draftId: 'draft-security-1',
@@ -274,6 +305,14 @@ function auditPayload(uid){
     lastSequence: 1002,
     updatedAt: 1785763600002
   }));
+
+  await assertSucceeds(setDoc(doc(owner, 'customers', 'code_cu90001'), customerPayload()));
+  await assertSucceeds(getDoc(doc(branch1, 'customers', 'code_cu90001')));
+  await assertSucceeds(getDoc(doc(branch2, 'customers', 'code_cu90001')));
+  await assertFails(setDoc(doc(branch1, 'customers', 'code_cu90002'), { ...customerPayload(), customerCode: 'CU90002', code: 'CU90002' }));
+  await assertFails(updateDoc(doc(branch1, 'customers', 'code_cu90001'), { phone: '0822222222' }));
+  await assertSucceeds(updateDoc(doc(owner, 'customers', 'code_cu90001'), { phone: '0822222222', updatedAt: 1785763600003 }));
+  await assertFails(deleteDoc(doc(owner, 'customers', 'code_cu90001')));
 
   await assertSucceeds(setDoc(doc(branch1, 'invoiceRequestDrafts', 'own-draft'), draftPayload('employee-branch-1')));
   await assertSucceeds(getDoc(doc(branch1, 'invoiceRequestDrafts', 'own-draft')));

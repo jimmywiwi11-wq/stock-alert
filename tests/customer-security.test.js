@@ -14,5 +14,8 @@ assert.ok(desktopSource.includes("upsertCustomerMaster(item,{createdFrom:'tax-in
 assert.ok(masterSource.includes('findDuplicateCustomer'), 'Customer Master should provide duplicate prevention');
 assert.ok(masterSource.includes('taxText'), 'Customer Master should keep taxId as digit string');
 assert.ok(masterSource.includes('PENDING_KEY'), 'offline writes should be queued for later sync');
+assert.ok(masterSource.includes("FIRESTORE_COLLECTION = 'customers'"), 'Customer Master should use shared Firestore customers collection');
+assert.ok(masterSource.includes('bindFirestoreCustomerMaster'), 'Customer Master should listen to shared Firestore customers collection');
+assert.ok(masterSource.includes('applyLegacyMigration'), 'Customer Master should provide preview-confirmed legacy migration');
 
 console.log('customer security contract checks passed');

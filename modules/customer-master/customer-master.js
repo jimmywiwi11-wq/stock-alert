@@ -4,7 +4,11 @@
   const MASTER_KEY = 'chokananCustomerMasterV1';
   const LEGACY_KEY = 'customers';
   const PENDING_KEY = 'chokananCustomerMasterPendingV1';
+  const FIRESTORE_COLLECTION = 'customers';
   const CHANNEL = 'chokanan-customer-master';
+  let remoteBound = false;
+  let remoteAuthWaiting = false;
+  let remoteUnsubscribe = null;
 
   function text(value){
     return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
@@ -20,6 +24,18 @@
 
   function taxText(value){
     return String(value == null ? '' : value).replace(/[^\d]/g, '');
+  }
+
+  function compact(value){
+    return normalizedName(value).replace(/\s+/g, '');
+  }
+
+  function simpleHash(value){
+    let hash = 0;
+    String(value || '').split('').forEach(char => {
+      hash = ((hash << 5) - hash + char.charCodeAt(0)) | 0;
+    });
+    return Math.abs(hash).toString(36);
   }
 
   function readJson(key, fallback){
@@ -108,6 +124,100 @@
     if (name && c.phone) return `name-phone:${name}|${c.phone}`;
     if (c.legacyIds[0]) return `legacy:${c.legacyIds[0]}`;
     return `id:${c.customerId}`;
+  }
+
+  function customerDocId(customer){
+    const c = normalizeCustomer(customer);
+    if (c.customerCode) return `code_${compact(c.customerCode).slice(0, 80)}`;
+    if (c.taxId) return `tax_${c.taxId}`;
+    return `customer_${simpleHash(`${c.normalizedName}|${normalizedAddress(c)}|${c.phone}`)}`;
+  }
+
+  function remoteReady(){
+    return !!(root.db && typeof root.db.collection === 'function');
+  }
+
+  function serverTimestamp(){
+    try {
+      return root.firebase && root.firebase.firestore && root.firebase.firestore.FieldValue.serverTimestamp();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function authReady(){
+    try {
+      if (typeof root.stockAlertAuthReady === 'function') return root.stockAlertAuthReady();
+      if (!root.auth) return Promise.resolve(null);
+      if (root.auth.currentUser) return Promise.resolve(root.auth.currentUser);
+      return new Promise(resolve => {
+        let done = false;
+        let unsub = () => {};
+        const finish = user => {
+          if (done) return;
+          done = true;
+          try { unsub(); } catch (_) {}
+          resolve(user || null);
+        };
+        try {
+          unsub = root.auth.onAuthStateChanged(user => {
+            if (user) finish(user);
+            else if (root.auth.signInAnonymously) root.auth.signInAnonymously().then(cred => finish(cred.user)).catch(() => finish(null));
+            else finish(null);
+          }, () => finish(null));
+        } catch (_) {
+          finish(null);
+        }
+        setTimeout(() => finish(root.auth && root.auth.currentUser), 4500);
+      });
+    } catch (_) {
+      return Promise.resolve(null);
+    }
+  }
+
+  function remotePayload(customer, options={}){
+    const c = normalizeCustomer(customer, options);
+    const now = Date.now();
+    const serverNow = serverTimestamp();
+    const payload = {
+      customerId: c.customerId,
+      customerCode: c.customerCode,
+      code: c.customerCode,
+      prefix: c.prefix,
+      customerName: c.customerName,
+      name: c.customerName,
+      normalizedName: c.normalizedName,
+      search: compact([c.customerCode, c.prefix, c.customerName, c.taxId, c.phone, c.address1, c.address2].join(' ')),
+      address1: c.address1,
+      address2: c.address2,
+      address: c.address,
+      taxId: c.taxId,
+      tax: c.taxId,
+      phone: c.phone,
+      tel: c.phone,
+      branch: c.branch,
+      headOffice: c.headOffice,
+      branchNumber: c.branchNumber,
+      active: c.active !== false,
+      createdAt: c.createdAt || now,
+      createdBy: c.createdBy || text(options.by),
+      updatedAt: now,
+      updatedBy: text(options.by || c.updatedBy),
+      source: c.source || options.source || 'customer-master',
+      createdFrom: c.createdFrom || options.createdFrom || c.source || 'customer-master',
+      legacyIds: Array.isArray(c.legacyIds) ? c.legacyIds : []
+    };
+    if (serverNow) payload.updatedAtServer = serverNow;
+    return payload;
+  }
+
+  async function writeRemoteCustomer(customer, options={}){
+    if (!remoteReady() || !customer) return { skipped: true, reason: 'firebase-not-ready' };
+    await authReady();
+    const payload = remotePayload(customer, options);
+    const id = customerDocId(payload);
+    await root.db.collection(FIRESTORE_COLLECTION).doc(id).set(payload, { merge: true });
+    return { ok: true, collection: FIRESTORE_COLLECTION, docId: id, customerId: payload.customerId, customerCode: payload.customerCode };
   }
 
   function mergeCustomers(rows){
@@ -200,6 +310,7 @@
     rows.push(item);
     setCustomerMaster(rows);
     queuePending(item, options);
+    syncPendingCustomers();
     notify({ type: existing ? 'CUSTOMER_UPDATED' : 'CUSTOMER_CREATED', customer: item });
     return item;
   }
@@ -217,11 +328,30 @@
     return Array.from(map.values());
   }
 
+  async function syncPendingCustomers(){
+    if (!remoteReady()) return { skipped: true, reason: 'firebase-not-ready' };
+    const pending = mergePending(readJson(PENDING_KEY, []));
+    if (!pending.length) return { ok: true, attempted: 0, synced: 0, failed: 0 };
+    const remaining = [];
+    let synced = 0;
+    for (const row of pending) {
+      try {
+        await writeRemoteCustomer(row.customer, { source: row.source, createdFrom: row.source });
+        synced += 1;
+      } catch (error) {
+        remaining.push({ ...row, lastError: error && (error.code || error.message) || String(error), lastTriedAt: Date.now() });
+      }
+    }
+    writeJson(PENDING_KEY, remaining);
+    return { ok: remaining.length === 0, attempted: pending.length, synced, failed: remaining.length };
+  }
+
   function previewLegacyMigration(){
     const legacy = getLegacyTaxInvoiceCustomers();
     const master = getCustomerMaster({ includeLegacy: false });
     const creates = [];
     const duplicates = [];
+    const conflicts = [];
     const duplicateInPreview = (customer, rows) => {
       const c = normalizeCustomer(customer);
       return rows.map(normalizeCustomer).find(row => {
@@ -232,9 +362,25 @@
         return c.legacyIds.some(id => row.legacyIds.includes(id));
       }) || null;
     };
+    function conflictReason(customer, duplicate){
+      const c = normalizeCustomer(customer);
+      const d = normalizeCustomer(duplicate);
+      const cNameOnly = normalizedName(c.customerName);
+      const dNameOnly = normalizedName(d.customerName);
+      const reasons = [];
+      if (c.customerCode && d.customerCode && c.customerCode.toLowerCase() === d.customerCode.toLowerCase() && c.taxId && d.taxId && c.taxId !== d.taxId) reasons.push('same customerCode but different taxId');
+      if (c.taxId && d.taxId && c.taxId === d.taxId && cNameOnly && dNameOnly && cNameOnly !== dNameOnly) reasons.push('same taxId but different normalizedName');
+      if (c.customerCode && d.customerCode && c.customerCode.toLowerCase() === d.customerCode.toLowerCase() && cNameOnly && dNameOnly && cNameOnly !== dNameOnly) reasons.push('same customerCode but different normalizedName');
+      return reasons;
+    }
     legacy.forEach(customer => {
       const dup = duplicateInPreview(customer, master.concat(creates));
-      if (dup) duplicates.push({ legacyId: customer.legacyIds[0], duplicateCustomerId: dup.customerId, reason: duplicateKey(customer) });
+      if (dup) {
+        const reasons = conflictReason(customer, dup);
+        const row = { legacyId: customer.legacyIds[0], duplicateCustomerId: dup.customerId, reason: duplicateKey(customer) };
+        if (reasons.length) conflicts.push({ ...row, reasons });
+        else duplicates.push(row);
+      }
       else creates.push(customer);
     });
     return {
@@ -242,13 +388,55 @@
       masterCount: master.length,
       createCount: creates.length,
       duplicateCount: duplicates.length,
+      conflictCount: conflicts.length,
       missingCodeCount: legacy.filter(row => !row.customerCode).length,
       missingAddressCount: legacy.filter(row => !row.address1 && !row.address2).length,
       missingTaxIdCount: legacy.filter(row => !row.taxId).length,
       creates,
       duplicates,
+      conflicts,
       rollbackMap: creates.map(row => ({ legacyId: row.legacyIds[0], customerId: row.customerId }))
     };
+  }
+
+  async function applyLegacyMigration(options={}){
+    const preview = previewLegacyMigration();
+    const rows = getCustomerMaster({ includeLegacy: false });
+    const next = mergeCustomers(rows.concat(preview.creates));
+    setCustomerMaster(next);
+    preview.creates.forEach(customer => queuePending(customer, { ...options, source: options.source || 'tax-invoice-legacy-migration' }));
+    const syncResult = await syncPendingCustomers();
+    notify({ type: 'CUSTOMERS_MIGRATED', preview, syncResult });
+    return { ...preview, syncResult };
+  }
+
+  function bindFirestoreCustomerMaster(){
+    if (remoteBound || !remoteReady()) return false;
+    if (root.auth && !root.auth.currentUser && !remoteAuthWaiting) {
+      remoteAuthWaiting = true;
+      authReady().then(() => {
+        remoteAuthWaiting = false;
+        bindFirestoreCustomerMaster();
+      });
+      return false;
+    }
+    remoteBound = true;
+    try {
+      remoteUnsubscribe = root.db.collection(FIRESTORE_COLLECTION).onSnapshot(snapshot => {
+        const remoteRows = snapshot.docs.map(doc => normalizeCustomer({ ...doc.data(), firestoreDocId: doc.id, source: doc.data().source || 'firestore-customers' }));
+        const localRows = readJson(MASTER_KEY, []);
+        setCustomerMaster(mergeCustomers(remoteRows.concat(Array.isArray(localRows) ? localRows : [])));
+        syncPendingCustomers();
+      }, error => {
+        notify({ type: 'CUSTOMERS_FIRESTORE_ERROR', error: error && (error.code || error.message) || String(error) });
+      });
+      syncPendingCustomers();
+      return true;
+    } catch (error) {
+      remoteBound = false;
+      notify({ type: 'CUSTOMERS_FIRESTORE_ERROR', error: error && (error.code || error.message) || String(error) });
+      return false;
+    }
   }
 
   function notify(message){
@@ -285,6 +473,7 @@
     MASTER_KEY,
     LEGACY_KEY,
     PENDING_KEY,
+    FIRESTORE_COLLECTION,
     normalizeCustomer,
     normalizeLegacyCustomer: normalizeCustomer,
     getLegacyTaxInvoiceCustomers,
@@ -293,9 +482,15 @@
     setCustomerMaster,
     findDuplicateCustomer,
     previewLegacyMigration,
+    applyLegacyMigration,
+    bindFirestoreCustomerMaster,
+    syncPendingCustomers,
+    writeRemoteCustomer,
+    customerDocId,
     nextCustomerCode,
     mergeCustomers
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = root.ChokAnanCustomerMaster;
+  if (root.setTimeout) root.setTimeout(bindFirestoreCustomerMaster, 0);
 })(typeof window !== 'undefined' ? window : globalThis);
