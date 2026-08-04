@@ -1,0 +1,47 @@
+{
+  "mode": "confirmed-reset",
+  "projectId": "check-chokanan",
+  "backupPath": "D:\\stock alert\\Github\\stock-alert\\backups\\tax-invoice-reset-before-20260804-171634\\tax-invoice-data-backup.json",
+  "deleted": {
+    "invoiceRequests": 17,
+    "taxInvoices": 26,
+    "taxInvoiceHistory": 6,
+    "invoices": 1,
+    "invoiceHistory": 0,
+    "invoiceRequestCounters": 2,
+    "invoiceRequestIdempotency": 17,
+    "invoiceRequestAuditLogs": 17,
+    "invoiceNumberReservations": 7,
+    "invoiceGenerationIdempotency": 7,
+    "invoiceGenerationLocks": 7,
+    "invoiceGenerationAuditLogs": 7
+  },
+  "countsAfter": {
+    "invoiceRequests": 0,
+    "taxInvoices": 0,
+    "taxInvoiceHistory": 0,
+    "invoices": 0,
+    "invoiceHistory": 0,
+    "invoiceRequestCounters": 0,
+    "invoiceRequestIdempotency": 0,
+    "invoiceRequestAuditLogs": 0,
+    "invoiceNumberReservations": 0,
+    "invoiceGenerationIdempotency": 0,
+    "invoiceGenerationLocks": 0,
+    "invoiceGenerationAuditLogs": 0
+  },
+  "protectedCountsBefore": {
+    "stock_alert_beta1_products": 243,
+    "customers": 37
+  },
+  "protectedCountsAfter": {
+    "stock_alert_beta1_products": 243,
+    "customers": 37
+  },
+  "counter": {
+    "collection": "invoiceNumberCounters",
+    "doc": "IV",
+    "lastSequence": 109,
+    "nextInvoiceNumber": "IV000110"
+  }
+}

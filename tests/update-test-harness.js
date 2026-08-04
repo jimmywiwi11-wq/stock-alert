@@ -1,9 +1,10 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const vm = require('vm');
 function createStorage(){ const m=new Map(); return { getItem:k=>m.has(k)?m.get(k):null, setItem:(k,v)=>m.set(k,String(v)), removeItem:k=>m.delete(k), clear:()=>m.clear(), _map:m }; }
 function loadUpdateContext(extra={}){
   const html = fs.readFileSync('index.html', 'utf8');
-  const start = html.indexOf('/* === V8.03 Update Loop Fix');
+  const marker = html.indexOf('Update Loop Fix');
+  const start = marker >= 0 ? html.lastIndexOf('/* ===', marker) : -1;
   const end = html.indexOf('/* === V7.2 Stable Fixes:', start);
   if (start < 0 || end < 0) throw new Error('update block not found');
   const code = html.slice(start, end);
@@ -25,7 +26,7 @@ function loadUpdateContext(extra={}){
     addEventListener: (name, fn) => { listeners['window:'+name] = fn; },
     closeModal: () => {},
     toast: () => {},
-    fetch: extra.fetch || (async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ version: '8.03', label: 'V8.03' }) }))
+    fetch: extra.fetch || (async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ version: '8.05', label: 'V8.05' }) }))
   };
   context.window = context;
   vm.createContext(context);
@@ -35,3 +36,4 @@ function loadUpdateContext(extra={}){
   return context;
 }
 module.exports = { loadUpdateContext, createStorage };
+

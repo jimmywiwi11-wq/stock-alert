@@ -1,0 +1,10 @@
+{
+  "version": "8.03",
+  "label": "V8.03",
+  "build": "20260804-UPDATE-MODAL-FIX",
+  "marker": "V8.03-UPDATE-LOOP-FIX",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Fix update modal loop when current and latest versions are equal; add guarded Service Worker update flow.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-08-04T00:00:00+07:00"
+}
