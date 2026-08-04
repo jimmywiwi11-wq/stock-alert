@@ -1,0 +1,10 @@
+const assert = require('assert');
+const { loadUpdateContext } = require('./update-test-harness');
+const ctx = loadUpdateContext();
+const u = ctx.StockAlertUpdate;
+assert.strictEqual(u.shouldShowUpdateModal({ version: '8.04', hasUpdate: true }), true);
+assert.strictEqual(u.shouldShowUpdateModal({ version: '8.03', hasUpdate: false }), false);
+ctx.sessionStorage.setItem('stockAlertDismissUpdateVersion', '8.04');
+assert.strictEqual(u.shouldShowUpdateModal({ version: '8.04', hasUpdate: true }), false);
+assert.strictEqual(u.shouldShowUpdateModal({ version: '8.05', hasUpdate: true }), true);
+console.log('update modal visibility passed');

@@ -12,7 +12,7 @@ assert.ok(js.includes('cmsInvoicePreviewWordsV42'));
 assert.ok(js.includes('thaiBahtTextLocal'));
 assert.ok(js.includes('buyerAddress'));
 assert.ok(js.includes('shopTax ?'));
-assert.ok(js.includes('!requestIsReady(row) && !requestIsPrinted(row)'));
+assert.ok(js.includes('!requestCanPreview(row)'));
 assert.ok(css.includes('overflow-x: hidden'));
 assert.ok(css.includes('touch-action: pan-y'));
 assert.ok(css.includes('border-radius: 0'));

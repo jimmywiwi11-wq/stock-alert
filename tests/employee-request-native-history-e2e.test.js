@@ -1,8 +1,10 @@
-const assert = require('assert');
+﻿const assert = require('assert');
 const { chromium } = require('C:/Users/Acer/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const launchOptions = { headless: true };
+  if (process.env.BROWSER_EXECUTABLE) launchOptions.executablePath = process.env.BROWSER_EXECUTABLE;
+  const browser = await chromium.launch(launchOptions);
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
   const dialogs = [];
   page.on('dialog', async dialog => {

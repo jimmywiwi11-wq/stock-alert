@@ -4,7 +4,7 @@ const path = require('path');
 
 const desktop = fs.readFileSync(path.join(__dirname, '..', 'desktop', 'tax-invoice', 'tax_invoice_app.html'), 'utf8');
 
-assert.ok(desktop.includes("window.DESKTOP_TAX_INVOICE_BUILD='V28-NATIVE-PRINT-CUSTOMER-FIX'"));
+assert.ok(desktop.includes("window.DESKTOP_TAX_INVOICE_BUILD='V31-LAYOUT-DELETE-ALL'"));
 assert.ok(desktop.includes('id="desktopTaxInvoiceRuntimeMarker"'));
 assert.ok(desktop.includes('function desktopHistoryRows()'));
 assert.ok(desktop.includes('ChokAnanInvoiceHistoryAdapter.getUnifiedHistoryRows'));

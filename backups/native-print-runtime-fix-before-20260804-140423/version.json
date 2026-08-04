@@ -1,0 +1,6 @@
+{
+  "version": "7.97",
+  "label": "V7.97",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Employee invoice requests now open in the native Tax Invoice editor before save, preview, and print."
+}

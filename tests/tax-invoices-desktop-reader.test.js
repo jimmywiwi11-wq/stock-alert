@@ -38,7 +38,7 @@ global.db = {
 
 (async () => {
   assert.strictEqual(adapter.PRIMARY_INVOICE_COLLECTION, 'taxInvoices');
-  assert.strictEqual(adapter.DESKTOP_HISTORY_BUILD, 'V28-NATIVE-PRINT-CUSTOMER-FIX');
+  assert.strictEqual(adapter.DESKTOP_HISTORY_BUILD, 'V31-LAYOUT-DELETE-ALL');
   assert.strictEqual(typeof adapter.loadTaxInvoicesFromFirestore, 'function');
   assert.strictEqual(typeof adapter.subscribeTaxInvoices, 'function');
   assert.strictEqual(typeof adapter.normalizeTaxInvoiceForDesktop, 'function');

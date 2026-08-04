@@ -182,7 +182,7 @@
       '<button type="button" class="cmsBackButtonV3" id="cmsBackToStockAlertV3">กลับสู่ระบบสินค้าขาด</button>',
       '<div><h1>ChokAnan Management System (CMS)</h1><small>ใบกำกับภาษี - โหมดทดสอบข้อมูลสินค้าแบบอ่านอย่างเดียว</small></div>',
       '<span class="cmsTestBadgeV3" id="cmsBridgeStatusV3">กำลังเชื่อมต่อ</span>',
-      '<small class="cmsTestBadgeV3" id="cmsParentTaxBridgeMarkerV27">V28-NATIVE-PRINT-CUSTOMER-FIX</small>',
+      '<small class="cmsTestBadgeV3" id="cmsParentTaxBridgeMarkerV101">V101-LAYOUT-DELETE-ALL</small>',
       '</div>',
       '<div class="cmsModuleBodyV3">',
       '<div class="cmsModuleStateV3" id="cmsModuleStateV3"><div><b>กำลังโหลดใบกำกับภาษี</b><br><small>ระบบจะแยกหน้าจอและ CSS ผ่าน iframe</small></div></div>',

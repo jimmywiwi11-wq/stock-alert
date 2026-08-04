@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tax Invoice App V28</title>
+<title>Tax Invoice App V32</title>
 <link rel="icon" href="./assets/icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
@@ -637,8 +637,8 @@ button[onclick^="deleteProduct"]:hover,button[onclick^="deleteInvoice"]:hover,bu
   <img class="app-logo" src="./assets/icons/icon-64.png" alt="Tax Invoice App logo">
   <div class="app-title">
     <strong>Tax Invoice App</strong>
-    <span>โชคอนันต์ ฮาร์ดแวร์ • V28</span>
-    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V28-NATIVE-PRINT-CUSTOMER-FIX</small>
+    <span>โชคอนันต์ ฮาร์ดแวร์ • V32</span>
+    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V32-SAVE-HISTORY-PRINT-STATUS</small>
   </div>
 </header>
 <nav class="hidden-print">
@@ -916,6 +916,7 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
       <button onclick="renameFullTaxTemplate()">Rename Layout</button>
       <button class="danger" onclick="deleteFullTaxTemplate()">Delete Layout</button>
       <button onclick="resetFullTaxLayout()">Reset Layout</button>
+      <button onclick="createBlankFullTaxLayout()">Blank 9 x 11 Layout</button>
       <button onclick="printFullTaxTest()">Print Test</button>
       <button onclick="exportFullTaxLayout()">Export Layout</button>
       <button onclick="document.getElementById('layoutImportInput').click()">Import Layout</button>
@@ -940,6 +941,7 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
       <label><input id="overlayEnabled" type="checkbox" onchange="saveOverlaySettings()"> Enable Overlay</label>
       <label>Opacity</label><input id="overlayOpacity" type="range" min="0" max="1" step="0.05" value="0.35" oninput="saveOverlaySettings()">
       <button onclick="document.getElementById('overlayImageInput').click()">Choose Scanned Image</button>
+      <button class="danger" onclick="deleteLayoutBackground()">Delete Background</button>
       <input id="overlayImageInput" type="file" accept="image/*" onchange="loadOverlayImage(this)">
       <h3 style="margin-top:14px">Grid</h3>
       <label><input id="showGrid" type="checkbox" checked onchange="saveDesignerPrefs()"> Show Grid</label>
@@ -956,6 +958,8 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
         <button onclick="addFullTaxObject()">Add</button>
         <button onclick="duplicateSelectedObject()">Duplicate</button>
         <button class="danger" onclick="deleteSelectedObject()">Delete</button>
+        <button class="danger" onclick="clearAllLayoutObjects()">ล้างวัตถุทั้งหมด</button>
+        <button onclick="undoLastLayoutDelete()">ย้อนกลับการลบล่าสุด</button>
         <button onclick="toggleSelectedVisible()">Hide / Show</button>
         <button onclick="toggleSelectedLocked()">Lock / Unlock</button>
       </div>
@@ -1108,14 +1112,14 @@ try{if(window.firebase&&!firebase.apps.length)firebase.initializeApp(firebaseCon
 function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[TaxInvoice auth]',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[TaxInvoice auth listener]',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[TaxInvoice auth ready]',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 window.stockAlertAuthReady=stockAlertAuthReady;
 </script>
-<script src="../../modules/customer-master/customer-master.js?v=7.98"></script>
-<script src="../../modules/invoice-generator/invoice-number-format.js?v=7.98"></script>
-<script src="../../modules/invoice-generator/invoice-number-service.js?v=7.98"></script>
-<script src="../../modules/invoice-generator/invoice-print-service.js?v=7.98"></script>
-<script src="../../modules/invoice-generator/invoice-history-adapter.js?v=7.98"></script>
+<script src="../../modules/customer-master/customer-master.js?v=8.03"></script>
+<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.03"></script>
+<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.03"></script>
+<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.03"></script>
+<script src="../../modules/invoice-generator/invoice-history-adapter.js?v=8.03"></script>
 <script>
-const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[], employeeInvoiceRequestRows=[], employeeNativeImportContext=null, employeeRequestImportWaiters={};
-window.DESKTOP_TAX_INVOICE_BUILD='V28-NATIVE-PRINT-CUSTOMER-FIX';
+const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], lastEmployeeNativeSyncPromise=null, productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[], employeeInvoiceRequestRows=[], employeeNativeImportContext=null, employeeRequestImportWaiters={};
+window.DESKTOP_TAX_INVOICE_BUILD='V32-SAVE-HISTORY-PRINT-STATUS';
 let productBulkSelectMode=false,customerBulkSelectMode=false,selectedProductIds=new Set(),selectedCustomerIds=new Set(),visibleProductIds=[],visibleCustomerIds=[];
 const THAI_PRINT_FONT_STACK='"TH Sarabun New","Sarabun","Noto Sans Thai","Tahoma","Leelawadee UI",sans-serif';
 function nextFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
@@ -1906,22 +1910,38 @@ async function printInvoiceClean(){
   window.print();
   let qs=new URLSearchParams(location.search);if(qs.get('cmsTest')==='1'||qs.get('e2eNativeImport')==='1')setTimeout(cleanup,800);
 }
+function markLocalInvoiceRecordsPrinted(records){
+  let ids=new Set((records||[]).map(invoiceRecordKey).filter(Boolean));
+  if(!ids.size)return;
+  let now=new Date().toISOString(),changed=false;
+  let rows=store.get('invoices',[]).map(x=>{
+    if(!ids.has(invoiceRecordKey(x))&&!(x.no&&ids.has(String(x.no))))return x;
+    changed=true;
+    let printCount=(Number(x.printCount||0)||0)+1;
+    return {...x,printed:true,printCount,printStatus:printCount>1?'reprinted':'printed',status:'printed',printedAt:now,updatedAt:now};
+  });
+  if(changed)store.set('invoices',rows);
+}
 function markRecordsPrintedAfterConfirmation(records){
   if(!records?.length)return;
-  if(!(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.markPrinted==='function'))return;
   setTimeout(()=>{
     let ok=confirm('พิมพ์ใบกำกับภาษีเรียบร้อยแล้วใช่ไหม?\\nระบบจะอัปเดตสถานะเป็นพิมพ์แล้วหลังยืนยัน');
     if(!ok)return;
     records.forEach(x=>{
+      let done=()=>{markLocalInvoiceRecordsPrinted([x]);try{renderHistory()}catch(e){}};
       if(new URLSearchParams(location.search).get('cmsTest')==='1'&&window.TaxInvoiceCMSBridge&&typeof TaxInvoiceCMSBridge.markPrinted==='function'){
         TaxInvoiceCMSBridge.markPrinted(x,{by:'tax-invoice-desktop',uid:''})
-          .then(()=>{try{renderHistory()}catch(e){}})
+          .then(done)
           .catch(e=>console.warn('[TaxInvoice parent bridge print sync]',e));
         return;
       }
-      ChokAnanInvoiceHistoryAdapter.markPrinted(x,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})
-        .then(()=>{try{renderHistory()}catch(e){}})
-        .catch(e=>console.warn('[TaxInvoice print sync]',e));
+      if(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.markPrinted==='function'){
+        ChokAnanInvoiceHistoryAdapter.markPrinted(x,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})
+          .then(done)
+          .catch(e=>console.warn('[TaxInvoice print sync]',e));
+        return;
+      }
+      done();
     });
   },900);
 }
@@ -1950,7 +1970,7 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
     if(dups.length){alert('เลขที่บิลซ้ำ กรุณาตรวจเลขที่บิลก่อนบันทึก\n'+dups.join(', '));return false}
     if(editInvoiceId&&!confirm(`บิลนี้เป็นส่วนหนึ่งของการแก้ไขรายการ และรายการเกิน 10 รายการ\nระบบจะบันทึกใหม่เป็นชุด ${plan.totalInvoices} ใบตามกฎใบกำกับภาษีเต็ม 9 × 11 นิ้ว\nต้องการดำเนินการต่อหรือไม่?`))return false;
     if(!confirm(fullTaxSplitSummary(plan)))return false;
-    let created=createSplitFullTaxInvoices(plan);lastSavedInvoiceRecords=created;syncEmployeeRequestNativeSave(created);
+    let created=createSplitFullTaxInvoices(plan);lastSavedInvoiceRecords=created;lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(created,{force:!silent});
     if(!silent)alert(`บันทึกใบกำกับภาษีเต็มแล้ว ${created.length} ใบ\nจำนวนรายการทั้งหมด ${plan.totalItems} รายการ`);
     if(!keepFormAfterSave&&!employeeNativeImportContext?.sourceRequestId)newInvoice();
     else{invoiceItems=JSON.parse(JSON.stringify(created[0]?.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}
@@ -1964,8 +1984,7 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
   if(idx>=0){let old=a[idx];['invoiceId','historyId','sourceRequestId','requestId','sourceRequestNumber','requestedByUid','ownerUid','syncedFromTaxInvoiceHistory'].forEach(k=>{if(old&&old[k]!==undefined&&inv[k]===undefined)inv[k]=old[k]})}
   if(idx>=0){a[idx]=inv}else{a.push(inv);advanceInvoiceCounterFromNo(inv.no);editInvoiceId=inv.id}
   store.set('invoices',a);
-  lastSavedInvoiceRecords=[inv];syncEmployeeRequestNativeSave(lastSavedInvoiceRecords);
-  if(!silent&&window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function')ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices([inv],{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''}).then(rows=>{if(rows&&rows.length){lastSavedInvoiceRecords=rows;renderHistory();if(!keepFormAfterSave&&!silent)return;if(editInvoiceId===inv.id){let synced=rows[0];invNo.value=synced.no||invNo.value;invoiceItems=JSON.parse(JSON.stringify(synced.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}}}).catch(e=>console.warn('[TaxInvoice desktop history sync]',e));
+  lastSavedInvoiceRecords=[inv];lastEmployeeNativeSyncPromise=syncSavedInvoiceRecordsToCentral(lastSavedInvoiceRecords,{force:!silent}).then(rows=>{if(rows&&rows.length&&editInvoiceId===inv.id){let synced=rows[0];invNo.value=synced.no||invNo.value;invoiceItems=JSON.parse(JSON.stringify(synced.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}return rows}).catch(e=>{console.warn('[TaxInvoice desktop history sync]',e);return lastSavedInvoiceRecords});
   renderHistory();
   if(!silent)alert('บันทึกบิลแล้ว');
   if(!keepFormAfterSave&&!employeeNativeImportContext?.sourceRequestId){newInvoice();}
@@ -1977,11 +1996,8 @@ async function printAndSaveInvoice(){
   if(!ok)return;
   let records=Array.isArray(ok)?ok:(lastSavedInvoiceRecords.length?lastSavedInvoiceRecords:[]);
   if(!records.length){alert('บันทึกแล้ว แต่ไม่พบข้อมูลบิลสำหรับพิมพ์');return;}
-  if(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function'){
-    ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices(records,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})
-      .then(rows=>{if(rows&&rows.length){lastSavedInvoiceRecords=rows;renderHistory();}})
-      .catch(e=>console.warn('[TaxInvoice desktop print sync]',e));
-  }
+  records=await syncSavedInvoiceRecordsToCentral(records,{force:true});
+  if(!records?.length)records=lastSavedInvoiceRecords;
   await printInvoiceRecordsClean(records);
 }
 function employeeRequestId(row){return String(row?.requestId||row?.id||row?.requestNumber||'').trim()}
@@ -2020,7 +2036,21 @@ function clearEmployeeRequestEditorNotice(){let box=document.getElementById('emp
 async function markEmployeeRequestOpened(row){let id=employeeRequestId(row);if(!id)return;let payload={reviewState:'opened',reviewedAt:new Date().toISOString(),status:'ready_to_print',printStatus:'ready_to_print',updatedAt:new Date().toISOString()};try{if(window.TaxInvoiceCMSBridge&&typeof TaxInvoiceCMSBridge.markRequestOpened==='function')await TaxInvoiceCMSBridge.markRequestOpened(row,payload);else if(window.db&&typeof db.collection==='function'&&!(new URLSearchParams(location.search).get('cmsTest')==='1'))await db.collection('invoiceRequests').doc(id).set(payload,{merge:true})}catch(e){console.warn('[employee request review opened]',e)}}
 async function loadEmployeeRequestIntoNativeInvoiceEditor(id){let row=employeeInvoiceRequestRows.find(x=>employeeRequestId(x)===String(id));if(!row)return alert('ไม่พบคำขอ');let existing=nativeInvoicesForRequest(id);if(existing.length){loadInvoiceToForm(existing[0],true);employeeNativeImportContext=employeeRequestNativeEditorContext(row);employeeRequestEditorNotice(row);return}let c=employeeRequestCustomer(row),items=employeeRequestItemRows(row);if(!c.name)return alert('คำขอนี้ไม่มีข้อมูลลูกค้า');if(!items.length)return alert('คำขอนี้ไม่มีรายการสินค้า');editInvoiceId=null;employeeNativeImportContext=employeeRequestNativeEditorContext(row);invNo.value=nextInvoiceNo();invDate.value=String(row.invoiceDate||row.requestedAt||new Date().toISOString()).slice(0,10);invType.selectedIndex=0;vatMode.value='excluded';paperSize.value='9x11';selectedInvoiceCustomerId=c.id||'';selectedInvoiceCustomerName=c.name||'';if(window.customerSearchInvoice)customerSearchInvoice.value=c.name||'';buyerName.value=c.name||'';buyerTax.value=c.taxId||'';buyerAddress.value=c.address||'';updateBuyerCustomerStatus(selectedInvoiceCustomerId?'selected':'unselected');invoiceItems=JSON.parse(JSON.stringify(items));showPage('invoice');employeeRequestEditorNotice(row);renderInvoiceItems();renderInvoicePreview();await markEmployeeRequestOpened(row);setTimeout(()=>{try{document.getElementById('invoice')?.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){}},0)}
 function employeeRequestSavedRecords(records){return (records||[]).map(x=>({...x,source:'employee-request',sourceRequestId:employeeNativeImportContext?.sourceRequestId||x.sourceRequestId,requestId:employeeNativeImportContext?.requestId||x.requestId,sourceRequestNumber:employeeNativeImportContext?.sourceRequestNumber||x.sourceRequestNumber,requestNumber:employeeNativeImportContext?.requestNumber||x.requestNumber,customerSnapshot:employeeNativeImportContext?.customerSnapshot||x.customerSnapshot||{},itemsSnapshot:JSON.parse(JSON.stringify(x.items||[])),nativeImportState:'native-saved',nativeImportKey:employeeNativeImportContext?.nativeImportKey||'',importedToNativeHistory:true,printStatus:x.printStatus||'ready_to_print',status:x.status||'ready_to_print'}))}
-async function syncEmployeeRequestNativeSave(records){if(!employeeNativeImportContext?.sourceRequestId||!records?.length)return;let row=employeeNativeImportContext.requestSnapshot||employeeInvoiceRequestRows.find(x=>employeeRequestId(x)===employeeNativeImportContext.sourceRequestId)||{requestId:employeeNativeImportContext.sourceRequestId,requestNumber:employeeNativeImportContext.requestNumber,customerSnapshot:employeeNativeImportContext.customerSnapshot};let normalized=employeeRequestSavedRecords(records);try{if(window.TaxInvoiceCMSBridge&&typeof TaxInvoiceCMSBridge.markRequestImported==='function')await TaxInvoiceCMSBridge.markRequestImported(row,normalized);else if(window.db&&typeof db.collection==='function')await db.collection('invoiceRequests').doc(employeeNativeImportContext.sourceRequestId).set({status:'ready_to_print',printStatus:'ready_to_print',generationState:'native-saved',nativeImportState:'native-saved',importedToNativeHistory:true,nativeInvoiceIds:normalized.map(x=>String(x.id)),generatedInvoiceIds:normalized.map(x=>String(x.invoiceId||x.id)),generatedInvoiceNumbers:normalized.map(x=>x.no||x.invoiceNumber||''),nativeImportedAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});employeeInvoiceRequestRows=employeeInvoiceRequestRows.map(x=>employeeRequestId(x)===employeeNativeImportContext.sourceRequestId?{...x,importedToNativeHistory:true,nativeInvoiceIds:normalized.map(r=>String(r.id)),generatedInvoiceIds:normalized.map(r=>String(r.invoiceId||r.id)),generatedInvoiceNumbers:normalized.map(r=>r.no||r.invoiceNumber||''),status:'ready_to_print',printStatus:'ready_to_print'}:x);renderEmployeeInvoiceRequests()}catch(e){console.warn('[employee request native save sync]',e)}}
+async function syncEmployeeRequestNativeSave(records){if(!employeeNativeImportContext?.sourceRequestId||!records?.length)return records||[];let row=employeeNativeImportContext.requestSnapshot||employeeInvoiceRequestRows.find(x=>employeeRequestId(x)===employeeNativeImportContext.sourceRequestId)||{requestId:employeeNativeImportContext.sourceRequestId,requestNumber:employeeNativeImportContext.requestNumber,customerSnapshot:employeeNativeImportContext.customerSnapshot};let normalized=employeeRequestSavedRecords(records);let ids=normalized.map(x=>String(x.invoiceId||x.id||''));let numbers=normalized.map(x=>x.no||x.invoiceNumber||'');try{if(window.TaxInvoiceCMSBridge&&typeof TaxInvoiceCMSBridge.markRequestImported==='function')await TaxInvoiceCMSBridge.markRequestImported(row,normalized);else if(window.db&&typeof db.collection==='function'){let now=new Date().toISOString();for(let x of normalized){let invoiceId=String(x.invoiceId||x.id||x.no||x.invoiceNumber||'');if(invoiceId)await db.collection('taxInvoices').doc(invoiceId).set({...x,invoiceId,id:invoiceId,invoiceNumber:x.no||x.invoiceNumber||invoiceId,no:x.no||x.invoiceNumber||invoiceId,status:'ready_to_print',printStatus:'ready_to_print',importedToNativeHistory:true,nativeImportedAt:now,updatedAt:now},{merge:true});}await db.collection('invoiceRequests').doc(employeeNativeImportContext.sourceRequestId).set({status:'ready_to_print',printStatus:'ready_to_print',generationState:'native-saved',nativeImportState:'native-saved',importedToNativeHistory:true,nativeInvoiceIds:ids,generatedInvoiceIds:ids,generatedInvoiceNumbers:numbers,printedInvoiceCount:0,nativeImportedAt:now,updatedAt:now},{merge:true});}employeeInvoiceRequestRows=employeeInvoiceRequestRows.map(x=>employeeRequestId(x)===employeeNativeImportContext.sourceRequestId?{...x,importedToNativeHistory:true,nativeInvoiceIds:ids,generatedInvoiceIds:ids,generatedInvoiceNumbers:numbers,status:'ready_to_print',printStatus:'ready_to_print'}:x);renderEmployeeInvoiceRequests();return normalized}catch(e){console.warn('[employee request native save sync]',e);return normalized}}
+async function syncSavedInvoiceRecordsToCentral(records,{force=false}={}){
+  let rows=Array.isArray(records)?records.filter(Boolean):[];
+  if(!rows.length)return [];
+  let latest=rows;
+  let jobs=[];
+  if(employeeNativeImportContext?.sourceRequestId)jobs.push(syncEmployeeRequestNativeSave(rows).then(r=>{if(r?.length)latest=r;}));
+  if((force||!employeeNativeImportContext?.sourceRequestId)&&window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function'){
+    jobs.push(ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices(rows,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''}).then(r=>{if(r?.length)latest=r;}));
+  }
+  if(!jobs.length)return rows;
+  await Promise.allSettled(jobs);
+  if(latest?.length){lastSavedInvoiceRecords=latest;try{renderHistory()}catch(e){}}
+  return latest||rows;
+}
 function textFromHtml(html){let div=document.createElement('div');div.innerHTML=html||'';return div.textContent||''}
 function nextAnimationFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
 async function waitForPrintDomReady(){await waitForThaiFontsReady();await nextAnimationFrame();await nextAnimationFrame()}
@@ -2484,7 +2514,7 @@ function loadSettings(){let s=store.get('settings',{});shopName.value=s.shopName
 function money(n){return (+n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function thaiBahtText(num){num=Math.round((+num||0)*100)/100;let [b,s]=num.toFixed(2).split('.');const t=['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'],p=['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];function read(n){n=String(parseInt(n||0));if(n==='0')return 'ศูนย์';let out='';for(let i=0;i<n.length;i++){let d=+n[i],pos=n.length-i-1;if(d===0)continue;if(pos===1&&d===1)out+='สิบ';else if(pos===1&&d===2)out+='ยี่สิบ';else if(pos===0&&d===1&&n.length>1)out+='เอ็ด';else out+=t[d]+p[pos]}return out}let res=read(b)+'บาท';return s==='00'?res+'ถ้วน':res+read(s)+'สตางค์'}
 const FULL_TAX_TEMPLATE='9x11-full-tax-invoice';
-let selectedLayoutObjectId=null,layoutDrag=null,layoutResize=null;
+let selectedLayoutObjectId=null,layoutDrag=null,layoutResize=null,layoutUndoStack=[];
 function defaultFullTaxCalibration(){return {offsetX:0,offsetY:0,topMargin:0,leftMargin:0,lineHeight:0,charSpacing:0,columnSpacing:0,scaleX:1,scaleY:1}}
 function nextLayoutObjectId(){return 'obj_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
 function cleanLayoutDisplayName(v){return String(v||'').replace(/\s+/g,' ').trim()||'New Object'}
@@ -2494,10 +2524,27 @@ function uniqueLayoutDisplayName(base,objects,selfId=null){
   if(!used.has(base))return base;let i=2,name=`${base} (${i})`;while(used.has(name)){i++;name=`${base} (${i})`}return name;
 }
 function isCompanyNameObject(o){let key=String(o?.source||o?.id||o?.displayName||o?.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();return key==='companyname'||key==='shopname'}
+function layoutKeyName(v){return String(v||'').replace(/[\s_-]+/g,'').toLowerCase()}
+function layoutObjectMatchesSource(o,sources){let keys=[o?.source,o?.id,o?.displayName,o?.fieldName].map(layoutKeyName);return (sources||[]).map(layoutKeyName).some(src=>keys.includes(src))}
+function normalizeLayoutObjectIds(layout){if(!layout||!Array.isArray(layout.objects))return layout;let used=new Set();layout.objects.forEach(o=>{let id=String(o.id||'');if(!id||used.has(id)){id=nextLayoutObjectId();while(used.has(id))id=nextLayoutObjectId();o.id=id}used.add(id)});return layout}
 function minimumLayoutObjectHeight(o){let fs=+o.fontSize||12,lh=+o.lineHeight||1.3;return Math.ceil(fs*.3528*lh+2)}
 function ensureCompanyNameObjectBox(o){if(!isCompanyNameObject(o))return;o.id='company_name';o.source='companyName';o.displayName=o.displayName||'Company Name';o.fieldName=o.displayName;if(!o.companyNameFontMigrated){o.font=(!o.font||o.font==='TH Sarabun New')?'Sarabun':o.font;o.fontSize=+o.fontSize||18;o.bold=false;o.fontWeight=String(o.fontWeight&&o.fontWeight!=='700'?o.fontWeight:'500');o.lineHeight=+o.lineHeight||1.25;o.letterSpacing=o.letterSpacing||'normal';o.companyNameFontMigrated=true}else{o.font=o.font||'Sarabun';o.fontSize=+o.fontSize||18;o.fontWeight=String(o.fontWeight||'500');o.lineHeight=+o.lineHeight||1.25;o.letterSpacing=o.letterSpacing||'normal'}o.thaiSafeHeight=o.thaiSafeHeight!==false;o.h=Math.max(+o.h||0,minimumLayoutObjectHeight(o))}
+function ensureFullTaxLayoutField(layout,field){
+  if(!layout||!Array.isArray(layout.objects)||layout.objects.some(o=>layoutObjectMatchesSource(o,field.aliases)))return;
+  layout.objects.push(fullTaxObj(field.name,field.x,field.y,field.w,field.h,field.fontSize||12,field.align||'left',!!field.bold,{id:field.id,source:field.source,font:field.font||'TH Sarabun New',fontWeight:field.fontWeight||(field.bold?'700':'400'),lineHeight:field.lineHeight||1.3,manualDisplayName:true,autoAddedForPrintFieldsFix:true}));
+}
+function ensureRequiredFullTaxLayoutFields(layout){
+  if(layout?.allowMissingRequiredObjects||layout?.blankLayout)return;
+  ensureFullTaxLayoutField(layout,{id:'customer_name',name:'Customer Name',source:'customerName',aliases:['customerName','printCustomerName','buyerName','customerFullName'],x:23,y:48,w:120,h:7,fontSize:12,bold:true});
+  ensureFullTaxLayoutField(layout,{id:'customer_tax_id',name:'Customer Tax ID',source:'customerTaxId',aliases:['customerTaxId','printCustomerTaxId','buyerTax','taxId','taxNumber','customerTax'],x:23,y:74,w:70,h:7,fontSize:12});
+  ensureFullTaxLayoutField(layout,{id:'shop_address',name:'Shop Address',source:'shopAddress',aliases:['shopAddress','companyAddress','sellerAddress','businessAddress'],x:18,y:23,w:150,h:12,fontSize:12});
+  ensureFullTaxLayoutField(layout,{id:'shop_address_1',name:'Shop Address 1',source:'shopAddress1',aliases:['shopAddress1','companyAddress1','sellerAddress1','businessAddress1'],x:18,y:23,w:150,h:6,fontSize:12});
+  ensureFullTaxLayoutField(layout,{id:'shop_address_2',name:'Shop Address 2',source:'shopAddress2',aliases:['shopAddress2','companyAddress2','sellerAddress2','businessAddress2'],x:18,y:30,w:150,h:6,fontSize:12});
+}
 function normalizeFullTaxLayoutObjects(layout){
   if(!layout||!Array.isArray(layout.objects))return layout;
+  normalizeLayoutObjectIds(layout);
+  ensureRequiredFullTaxLayoutFields(layout);
   let companyObjects=layout.objects.filter(isCompanyNameObject),primaryCompany=companyObjects.find(o=>o.id==='company_name')||companyObjects[0]||null;
   if(primaryCompany)ensureCompanyNameObjectBox(primaryCompany);
   companyObjects.forEach(o=>{if(o!==primaryCompany){o.duplicateCompanyNameObject=true;o.visible=false;if(o.source==='companyName')o.source=''}});
@@ -2547,7 +2594,8 @@ function getFullTaxLayouts(){let layouts=store.get('fullTaxLayouts',null);if(!Ar
 function setFullTaxLayouts(layouts){store.set('fullTaxLayouts',layouts)}
 function activeFullTaxLayout(){let layouts=getFullTaxLayouts(),id=store.get('activeFullTaxTemplate',FULL_TAX_TEMPLATE),layout=layouts.find(x=>x.id===id)||layouts[0];if(!layout.objects)layout.objects=[];layout.calibration=Object.assign(defaultFullTaxCalibration(),layout.calibration||{});layout.overlay=Object.assign({enabled:false,opacity:.35,image:''},layout.overlay||{});layout.designer=Object.assign({showGrid:true,snap:true,gridSize:1},layout.designer||{});normalizeFullTaxLayoutObjects(layout);return layout}
 function saveActiveFullTaxLayout(layout){let layouts=getFullTaxLayouts(),idx=layouts.findIndex(x=>x.id===layout.id);if(idx>=0)layouts[idx]=layout;else layouts.push(layout);setFullTaxLayouts(layouts);store.set('activeFullTaxTemplate',layout.id)}
-function getFullTaxCompanyInfo(){let base=store.get('settings',{}),saved=store.get('fullTaxCompanyInfo',{});return Object.assign({companyName:base.shopName||'',companyAddress:base.shopAddress||'',companyTax:base.shopTax||'',companyPhone:base.shopPhone||'',footerNotes:'',terms:'',paymentNotes:''},saved)}
+function fullTaxShopAddressParts(info={}){let raw1=info.shopAddress1||info.companyAddress1||info.sellerAddress1||info.businessAddress1||'',raw2=info.shopAddress2||info.companyAddress2||info.sellerAddress2||info.businessAddress2||'',raw=info.shopAddress||info.companyAddress||info.sellerAddress||info.businessAddress||info.address||'';let p=(raw1||raw2)?splitAddressForInvoiceLines(raw1,raw2):splitAddressForInvoiceLines(raw,'');return {shopAddress:p.buyerAddress,shopAddress1:p.address1,shopAddress2:p.address2}}
+function getFullTaxCompanyInfo(){let base=store.get('settings',{}),saved=store.get('fullTaxCompanyInfo',{}),merged=Object.assign({companyName:base.shopName||'',companyAddress:base.shopAddress||'',companyTax:base.shopTax||'',companyPhone:base.shopPhone||'',footerNotes:'',terms:'',paymentNotes:''},saved);let parts=fullTaxShopAddressParts(Object.assign({},base,merged));merged.companyAddress=merged.companyAddress||parts.shopAddress;merged.shopAddress=parts.shopAddress||merged.companyAddress||'';merged.shopAddress1=parts.shopAddress1||'';merged.shopAddress2=parts.shopAddress2||'';merged.sellerAddress=merged.sellerAddress||merged.shopAddress;merged.businessAddress=merged.businessAddress||merged.shopAddress;return merged}
 function saveFullTaxCompanyInfo(info){store.set('fullTaxCompanyInfo',Object.assign(getFullTaxCompanyInfo(),info));renderAllFullTaxLayoutSurfaces()}
 function isShortInvoiceType(){return window.invType&&invType.selectedIndex===1}
 function shouldUseFullTaxLayout(){return window.paperSize&&paperSize.value==='9x11'&&!isShortInvoiceType()}
@@ -2557,18 +2605,18 @@ function currentFullTaxPrintData(sample=false){
   let testNames=['ก่ ก้ ก๊ ก๋ ก์','ค่า ไม้ น้ำ สีฟ้า','สีน้ำมันแกลลอน','แม่สีปากกา ดำ แดง เหลือง เขียว น้ำเงิน น้ำตาล','หนึ่งพันยี่สิบเจ็ดบาทยี่สิบสตางค์','บริษัท โชคอนันต์ ฮาร์ดแวร์ จำกัด'];
   let items=sample?Array.from({length:10},(_,i)=>({code:'T'+String(i+1).padStart(3,'0'),name:testNames[i%testNames.length],qty:i+1,unit:i%2?'แกลลอน':'ชิ้น',price:125+i*17})):invoiceItems;
   let address=sample?{buyerAddress:'เลขที่ 78/10-12 หมู่ที่ 5 ตำบลสุรศักดิ์ อำเภอศรีราชา จังหวัดชลบุรี',buyerAddress1:'เลขที่ 78/10-12 หมู่ที่ 5 ตำบลสุรศักดิ์',buyerAddress2:'อำเภอศรีราชา จังหวัดชลบุรี'}:invoiceCustomerAddressParts(selectedInvoiceCustomerId,buyerAddress.value);
-  return {company:ci,invoiceNo:sample?'TEST-000001':invNo.value,date:sample?(new Date().toISOString().slice(0,10)):invDate.value,buyerName:sample?'บริษัท โชคอนันต์ ฮาร์ดแวร์ จำกัด':buyerName.value,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:sample?'0105559999999':buyerTax.value,items,itemStart:1,amounts:c,amountWords:sample?'หนึ่งพันยี่สิบเจ็ดบาทยี่สิบสตางค์':thaiBahtText(c.total)}
+  let customerName=sample?'บริษัท โชคอนันต์ ฮาร์ดแวร์ จำกัด':buyerName.value,customerTaxId=sample?'0105559999999':String(buyerTax.value||'');return {company:ci,invoiceNo:sample?'TEST-000001':invNo.value,date:sample?(new Date().toISOString().slice(0,10)):invDate.value,buyerName:customerName,customerName,printCustomerName:customerName,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:customerTaxId,customerTaxId,printCustomerTaxId:customerTaxId,shopAddress:ci.shopAddress||ci.companyAddress||'',shopAddress1:ci.shopAddress1||'',shopAddress2:ci.shopAddress2||'',items,itemStart:1,amounts:c,amountWords:sample?'หนึ่งพันยี่สิบเจ็ดบาทยี่สิบสตางค์':thaiBahtText(c.total)}
 }
 function savedInvoiceFullTaxPrintData(x){
   let ci=getFullTaxCompanyInfo(),oldItems=invoiceItems,oldVat=window.vatMode?vatMode.value:'included',c;
   invoiceItems=JSON.parse(JSON.stringify(x.items||[]));if(window.vatMode)vatMode.value=x.vatMode||'included';c=calc();invoiceItems=oldItems;if(window.vatMode)vatMode.value=oldVat;
   let address=(x.buyerAddress1!==undefined||x.buyerAddress2!==undefined)?{buyerAddress:x.buyerAddress||[x.buyerAddress1,x.buyerAddress2].filter(Boolean).join('\n').trim(),buyerAddress1:customerAddress1ForInvoice(x.buyerAddress1||''),buyerAddress2:x.buyerAddress2||''}:invoiceCustomerAddressParts(x.customerId,x.buyerAddress||'');
-  return {company:ci,invoiceNo:x.no,date:x.date,buyerName:x.buyerName,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:x.buyerTax,items:x.items||[],itemStart:+x.itemStart||1,amounts:c,amountWords:thaiBahtText(c.total)}
+  let customerName=x.buyerName||x.customerName||x.customerSnapshot?.customerName||'',customerTaxId=String(x.buyerTax||x.customerTaxId||x.taxId||x.customerSnapshot?.taxId||'');return {company:ci,invoiceNo:x.no,date:x.date,buyerName:customerName,customerName,printCustomerName:customerName,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:customerTaxId,customerTaxId,printCustomerTaxId:customerTaxId,shopAddress:ci.shopAddress||ci.companyAddress||'',shopAddress1:ci.shopAddress1||'',shopAddress2:ci.shopAddress2||'',items:x.items||[],itemStart:+x.itemStart||1,amounts:c,amountWords:thaiBahtText(c.total)}
 }
 function layoutObjectBindingSource(o){
   let nameKey=String(o.displayName||o.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();
   let key=String(o.source||o.displayName||o.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();
-  let map={customeraddress:'buyerAddress',customeraddress1:'buyerAddress1',customeraddress2:'buyerAddress2',buyeraddress1:'buyerAddress1',buyeraddress2:'buyerAddress2'};
+  let map={customername:'customerName',printcustomername:'customerName',customerfullname:'customerName',buyername:'buyerName',customeraddress:'buyerAddress',customeraddress1:'buyerAddress1',customeraddress2:'buyerAddress2',buyeraddress1:'buyerAddress1',buyeraddress2:'buyerAddress2',customertaxid:'customerTaxId',printcustomertaxid:'customerTaxId',customertax:'customerTaxId',taxid:'customerTaxId',taxnumber:'customerTaxId',buyertax:'buyerTax',shopaddress:'shopAddress',companyaddress:'companyAddress',selleraddress:'shopAddress',businessaddress:'shopAddress',shopaddress1:'shopAddress1',companyaddress1:'shopAddress1',selleraddress1:'shopAddress1',businessaddress1:'shopAddress1',shopaddress2:'shopAddress2',companyaddress2:'shopAddress2',selleraddress2:'shopAddress2',businessaddress2:'shopAddress2'};
   if(map[nameKey]&&nameKey!=='customeraddress')return map[nameKey];
   return map[key]||o.source||'';
 }
@@ -2583,7 +2631,10 @@ function objectText(o,data){
   if(o.text!==undefined)return o.text;
   switch(binding){
     case 'companyName':return ci.companyName||'';
-    case 'companyAddress':return ci.companyAddress||'';
+    case 'companyAddress':return ci.companyAddress||ci.shopAddress||'';
+    case 'shopAddress':return data.shopAddress||ci.shopAddress||ci.companyAddress||'';
+    case 'shopAddress1':return data.shopAddress1||ci.shopAddress1||'';
+    case 'shopAddress2':return data.shopAddress2||ci.shopAddress2||'';
     case 'companyTax':return ci.companyTax||'';
     case 'companyPhone':return ci.companyPhone||'';
     case 'footerNotes':return ci.footerNotes||'';
@@ -2591,11 +2642,13 @@ function objectText(o,data){
     case 'paymentNotes':return ci.paymentNotes||'';
     case 'invoiceNo':return data.invoiceNo||'';
     case 'date':return data.date||'';
-    case 'buyerName':return data.buyerName||'';
+    case 'buyerName':return data.buyerName||data.customerName||'';
+    case 'customerName':return data.customerName||data.printCustomerName||data.buyerName||'';
     case 'buyerAddress':return data.buyerAddress||'';
     case 'buyerAddress1':return data.buyerAddress1||'';
     case 'buyerAddress2':return data.buyerAddress2||'';
-    case 'buyerTax':return data.buyerTax||'';
+    case 'buyerTax':return data.buyerTax||data.customerTaxId||'';
+    case 'customerTaxId':return data.customerTaxId||data.printCustomerTaxId||data.buyerTax||'';
     case 'itemNo':return it?String((+data.itemStart||1)+row):'';
     case 'itemDescription':return it?it.name||'':'';
     case 'itemQty':return it?String(it.qty||''):'';
@@ -2662,18 +2715,24 @@ function startLayoutPointer(e){let obj=activeObject();selectLayoutObject(e.curre
 function moveLayoutPointer(e){let l=activeFullTaxLayout(),obj=l.objects.find(o=>o.id===(layoutDrag?.id||layoutResize?.id));if(!obj)return;let p=pagePoint(e);if(layoutDrag){obj.x=snapValue(layoutDrag.ox+p.x-layoutDrag.x);obj.y=snapValue(layoutDrag.oy+p.y-layoutDrag.y)}if(layoutResize){obj.w=Math.max(2,snapValue(layoutResize.w+p.x-layoutResize.x));obj.h=Math.max(2,snapValue(layoutResize.h+p.y-layoutResize.y))}saveActiveFullTaxLayout(l);renderLayoutDesignerCanvas();if(shouldUseFullTaxLayout())renderFullTaxLayoutPreview()}
 function endLayoutPointer(){layoutDrag=null;layoutResize=null;document.removeEventListener('mousemove',moveLayoutPointer);document.removeEventListener('mouseup',endLayoutPointer)}
 document.addEventListener('keydown',e=>{if(!document.getElementById('layoutDesigner')?.classList.contains('active'))return;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;let obj=activeObject();if(!obj||obj.locked||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;e.preventDefault();let step=e.ctrlKey?5:e.shiftKey?1:.1;if(e.key==='ArrowLeft')obj.x-=step;if(e.key==='ArrowRight')obj.x+=step;if(e.key==='ArrowUp')obj.y-=step;if(e.key==='ArrowDown')obj.y+=step;let l=activeFullTaxLayout();saveDesignerLayoutMutation(l)})
-function renderObjectList(){let box=document.getElementById('layoutObjectList'),layout=activeFullTaxLayout();if(!box)return;box.innerHTML=layout.objects.map(o=>`<button class="${o.id===selectedLayoutObjectId?'active':''}" onclick="selectLayoutObject('${o.id}')">${escapeHtml(o.displayName||o.fieldName)}${o.visible===false?' (hidden)':''}${o.locked?' (locked)':''}</button>`).join('')}
+function renderObjectList(){let box=document.getElementById('layoutObjectList'),layout=activeFullTaxLayout();if(!box)return;box.innerHTML=layout.objects.length?layout.objects.map(o=>`<button class="${o.id===selectedLayoutObjectId?'active':''}" onclick="selectLayoutObject('${o.id}')">${escapeHtml(o.displayName||o.fieldName||o.id)}${o.visible===false?' (hidden)':''}${o.locked?' (locked)':''}<small style="display:block;color:#64748b;font-weight:400">ID: ${escapeHtml(o.id||'-')} | Key: ${escapeHtml(o.source||o.text||'-')}</small></button>`).join(''):'<div class="small" style="padding:10px;color:#64748b">Blank layout: no objects</div>'}
 function loadSelectedObjectForm(){let o=activeObject(),layout=activeFullTaxLayout(),ids=['objFieldName','objText','objX','objY','objW','objH','objFont','objFontSize','objFontWeight','objLineHeight','objLetterSpacing','objAlign','objBold','objThaiSafeHeight','objItalic','objUnderline','objVisible','objLocked','objRotation'];ids.forEach(id=>{let el=document.getElementById(id);if(el)el.disabled=!o});let isCompany=o&&isCompanyNameObject(o);if(window.companyNameRenderDebug)companyNameRenderDebug.textContent=isCompany?companyNameDebugText(o,layout):'';if(window.companyNameTestMode)companyNameTestMode.style.display=isCompany?'flex':'none';if(!o)return;objFieldName.value=o.displayName||o.fieldName||'';objText.value=o.text!==undefined?o.text:'';objText.disabled=!!o.source&&o.text===undefined;objX.value=o.x;objY.value=o.y;objW.value=o.w;objH.value=o.h;objFont.value=o.font||'TH Sarabun New';objFontSize.value=o.fontSize;objFontWeight.value=o.bold?'700':String(o.fontWeight||'400');objLineHeight.value=o.lineHeight||1.3;objLetterSpacing.value=(o.letterSpacing===undefined||o.letterSpacing==='normal')?'':o.letterSpacing;objAlign.value=o.align||'left';objBold.checked=!!o.bold;objThaiSafeHeight.checked=o.thaiSafeHeight!==false;objItalic.checked=!!o.italic;objUnderline.checked=!!o.underline;objVisible.checked=o.visible!==false;objLocked.checked=!!o.locked;objRotation.value=o.rotation||0}
 function updateSelectedObjectFromForm(k,v){let l=activeFullTaxLayout(),o=l.objects.find(x=>x.id===selectedLayoutObjectId);if(!o)return;if(k==='fieldName'){o.displayName=uniqueLayoutDisplayName(v,l.objects,o.id);o.fieldName=o.displayName;o.manualDisplayName=true}else if(k==='text'){o.text=v;autoRenameObjectFromText(l,o,v)}else{o[k]=v;if(k==='fontWeight')o.bold=String(v)==='700';if(k==='bold')o.fontWeight=v?'700':'400';if(k==='letterSpacing'&&(v===''||v===null))o.letterSpacing='normal';if(['x','y','w','h','fontSize','rotation','lineHeight'].includes(k)&&!Number.isFinite(v))o[k]=k==='lineHeight'?1.3:0;if(['fontSize','lineHeight','font','fontWeight','bold','h','w','align'].includes(k))ensureCompanyNameObjectBox(o)}saveDesignerLayoutMutation(l)}
 function applyThaiStandardFontToSelectedObject(){let l=activeFullTaxLayout(),o=activeObject();if(!o)return;if(isCompanyNameObject(o)){o.font='Sarabun';o.fontWeight=o.bold?'700':'500';o.lineHeight=1.25}else{o.font='TH Sarabun New';o.fontWeight=o.bold?'700':'400';o.lineHeight=1.3}o.letterSpacing='normal';o.thaiSafeHeight=true;saveDesignerLayoutMutation(l)}
 function setCompanyNameTestFontSize(size){let l=activeFullTaxLayout(),o=l.objects.find(isCompanyNameObject);if(!o)return;o.fontSize=size;o.font=o.font||'Sarabun';o.lineHeight=+o.lineHeight||1.25;o.h=Math.max(+o.h||0,minimumLayoutObjectHeight(o));selectedLayoutObjectId=o.id;saveDesignerLayoutMutation(l)}
-function addFullTaxObject(){let l=activeFullTaxLayout(),o=fullTaxObj('New Object',20,20,35,8,12,'left',false,{text:'New Object'});o.displayName=uniqueLayoutDisplayName(o.text,l.objects,o.id);o.fieldName=o.displayName;o.manualDisplayName=false;l.objects.push(o);selectedLayoutObjectId=o.id;saveDesignerLayoutMutation(l)}
-function duplicateSelectedObject(){let l=activeFullTaxLayout(),o=activeObject();if(!o)return;let n={...o,id:nextLayoutObjectId(),displayName:uniqueLayoutDisplayName(o.displayName||o.fieldName,l.objects,null),x:+o.x+3,y:+o.y+3};n.fieldName=n.displayName;l.objects.push(n);selectedLayoutObjectId=n.id;saveDesignerLayoutMutation(l)}
-function deleteSelectedObject(){let l=activeFullTaxLayout();if(!selectedLayoutObjectId)return;l.objects=l.objects.filter(o=>o.id!==selectedLayoutObjectId);selectedLayoutObjectId=null;saveDesignerLayoutMutation(l)}
+function cloneLayoutForUndo(layout){return JSON.parse(JSON.stringify(layout||activeFullTaxLayout()))}
+function pushLayoutUndo(reason){let layout=activeFullTaxLayout();layoutUndoStack.push({reason:reason||'layout-delete',layout:cloneLayoutForUndo(layout),at:new Date().toISOString()});layoutUndoStack=layoutUndoStack.slice(-10);try{store.set('lastFullTaxLayoutDeleteUndo',layoutUndoStack[layoutUndoStack.length-1])}catch(e){}}
+function markLayoutUserManaged(layout){layout.allowMissingRequiredObjects=true;layout.userManagedObjects=true;layout.updatedAt=new Date().toISOString();return layout}
+function addFullTaxObject(){let l=markLayoutUserManaged(activeFullTaxLayout()),o=fullTaxObj('New Object',20,20,35,8,12,'left',false,{text:'New Object'});o.displayName=uniqueLayoutDisplayName(o.text,l.objects,o.id);o.fieldName=o.displayName;o.manualDisplayName=false;l.blankLayout=false;l.objects.push(o);selectedLayoutObjectId=o.id;saveDesignerLayoutMutation(l)}
+function duplicateSelectedObject(){let l=markLayoutUserManaged(activeFullTaxLayout()),o=activeObject();if(!o)return;let n={...o,id:nextLayoutObjectId(),displayName:uniqueLayoutDisplayName(o.displayName||o.fieldName,l.objects,null),x:+o.x+3,y:+o.y+3,locked:false,protected:false,required:false,system:false,nonDeletable:false,isCore:false};n.fieldName=n.displayName;l.blankLayout=false;l.objects.push(n);selectedLayoutObjectId=n.id;saveDesignerLayoutMutation(l)}
+function deleteSelectedObject(){let l=markLayoutUserManaged(activeFullTaxLayout());normalizeLayoutObjectIds(l);if(!selectedLayoutObjectId)return alert('กรุณาเลือกวัตถุ');let o=l.objects.find(x=>x.id===selectedLayoutObjectId);if(!o)return alert('ไม่พบวัตถุที่เลือก');if(o.locked&&!confirm('วัตถุนี้ถูกล็อก ต้องการปลดล็อกและลบหรือไม่?'))return;pushLayoutUndo('delete-object');l.objects=l.objects.filter(x=>x.id!==selectedLayoutObjectId);l.blankLayout=l.objects.length===0;selectedLayoutObjectId=null;saveDesignerLayoutMutation(l)}
+function clearAllLayoutObjects(){let l=markLayoutUserManaged(activeFullTaxLayout());if(!confirm('ต้องการลบวัตถุทั้งหมดออกจากเลย์เอาต์นี้หรือไม่ การกระทำนี้ไม่ลบข้อมูลลูกค้า สินค้า หรือประวัติบิล'))return;pushLayoutUndo('clear-all-objects');let removeBg=confirm('ต้องการลบภาพพื้นหลัง/overlay ด้วยหรือไม่?');l.objects=[];l.blankLayout=true;if(removeBg)l.overlay={enabled:false,opacity:.35,image:''};selectedLayoutObjectId=null;saveDesignerLayoutMutation(l)}
+function undoLastLayoutDelete(){let item=layoutUndoStack.pop()||store.get('lastFullTaxLayoutDeleteUndo',null);if(!item?.layout)return alert('ไม่มีรายการลบให้ย้อนกลับ');saveActiveFullTaxLayout(item.layout);store.set('lastFullTaxLayoutDeleteUndo',null);selectedLayoutObjectId=null;initLayoutDesigner();renderInvoicePreview()}
 function toggleSelectedVisible(){let o=activeObject();if(!o)return;o.visible=o.visible===false;saveDesignerLayoutMutation(activeFullTaxLayout())}
 function toggleSelectedLocked(){let o=activeObject();if(!o)return;o.locked=!o.locked;saveDesignerLayoutMutation(activeFullTaxLayout())}
 function saveFullTaxLayout(){saveActiveFullTaxLayout(activeFullTaxLayout());alert('Layout saved')}
 function createFullTaxTemplate(){let name=prompt('Template name','New Template');if(!name)return;let l=defaultFullTaxLayout();l.id='tpl-'+Date.now();l.name=name;saveActiveFullTaxLayout(l);populateTemplateSelect();renderLayoutDesignerCanvas()}
+function createBlankFullTaxLayout(){let name=prompt('Template name','Blank 9 x 11 Layout');if(!name)return;let base=defaultFullTaxLayout();base.id='tpl-blank-'+Date.now();base.name=name;base.objects=[];base.blankLayout=true;base.allowMissingRequiredObjects=true;base.userManagedObjects=true;base.overlay=Object.assign({enabled:false,opacity:.35,image:''},base.overlay||{});saveActiveFullTaxLayout(base);store.set('activeFullTaxTemplate',base.id);selectedLayoutObjectId=null;populateTemplateSelect();initLayoutDesigner();renderInvoicePreview()}
 function selectFullTaxTemplate(id){store.set('activeFullTaxTemplate',id);selectedLayoutObjectId=null;initLayoutDesigner();renderInvoicePreview()}
 function renameFullTaxTemplate(){let l=activeFullTaxLayout(),name=prompt('New layout name',l.name);if(!name)return;l.name=name;saveActiveFullTaxLayout(l);populateTemplateSelect()}
 function duplicateFullTaxTemplate(){let l=JSON.parse(JSON.stringify(activeFullTaxLayout()));l.id='tpl-'+Date.now();l.name=l.name+' Copy';saveActiveFullTaxLayout(l);populateTemplateSelect();renderLayoutDesignerCanvas()}
@@ -2684,12 +2743,13 @@ function saveCompanyInfoFromDesigner(){saveFullTaxCompanyInfo({companyName:layou
 function loadDesignerPrefsForm(){let l=activeFullTaxLayout();showGrid.checked=!!l.designer.showGrid;snapGrid.checked=!!l.designer.snap;gridSize.value=String(l.designer.gridSize||1);overlayEnabled.checked=!!l.overlay.enabled;overlayOpacity.value=l.overlay.opacity||.35}
 function saveDesignerPrefs(){let l=activeFullTaxLayout();l.designer={showGrid:showGrid.checked,snap:snapGrid.checked,gridSize:+gridSize.value||1};saveDesignerLayoutMutation(l)}
 function saveOverlaySettings(){let l=activeFullTaxLayout();l.overlay.enabled=overlayEnabled.checked;l.overlay.opacity=+overlayOpacity.value||.35;saveDesignerLayoutMutation(l)}
-function loadOverlayImage(input){let file=input.files?.[0];input.value='';if(!file)return;let r=new FileReader();r.onload=()=>{let l=activeFullTaxLayout();l.overlay.image=r.result;l.overlay.enabled=true;saveActiveFullTaxLayout(l);initLayoutDesigner()};r.readAsDataURL(file)}
+function deleteLayoutBackground(){let l=activeFullTaxLayout();if(!l.overlay?.image&&!l.overlay?.enabled)return alert('ไม่มีพื้นหลังให้ลบ');if(!confirm('ลบภาพพื้นหลัง/overlay ออกจากเลย์เอาต์นี้หรือไม่?'))return;pushLayoutUndo('delete-background');l.overlay={enabled:false,opacity:.35,image:''};saveDesignerLayoutMutation(l)}
+function loadOverlayImage(input){let file=input.files?.[0];input.value='';if(!file)return;let r=new FileReader();r.onload=()=>{let l=markLayoutUserManaged(activeFullTaxLayout());l.overlay.image=r.result;l.overlay.enabled=true;saveActiveFullTaxLayout(l);initLayoutDesigner()};r.readAsDataURL(file)}
 function loadCalibrationForm(){let c=activeFullTaxLayout().calibration;calOffsetX.value=c.offsetX;calOffsetY.value=c.offsetY;calTopMargin.value=c.topMargin;calLeftMargin.value=c.leftMargin;calLineHeight.value=c.lineHeight;calCharSpacing.value=c.charSpacing;calColumnSpacing.value=c.columnSpacing;calScaleX.value=c.scaleX;calScaleY.value=c.scaleY}
 function saveCalibrationFromDesigner(){let l=activeFullTaxLayout();l.calibration={offsetX:+calOffsetX.value||0,offsetY:+calOffsetY.value||0,topMargin:+calTopMargin.value||0,leftMargin:+calLeftMargin.value||0,lineHeight:+calLineHeight.value||0,charSpacing:+calCharSpacing.value||0,columnSpacing:+calColumnSpacing.value||0,scaleX:+calScaleX.value||1,scaleY:+calScaleY.value||1};saveDesignerLayoutMutation(l)}
 function downloadJson(name,data){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 function exportFullTaxLayout(){downloadJson('full-tax-layout.json',activeFullTaxLayout())}
-function importFullTaxLayout(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=JSON.parse(t);if(!l.objects)throw new Error('Invalid layout');l.id=l.id||'tpl-'+Date.now();saveActiveFullTaxLayout(l);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
+function importFullTaxLayout(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=JSON.parse(t);if(!Array.isArray(l.objects))throw new Error('Invalid layout');l.id=l.id||'tpl-'+Date.now();l.allowMissingRequiredObjects=true;l.userManagedObjects=true;l.blankLayout=l.objects.length===0;normalizeLayoutObjectIds(l);saveActiveFullTaxLayout(l);store.set('activeFullTaxTemplate',l.id);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
 function exportPrinterCalibration(){downloadJson('printer-calibration.json',activeFullTaxLayout().calibration)}
 function importPrinterCalibration(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=activeFullTaxLayout();l.calibration=Object.assign(defaultFullTaxCalibration(),JSON.parse(t));saveActiveFullTaxLayout(l);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
 async function printFullTaxTest(){let box=document.getElementById('templatePrintCanvas');if(!box)return;clearPrintEditingState(false);let oldTitle=document.title;document.title=' ';applyDynamicPageStyle('9x11');box.innerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(true),false);await waitForThaiFontsReady();document.body.classList.add('full-tax-test-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('full-tax-test-print');box.innerHTML='';document.title=oldTitle;applyDynamicPageStyle();initLayoutDesigner()},800)},80)}
@@ -2830,7 +2890,7 @@ window.onload=()=>{initFullTaxLayoutSystem();migrateCustomers();clearProductForm
   window.TaxInvoiceCMSBridge={getSharedProducts:()=>sharedProducts.slice(),isReadOnly:true,hasUnsavedChanges:()=>hasUnsavedInvoiceChanges,markPrinted:markPrintedViaParentBridge,markRequestOpened:markRequestOpenedViaParentBridge,markRequestImported:markRequestImportedViaParentBridge,requestEmployeeRequests:()=>post('REQUEST_EMPLOYEE_INVOICE_REQUESTS',{reason:'manual'}),requestRefresh:()=>post('REQUEST_REFRESH_TAX_HISTORY',{reason:'manual'}),diagnostics:()=>({bridgeReceivedCount:bridgeHistoryCount,desktopRenderedCount:bridgeRenderedCount,employeeRequestCount,lastBridgeUpdate,lastBridgeError,iframeBuild:window.DESKTOP_TAX_INVOICE_BUILD||''})};
 })();
 </script>
-<script src="../../modules/product-master/product-master.js?v=7.98"></script>
-<script src="../../modules/product-master/product-master-tax-bridge.js?v=7.98"></script>
+<script src="../../modules/product-master/product-master.js?v=8.03"></script>
+<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.03"></script>
 </body>
 </html>
