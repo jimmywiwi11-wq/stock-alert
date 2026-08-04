@@ -43,11 +43,13 @@ const assert = require('assert');
   const customerRows = customers.searchCustomers('012345', 5);
   assert.strictEqual(customerRows[0].customerCode, 'CU001');
   assert.strictEqual(customerRows[0].address1, '1 Main Road');
+  assert.deepStrictEqual(customers.searchCustomers('', 5), []);
 
   const productRows = products.searchProducts('PVC', 10);
   assert.strictEqual(productRows.length, 2);
   assert.strictEqual(productRows.filter(row => row.productCode === '001').length, 1);
   assert.strictEqual(products.searchProducts('piece', 10).some(row => row.productName.includes('PVC')), true);
+  assert.deepStrictEqual(products.searchProducts('', 10), []);
 
   const validItem = { productName: 'PVC Pipe 2 inch', unit: 'piece', salePrice: '120', quantity: '25' };
   assert.strictEqual(validation.validateItem(validItem).valid, true);

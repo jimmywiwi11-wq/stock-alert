@@ -94,9 +94,10 @@
   }
 
   function searchProducts(query, limit){
+    if (!normalize(query)) return [];
     return uniqueProducts(readProducts())
       .map(product => ({ product, score: score(product, query) }))
-      .filter(row => !query || row.score < 99)
+      .filter(row => row.score < 99)
       .sort((a, b) => a.score - b.score || a.product.productName.localeCompare(b.product.productName, 'th'))
       .slice(0, limit || 30)
       .map(row => row.product);
