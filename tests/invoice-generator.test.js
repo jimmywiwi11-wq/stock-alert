@@ -124,7 +124,8 @@ function testValidationAndPlan(){
   assert.deepStrictEqual(plan.invoices.map(invoice => invoice.invoiceNumber), ['IV000125', 'IV000126', 'IV000127']);
   assert.strictEqual(plan.invoices[0].itemsSnapshot.length, 10);
   assert.strictEqual(plan.invoices[2].itemsSnapshot.length, 5);
-  assert.strictEqual(plan.invoices[0].status, 'พร้อมพิมพ์');
+  assert.strictEqual(plan.invoices[0].status, 'ready_to_print');
+  assert.strictEqual(plan.invoices[0].statusText, 'พร้อมพิมพ์');
   assert.strictEqual(plan.invoices[0].printed, false);
   assert.strictEqual(plan.invoices[0].ownerUid, 'employee-1');
   assert.ok(plan.batch.vatAmount > 0);
@@ -141,10 +142,20 @@ function testPreviewAndPrint(){
   assert.strictEqual(printed.printed, true);
   assert.strictEqual(printed.printStatus, 'printed');
   const batchStatus = print.printBatchStatus([printed, plan.invoices[1]]);
-  assert.strictEqual(batchStatus.status, 'พร้อมพิมพ์');
+  assert.strictEqual(batchStatus.status, 'partially_printed');
   const requestUpdate = status.printedRequestUpdate([printed, print.markInvoicePrinted(plan.invoices[1], { by: 'Admin' }, 124)], { by: 'Admin' }, 125);
-  assert.strictEqual(requestUpdate.status, 'พิมพ์แล้ว');
+  assert.strictEqual(requestUpdate.status, 'printed');
   assert.strictEqual(requestUpdate.printedInvoiceCount, 2);
+}
+
+function testTaxInvoicesSingleSourceWritePath(){
+  const fs = require('fs');
+  const path = require('path');
+  const source = fs.readFileSync(path.join(__dirname, '..', 'modules', 'invoice-generator', 'invoice-generator.js'), 'utf8');
+  assert.ok(source.includes('const invoiceRef = store.ref(db, store.INVOICE_COLLECTION, invoice.invoiceId)'));
+  assert.ok(source.includes('transaction.set(invoiceRef, invoice)'));
+  assert.ok(!source.includes("store.ref(db, 'invoices', invoice.invoiceId)"));
+  assert.ok(!source.includes('transaction.set(desktopHistoryRef, legacyInvoiceShape(invoice))'));
 }
 
 testInvoiceNumbers();
@@ -152,5 +163,6 @@ testChunking();
 testVat();
 testValidationAndPlan();
 testPreviewAndPrint();
+testTaxInvoicesSingleSourceWritePath();
 
 console.log('invoice generator tests passed');

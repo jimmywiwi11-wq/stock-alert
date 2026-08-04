@@ -23,6 +23,17 @@
     return String(value == null ? '' : value).trim();
   }
 
+  function splitAddressForInvoice(address1='', address2=''){
+    const first = text(address1).replace(/\r/g, '');
+    const second = text(address2).replace(/\r/g, '');
+    if (second) return { address1: first, address2: second };
+    const parts = first.split('\n').map(item => item.trim()).filter(Boolean);
+    if (parts.length > 1) return { address1: parts[0], address2: parts.slice(1).join(' ') };
+    const cut = first.search(/(?:อำเภอ|อําเภอ|อ\.|เขต|จังหวัด|จ\.)/u);
+    if (cut > 0) return { address1: first.slice(0, cut).trim(), address2: first.slice(cut).trim() };
+    return { address1: first, address2: '' };
+  }
+
   function itemSnapshot(item, lineNumber){
     return {
       requestItemId: item.requestItemId || '',
@@ -42,6 +53,7 @@
 
   function customerSnapshot(customer){
     const c = customer || {};
+    const address = splitAddressForInvoice(c.address1 || c.buyerAddress1 || c.customerAddress || c.fullAddress || c.address || '', c.address2 || c.buyerAddress2 || '');
     return {
       customerId: c.customerId || c.id || '',
       customerCode: c.customerCode || c.code || '',
@@ -50,8 +62,9 @@
       taxId: c.taxId || c.tax || '',
       phone: c.phone || c.tel || '',
       branch: c.branch || '',
-      address1: c.address1 || c.buyerAddress1 || c.address || '',
-      address2: c.address2 || c.buyerAddress2 || ''
+      address1: address.address1,
+      address2: address.address2,
+      address: [address.address1, address.address2].filter(Boolean).join(' ').trim()
     };
   }
 
@@ -81,7 +94,8 @@
       total: invoice.grandTotal,
       sourceRequestId: invoice.sourceRequestId,
       sourceRequestNumber: invoice.sourceRequestNumber,
-      printStatus: 'unprinted',
+      source: 'employee-request',
+      printStatus: 'ready_to_print',
       printCount: 0
     };
   }
@@ -104,7 +118,7 @@
       paperSize: validation.SETTINGS.paperSize,
       vatMode: validation.SETTINGS.vatMode,
       vatRate: validation.SETTINGS.vatRate,
-      source: 'invoice-request',
+      source: 'employee-request',
       sourceRequestId: request.requestId,
       sourceRequestNumber: request.requestNumber,
       requestId: request.requestId,
@@ -133,11 +147,12 @@
       vat: vat.vatAmount,
       grandTotal: vat.grandTotal,
       total: vat.grandTotal,
-      status: validation.STATUS_READY,
+      status: 'ready_to_print',
+      statusText: validation.STATUS_READY,
       printed: false,
       printedAt: null,
       printedBy: '',
-      printStatus: 'unprinted',
+      printStatus: 'ready_to_print',
       printCount: 0,
       createdAt: Date.now(),
       createdByUid: actor.uid || '',
@@ -193,10 +208,8 @@
       transaction.set(lockRef, root.ChokAnanInvoiceGenerationLock.createLockPayload(requestId, actor, now), { merge: true });
       plan.invoices.forEach((invoice, index) => {
         const invoiceRef = store.ref(db, store.INVOICE_COLLECTION, invoice.invoiceId);
-        const historyRef = store.ref(db, store.HISTORY_COLLECTION, invoice.invoiceId);
         const reservationRef = store.ref(db, root.ChokAnanInvoiceNumberReservation.RESERVATION_COLLECTION, invoice.chunkKey);
         transaction.set(invoiceRef, invoice);
-        transaction.set(historyRef, { ...invoice, historyId: invoice.invoiceId, historySource: 'taxInvoiceHistory' });
         transaction.set(reservationRef, root.ChokAnanInvoiceNumberReservation.createReservation(request, plan.chunks[index], invoice.invoiceNumber, invoice.invoiceSequence));
       });
       transaction.set(counterRef, {
@@ -221,8 +234,9 @@
         requestedByUid: request.requestedByUid || ''
       });
       transaction.update(requestRef, {
-        status: root.ChokAnanInvoiceGenerationValidation.STATUS_READY,
-        generationState: 'generated',
+        status: 'ready_to_print',
+        statusText: root.ChokAnanInvoiceGenerationValidation.STATUS_READY,
+        generationState: 'completed',
         generated: true,
         generatedInvoiceIds: invoiceIds,
         generatedInvoiceNumbers: plan.invoices.map(invoice => invoice.invoiceNumber),

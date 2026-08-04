@@ -66,7 +66,8 @@ const assert = require('assert');
   assert.strictEqual(result.ok, true);
   assert.ok(writes.some(row => row.collectionName === 'taxInvoices' && row.id === 'inv-1' && row.payload.printed === true));
   const requestWrite = writes.find(row => row.collectionName === 'invoiceRequests' && row.id === 'req-1');
-  assert.strictEqual(requestWrite.payload.status, 'พิมพ์แล้ว');
+  assert.strictEqual(requestWrite.payload.status, 'printed');
+  assert.strictEqual(requestWrite.payload.printStatus, 'printed');
   assert.strictEqual(requestWrite.payload.printedInvoiceCount, 1);
 
   docs.set('invoiceNumberCounters/IV', { lastSequence: 115 });
@@ -114,9 +115,64 @@ const assert = require('assert');
     paperSize: '9x11'
   }], { by: 'desktop', uid: 'admin-1' });
   assert.strictEqual(manualRows[0].no, 'IV000116');
+  assert.strictEqual(manualRows[0].invoiceId, 'IV000116');
   assert.strictEqual(docs.get('invoiceNumberCounters/IV').lastSequence, 116);
   assert.ok(writes.some(row => row.collectionName === 'taxInvoices' && row.payload.source === 'desktop-manual'));
-  assert.ok(writes.some(row => row.collectionName === 'taxInvoiceHistory' && row.payload.invoiceNumber === 'IV000116'));
+  assert.ok(!writes.some(row => row.collectionName === 'taxInvoiceHistory' && row.payload.invoiceNumber === 'IV000116'));
+
+  const listened = [];
+  global.db.collection = function(collectionName){
+    return {
+      onSnapshot(callback){
+        listened.push(collectionName);
+        callback({
+          docs: [{
+            id: `${collectionName}-remote-1`,
+            data: () => ({
+              invoiceId: `${collectionName}-remote-1`,
+              invoiceNumber: collectionName === 'taxInvoices' ? 'IV000201' : 'IV000200',
+              requestedByUid: 'employee-1',
+              customerSnapshot: { customerName: 'Remote Buyer' },
+              items: [{ name: 'Remote Item', qty: 1, unit: 'pc', price: 20 }],
+              total: 20,
+              status: 'ready_to_print'
+            })
+          }]
+        });
+        return () => {};
+      }
+    };
+  };
+  const unsubscribe = adapter.bindFirestoreHistory({ render(){} });
+  assert.deepStrictEqual(listened.sort(), ['invoiceHistory', 'invoices', 'taxInvoiceHistory', 'taxInvoices'].sort());
+  assert.ok(adapter.readLocalInvoices().some(row => row.no === 'IV000201'));
+  unsubscribe();
+
+  global.db.collection = function(collectionName){
+    return {
+      async get(){
+        return {
+          docs: collectionName === 'taxInvoices' ? [{
+            id: 'central-refresh-1',
+            data: () => ({
+              invoiceId: 'central-refresh-1',
+              invoiceNumber: 'IV000301',
+              sourceRequestId: 'req-refresh-1',
+              requestedByUid: 'employee-2',
+              customerSnapshot: { customerName: 'Refresh Buyer', taxId: '0205567064347', address1: '210/38 Moo 7 T.Nongkham อ.ศรีราชา จ.ชลบุรี 20230' },
+              itemsSnapshot: [{ productName: 'Refresh Item', quantity: 5, unit: 'pc', salePrice: 90 }],
+              grandTotal: 481.5,
+              status: 'ready_to_print',
+              printStatus: 'unprinted'
+            })
+          }] : []
+        };
+      }
+    };
+  };
+  const refreshResult = await adapter.refreshFirestoreHistoryOnce({ render(){} });
+  assert.strictEqual(refreshResult.ok, true);
+  assert.ok(adapter.readLocalInvoices().some(row => row.no === 'IV000301' && row.sourceRequestId === 'req-refresh-1'));
 
   console.log('invoice history adapter checks passed');
 })().catch(error => {

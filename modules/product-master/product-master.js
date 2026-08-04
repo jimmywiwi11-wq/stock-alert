@@ -86,6 +86,7 @@
       productCode: row.productCode || row.code,
       name: row.name,
       productName: row.productName || row.name,
+      normalizedName: compact(row.name),
       search: compact(row.name),
       unit: text(row.unit),
       price: row.salePrice,

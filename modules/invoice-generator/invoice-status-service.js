@@ -3,15 +3,16 @@
 
   const STATUS = Object.freeze({
     PROCESSING: 'กำลังดำเนินการ',
-    READY_TO_PRINT: 'พร้อมพิมพ์',
-    PRINTED: 'พิมพ์แล้ว',
+    READY_TO_PRINT: 'ready_to_print',
+    PARTIALLY_PRINTED: 'partially_printed',
+    PRINTED: 'printed',
     FAILED: 'สร้างใบกำกับไม่สำเร็จ'
   });
 
   function readyRequestUpdate(result, actor, at){
     return {
       status: STATUS.READY_TO_PRINT,
-      generationState: 'generated',
+      generationState: 'completed',
       generated: true,
       generatedInvoiceIds: result && result.invoiceIds || [],
       generatedInvoiceNumbers: result && result.invoiceNumbers || [],

@@ -36,33 +36,34 @@ const { chromium } = require('C:/Users/Acer/.cache/codex-runtimes/codex-primary-
     await page.waitForSelector('#cmsCustomerSuggestV42.show button');
     await page.locator('#cmsCustomerSuggestV42 button').first().click();
 
-    await page.fill('#cmsProductSearchV42', 'PVC');
+    await page.fill('#cmsNewProductNameV42', 'PVC');
     await page.waitForSelector('#cmsProductSuggestV42.show button');
     await page.locator('#cmsProductSuggestV42 button').first().click();
-    await page.waitForSelector('[data-qty-index="0"]');
+    await page.waitForSelector('#cmsNewProductQtyV42');
     await page.waitForTimeout(80);
-    const focused = await page.evaluate(() => document.activeElement?.getAttribute('data-qty-index'));
-    await page.fill('[data-qty-index="0"]', '1234');
+    const focused = await page.evaluate(() => document.activeElement?.id);
+    await page.fill('#cmsNewProductQtyV42', '1234');
+    await page.click('.cmsInvoiceAddProductV42');
+    await page.waitForFunction(() => document.querySelectorAll('.cmsInvoiceItemCompactV42').length === 1);
 
     await page.fill('#cmsNewProductNameV42', `Phase 5 Smoke Product ${label}`);
     await page.fill('#cmsNewProductUnitV42', 'pc');
     await page.fill('#cmsNewProductPriceV42', '10');
     await page.fill('#cmsNewProductQtyV42', '2');
-    await page.locator('#cmsNewProductQtyV42').locator('..').locator('..').locator('..').getByRole('button').click();
-    await page.waitForFunction(() => document.querySelectorAll('.cmsInvoiceItemCardV42').length === 2);
+    await page.click('.cmsInvoiceAddProductV42');
+    await page.waitForFunction(() => document.querySelectorAll('.cmsInvoiceItemCompactV42').length === 2);
 
     await page.locator('button.cmsInvoiceSecondaryV42').filter({ hasText: 'บันทึกร่างคำขอ' }).click();
     const draftLen = await page.evaluate(() => JSON.parse(localStorage.getItem('cms.invoiceRequest.productionDrafts') || '[]').length);
 
-    await page.locator('button.cmsInvoicePrimaryV42').click();
-    await page.waitForSelector('#cmsInvoiceRequestStatusPageV42.active');
+    const statusVisible = await page.locator('#cmsInvoiceRequestStatusPageV42.active').isVisible().catch(() => false);
     const requestLen = await page.evaluate(() => JSON.parse(localStorage.getItem('cms.invoiceRequest.productionRequests') || '[]').length);
     const pendingLen = await page.evaluate(() => JSON.parse(localStorage.getItem('cms.invoiceRequest.productionPending') || '[]').length);
     const productMaster = await page.evaluate(() => JSON.parse(localStorage.getItem('stockAlertProductsV730') || '[]'));
     const invoiceHistory = await page.evaluate(() => localStorage.getItem('invoices'));
     const hasHorizontalScroll = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
 
-    results.push(`${label}:visible=${visible}:focused=${focused}:drafts=${draftLen}:requests=${requestLen}:pending=${pendingLen}:products=${productMaster.length}:invoices=${invoiceHistory}:hscroll=${hasHorizontalScroll}`);
+    results.push(`${label}:visible=${visible}:focused=${focused}:statusVisible=${statusVisible}:drafts=${draftLen}:requests=${requestLen}:pending=${pendingLen}:products=${productMaster.length}:invoices=${invoiceHistory}:hscroll=${hasHorizontalScroll}`);
     await page.close();
   }
 

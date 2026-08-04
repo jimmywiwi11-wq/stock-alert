@@ -21,6 +21,9 @@
     selectedProduct: null,
     customerSearchTimer: null,
     productSearchTimer: null,
+    customerSearchToken: 0,
+    productSearchToken: 0,
+    composing: { customer: false, product: false, productName: false },
     realtimeBound: false,
     realtimeUnsubs: []
   };
@@ -181,20 +184,19 @@
 
   function renderCustomerPanel(){
     const c = state.customer;
-    const selectedName = c ? (customerSearch.fullName(c) || c.customerName || '-') : '-';
+    const selectedName = c ? (c.customerName || c.name || '-') : '-';
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">ลูกค้า</h3>
-      <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหา/เลือกลูกค้า</label><input class="cmsInvoiceInputV42" id="cmsCustomerSearchV42" placeholder="ค้นจากรหัส ชื่อ เลขภาษี หรือที่อยู่" oninput="CMSInvoiceRequest.searchCustomer(this.value)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsCustomerSuggestV42"></div></div>
+      <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหา/เลือกลูกค้า</label><input class="cmsInvoiceInputV42" id="cmsCustomerSearchV42" placeholder="ค้นจากรหัส ชื่อ เลขภาษี หรือที่อยู่" oncompositionstart="CMSInvoiceRequest.beginComposition('customer')" oncompositionend="CMSInvoiceRequest.endComposition('customer', this.value)" oninput="CMSInvoiceRequest.searchCustomer(this.value)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsCustomerSuggestV42"></div></div>
       <div class="cmsInvoiceSelectedCustomerV42" style="margin-top:10px"><label>ลูกค้าที่เลือก</label><div class="cmsInvoiceReadOnlyV42">${esc(selectedName)}</div></div>
     </div>`;
   }
 
   function renderProductPanel(){
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
-      <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหาสินค้าเดิม</label><input class="cmsInvoiceInputV42" id="cmsProductSearchV42" placeholder="ค้นจากชื่อ รหัส หน่วย ราคา หรือคำใกล้เคียง" oninput="CMSInvoiceRequest.searchProduct(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
       <div class="cmsInvoiceSubPanelV42"><h3 class="cmsInvoiceSectionTitleV42">เพิ่มสินค้า</h3>
         <div id="cmsSimilarBoxV42"></div>
         <div class="cmsInvoiceGridV42 two">
-          <div><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oninput="CMSInvoiceRequest.showSimilar(this.value)" placeholder="ชื่อสินค้าใหม่"></div>
+          <div class="cmsInvoiceSuggestWrapV42"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oninput="CMSInvoiceRequest.productNameChanged(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" placeholder="เลือกจากรายการหรือพิมพ์สินค้าใหม่"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
           <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย"></div>
           <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="ราคาขาย"></div>
           <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="จำนวน"></div>
@@ -267,13 +269,17 @@
 
   function customerSnapshot(){
     const c = state.customer || {};
+    const original = c.original || {};
+    const address1 = c.address1 || c.buyerAddress1 || c.customerAddress || c.fullAddress || original.address1 || original.buyerAddress1 || original.customerAddress || original.fullAddress || original.address || '';
+    const address2 = c.address2 || c.buyerAddress2 || original.address2 || original.buyerAddress2 || '';
     return {
       customerId: c.customerId || '',
       customerCode: c.customerCode || '',
       prefix: c.prefix || '',
       customerName: c.customerName || '',
-      address1: c.address1 || '',
-      address2: c.address2 || '',
+      address1,
+      address2,
+      address: [address1, address2].filter(Boolean).join(' ').trim(),
       taxId: c.taxId || '',
       phone: c.phone || '',
       headOffice: c.branch || '',
@@ -626,7 +632,7 @@
       store.saveProductionRequest({
         ...row,
         status: 'พร้อมพิมพ์',
-        generationState: 'generated',
+        generationState: 'completed',
         generatedInvoiceIds: result.invoiceIds || row.generatedInvoiceIds || [],
         generatedInvoiceNumbers: result.invoiceNumbers || [],
         invoiceBatchSummary: result.batch || null,
@@ -645,6 +651,60 @@
     return text(value).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '').trim();
   }
 
+  function thaiBahtTextLocal(value){
+    const amount = Math.round((Number(value) || 0) * 100) / 100;
+    const [baht, satang] = amount.toFixed(2).split('.');
+    const digits = ['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'];
+    const places = ['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];
+    function readNumber(raw){
+      const n = String(parseInt(raw || '0', 10) || 0);
+      if (n === '0') return 'ศูนย์';
+      let out = '';
+      for (let i = 0; i < n.length; i += 1) {
+        const d = Number(n[i]);
+        const pos = n.length - i - 1;
+        if (!d) continue;
+        if (pos === 1 && d === 1) out += 'สิบ';
+        else if (pos === 1 && d === 2) out += 'ยี่สิบ';
+        else if (pos === 0 && d === 1 && n.length > 1) out += 'เอ็ด';
+        else out += digits[d] + places[pos];
+      }
+      return out;
+    }
+    const result = `${readNumber(baht)}บาท`;
+    return satang === '00' ? `${result}ถ้วน` : `${result}${readNumber(satang)}สตางค์`;
+  }
+
+  function beginComposition(kind){
+    if (state.composing && kind) state.composing[kind] = true;
+  }
+
+  function endComposition(kind, value){
+    if (state.composing && kind) state.composing[kind] = false;
+    if (kind === 'customer') searchCustomer(value);
+    if (kind === 'product') searchProduct(value);
+    if (kind === 'productName') productNameChanged(value);
+  }
+
+  function hideSuggestionBox(box){
+    if (!box) return;
+    box.innerHTML = '';
+    box.dataset.rows = '[]';
+    box.classList.remove('show');
+  }
+
+  function normalizedStatus(row){
+    const status = text(row?.status).toLowerCase();
+    const printStatus = text(row?.printStatus).toLowerCase();
+    if (row?.printed === true || status === 'printed' || status === 'print_confirmed' || printStatus === 'printed' || printStatus === 'reprinted') return 'printed';
+    if (status === 'partially_printed' || printStatus === 'partially_printed') return 'partially_printed';
+    if (status === 'ready_to_print' || status === 'ready' || printStatus === 'ready_to_print' || row?.generationState === 'generated' || row?.generationState === 'completed') return 'ready_to_print';
+    if (status === 'processing' || status === 'not-started' || row?.generationState === 'not-started') return 'processing';
+    if (status.includes('พิมพ์แล้ว') || status.includes('สั่งพิมพ์แล้ว')) return 'printed';
+    if (status.includes('พร้อมพิมพ์')) return 'ready_to_print';
+    return status || 'processing';
+  }
+
   function readMobileHistory(){
     const rows = store.readJson(TAX_INVOICE_HISTORY_KEY, []);
     return Array.isArray(rows) ? rows : [];
@@ -661,9 +721,8 @@
 
   function renderProductPanel(){
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
-      <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหาสินค้าเดิม</label><input class="cmsInvoiceInputV42" id="cmsProductSearchV42" placeholder="ค้นจากชื่อ รหัส หน่วย หรือราคา" oninput="CMSInvoiceRequest.searchProduct(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
       <div class="cmsInvoiceProductEntryRowV42">
-        <div class="name"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oninput="CMSInvoiceRequest.productNameChanged(this.value)" placeholder="เลือกจากรายการหรือพิมพ์สินค้าใหม่" autocomplete="off"></div>
+        <div class="name cmsInvoiceSuggestWrapV42"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oncompositionstart="CMSInvoiceRequest.beginComposition('productName')" oncompositionend="CMSInvoiceRequest.endComposition('productName', this.value)" oninput="CMSInvoiceRequest.productNameChanged(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" placeholder="พิมพ์ชื่อสินค้า แล้วเลือกจากรายการ หรือพิมพ์สินค้าใหม่" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
         <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="0"></div>
         <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย"></div>
         <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="0.00"></div>
@@ -687,8 +746,14 @@
         <input class="unit" value="${esc(item.unit)}" oninput="CMSInvoiceRequest.updateItem(${index}, 'unit', this.value)" placeholder="หน่วย">
         <input class="price" value="${esc(item.salePrice ?? '')}" inputmode="decimal" oninput="CMSInvoiceRequest.updateItem(${index}, 'salePrice', this.value)" placeholder="ราคา">
         <div class="total" data-line-total="${index}">${money(line.lineSubtotal)}</div>
-        <button class="edit" type="button" onclick="CMSInvoiceRequest.focusItem(${index})">แก้ไข</button>
-        <button class="remove" type="button" onclick="CMSInvoiceRequest.removeItem(${index})">ลบ</button>
+        <div class="cmsInvoiceItemMenuWrapV42">
+          <button class="menu" type="button" onclick="CMSInvoiceRequest.toggleItemMenu(${index}, event)" aria-label="เมนูรายการ">...</button>
+          <div class="cmsInvoiceItemMenuV42" id="cmsInvoiceItemMenuV42-${index}">
+            <button type="button" onclick="CMSInvoiceRequest.focusItem(${index});CMSInvoiceRequest.closeItemMenus()">แก้ไข</button>
+            <button type="button" class="danger" onclick="CMSInvoiceRequest.removeItem(${index})">ลบ</button>
+            <button type="button" onclick="CMSInvoiceRequest.closeItemMenus()">X ปิด</button>
+          </div>
+        </div>
         <div class="meta">${esc(item.productCode || '-')} ${badges.map(w => `<span class="cmsInvoiceBadgeV42 ${item.isNewProduct ? 'test' : ''}">${esc(w)}</span>`).join('')}</div>
         ${Object.values(errors).map(error => `<div class="cmsInvoiceErrorV42">${esc(error)}</div>`).join('')}
       </div>`;
@@ -730,10 +795,24 @@
     document.querySelector(`[data-item-index="${index}"] input`)?.focus();
   }
 
+  function closeItemMenus(){
+    document.querySelectorAll('.cmsInvoiceItemMenuV42.show').forEach(menu => menu.classList.remove('show'));
+  }
+
+  function toggleItemMenu(index, event){
+    if (event) event.stopPropagation();
+    const menu = document.getElementById(`cmsInvoiceItemMenuV42-${index}`);
+    const willShow = menu && !menu.classList.contains('show');
+    closeItemMenus();
+    if (menu && willShow) menu.classList.add('show');
+  }
+
   function productNameChanged(value){
+    if (state.composing?.productName) return;
     if (!state.selectedProduct || normalizeUiText(value) !== normalizeUiText(state.selectedProduct.productName)) {
       state.selectedProduct = null;
     }
+    searchProduct(value);
     showSimilar(value);
   }
 
@@ -754,10 +833,11 @@
 
   function clearProductEntry(){
     state.selectedProduct = null;
-    ['cmsProductSearchV42', 'cmsNewProductNameV42', 'cmsNewProductQtyV42', 'cmsNewProductUnitV42', 'cmsNewProductPriceV42'].forEach(id => {
+    ['cmsNewProductNameV42', 'cmsNewProductQtyV42', 'cmsNewProductUnitV42', 'cmsNewProductPriceV42'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    hideSuggestionBox(document.getElementById('cmsProductSuggestV42'));
     const similar = document.getElementById('cmsSimilarBoxV42');
     if (similar) similar.innerHTML = '';
   }
@@ -765,26 +845,42 @@
   function searchCustomer(query){
     const box = document.getElementById('cmsCustomerSuggestV42');
     if (!box) return;
+    if (state.composing?.customer) return;
+    if (!normalizeUiText(query)) {
+      clearTimeout(state.customerSearchTimer);
+      hideSuggestionBox(box);
+      return;
+    }
+    const token = ++state.customerSearchToken;
     clearTimeout(state.customerSearchTimer);
     state.customerSearchTimer = setTimeout(() => {
+      if (token !== state.customerSearchToken) return;
       const rows = customerSearch.searchCustomers(query, 20);
       box.innerHTML = rows.length ? rows.map((customer, index) => `<button type="button" onmousedown="CMSInvoiceRequest.selectCustomer(${index})"><b>${esc(customerSearch.fullName(customer) || customer.customerName)}</b><small>${esc(customerSearch.shortMeta(customer))}</small></button>`).join('') : '<button type="button"><b>ไม่พบลูกค้า</b><small>ค้นจากฐาน Customer Master กลางเท่านั้น</small></button>';
       box.dataset.rows = JSON.stringify(rows);
-      box.classList.toggle('show', !!normalizeUiText(query) || rows.length > 0);
+      box.classList.toggle('show', !!normalizeUiText(query));
     }, 160);
   }
 
   function searchProduct(query){
     const box = document.getElementById('cmsProductSuggestV42');
     if (!box) return;
+    if (state.composing?.product) return;
+    if (!normalizeUiText(query)) {
+      clearTimeout(state.productSearchTimer);
+      hideSuggestionBox(box);
+      return;
+    }
+    const token = ++state.productSearchToken;
     clearTimeout(state.productSearchTimer);
     state.productSearchTimer = setTimeout(() => {
+      if (token !== state.productSearchToken) return;
       const rows = productSearch.searchProducts(query, 24);
       box.innerHTML = rows.length ? rows.map((product, index) => {
         return `<button type="button" onmousedown="CMSInvoiceRequest.addExistingProduct(${index})"><b>${esc(product.productName)}</b><small>${esc(product.productCode || '-')} | หน่วย ${esc(product.unit || '-')} | ราคาขาย ${product.salePrice == null ? '-' : money(product.salePrice)}</small></button>`;
       }).join('') : '<button type="button"><b>ไม่พบสินค้าเดิม</b><small>พิมพ์ชื่อในแถวเพิ่มสินค้าเพื่อสร้าง Product Master ใหม่</small></button>';
       box.dataset.rows = JSON.stringify(rows);
-      box.classList.toggle('show', !!normalizeUiText(query) || rows.length > 0);
+      box.classList.toggle('show', !!normalizeUiText(query));
     }, 160);
   }
 
@@ -794,8 +890,6 @@
     const product = rows[index];
     if (!product) return;
     if (box) box.classList.remove('show');
-    const search = document.getElementById('cmsProductSearchV42');
-    if (search) search.value = product.productName || '';
     fillProductEntry(product);
   }
 
@@ -869,23 +963,26 @@
   }
 
   function requestIsReady(row){
-    const status = text(row?.status);
-    return status === 'พร้อมพิมพ์' || status.includes('พร้อมพิมพ์') || row?.generationState === 'generated';
+    return normalizedStatus(row) === 'ready_to_print';
   }
 
   function requestIsPrinted(row){
-    const status = text(row?.status);
-    return status === 'พิมพ์แล้ว' || status === 'สั่งพิมพ์แล้ว' || status.includes('พิมพ์แล้ว') || status.includes('สั่งพิมพ์แล้ว');
+    const status = normalizedStatus(row);
+    return status === 'printed' || status === 'partially_printed';
   }
 
   function statusClass(row){
-    if (requestIsPrinted(row)) return 'printed';
-    if (requestIsReady(row)) return 'ready';
+    const status = normalizedStatus(row);
+    if (status === 'printed') return 'printed';
+    if (status === 'partially_printed') return 'partial';
+    if (status === 'ready_to_print') return 'ready';
     return '';
   }
 
   function statusText(row){
-    if (requestIsPrinted(row)) return text(row.status) || 'พิมพ์แล้ว';
+    const status = normalizedStatus(row);
+    if (status === 'printed') return 'พิมพ์แล้ว';
+    if (status === 'partially_printed') return 'พิมพ์บางส่วน';
     if (requestIsReady(row)) return 'พร้อมพิมพ์';
     return text(row?.status) || 'กำลังดำเนินการ';
   }
@@ -911,10 +1008,10 @@
       snapshot.forEach(saveRequestSnapshotFromDoc);
       rerender();
     }, error => console.warn('[invoice-request] request listener failed', error)));
-    state.realtimeUnsubs.push(window.db.collection('taxInvoiceHistory').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
+    state.realtimeUnsubs.push(window.db.collection('taxInvoices').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
       snapshot.forEach(doc => saveMobileHistory({ ...(doc.data() || {}), historyId: doc.id }));
       rerender();
-    }, error => console.warn('[invoice-request] history listener failed', error)));
+    }, error => console.warn('[invoice-request] taxInvoices listener failed', error)));
   }
 
   function renderStatus(){
@@ -933,7 +1030,7 @@
     const generated = Array.isArray(row.generatedInvoiceNumbers) && row.generatedInvoiceNumbers.length
       ? `<br>เลขที่ใบกำกับ: ${row.generatedInvoiceNumbers.map(esc).join(', ')}`
       : '';
-    const preview = requestIsReady(row) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
+    const preview = (requestIsReady(row) || requestIsPrinted(row)) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
       ? `<button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(row.requestId)}')">ดูตัวอย่างใบกำกับภาษี</button>`
       : '';
     const action = canGenerateInvoice(row)
@@ -947,7 +1044,7 @@
     bindRealtime();
     const rows = readMobileHistory();
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
-      header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoiceHistory ฐานกลาง'),
+      header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
       '<div class="cmsInvoiceListV42">',
       rows.length ? rows.map(row => `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${row.printed ? 'printed' : 'ready'}">${row.printed ? 'พิมพ์แล้ว' : 'พร้อมพิมพ์'}</strong></span></div>`).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
       '</div>'
@@ -969,23 +1066,76 @@
     return snap.docs.map(doc => ({ ...(doc.data() || {}), invoiceId: doc.id }));
   }
 
-  function previewInvoiceHtml(invoice, index){
+  function previewAddressParts(invoice, customer){
+    const raw = invoice.buyerAddress || [customer.address1, customer.address2].filter(Boolean).join('\n') || customer.address || '';
+    if (window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.splitAddressForInvoice === 'function') {
+      const parts = window.ChokAnanInvoicePreviewService.splitAddressForInvoice(invoice.buyerAddress1 || customer.address1 || raw, invoice.buyerAddress2 || customer.address2 || '');
+      return [parts.address1, parts.address2].filter(Boolean);
+    }
+    return String(raw || '-').split('\n').map(item => item.trim()).filter(Boolean);
+  }
+
+  function previewInvoiceHtml(invoice, index, totalCount){
     const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const settings = store.readJson('settings', {});
+    const shopName = invoice.shopName || settings.shopName || 'โชคอนันต์ ฮาร์ดแวร์ (สำนักงานใหญ่)';
+    const shopAddress = invoice.shopAddress || settings.shopAddress || '';
+    const shopTax = invoice.shopTax || settings.shopTax || '';
+    const invoiceDate = invoice.invoiceDate || invoice.date || invoice.requestedAt || new Date().toISOString().slice(0, 10);
+    const invoiceNo = invoice.invoiceNumber || invoice.no || invoice.invoiceId || '-';
+    const customer = invoice.customerSnapshot || {};
+    const buyerName = invoice.customerName || invoice.buyerName || customer.customerName || customer.name || '-';
+    const buyerTax = invoice.customerTaxId || invoice.buyerTax || customer.taxId || '-';
+    const buyerAddressLines = previewAddressParts(invoice, customer);
+    const beforeVat = +invoice.beforeVat || +invoice.subtotal || 0;
+    const vatAmount = +invoice.vatAmount || +invoice.vat || 0;
+    const grandTotal = +invoice.grandTotal || +invoice.total || beforeVat + vatAmount;
+    const creditDays = invoice.creditDays ?? invoice.paymentCreditDays ?? customer.creditDays ?? 0;
+    const totalText = typeof window.thaiBahtText === 'function' ? window.thaiBahtText(grandTotal) : thaiBahtTextLocal(grandTotal);
+    const pageLabel = totalCount > 1 ? `<div class="cmsInvoicePreviewPageLabelV42">ใบที่ ${index + 1}</div>` : '';
     return `<article class="cmsInvoicePreviewSheetV42">
-      <div class="cmsInvoicePreviewHeadV42"><span>ใบที่ ${index + 1}</span><b>${esc(invoice.invoiceNumber || '-')}</b></div>
-      <div class="cmsInvoicePreviewTitleV42">ใบกำกับภาษี</div>
-      <div class="cmsInvoicePreviewBuyerV42"><b>${esc(invoice.customerName || '-')}</b><span>เลขผู้เสียภาษี: ${esc(invoice.customerTaxId || '-')}</span></div>
-      <div class="cmsInvoicePreviewTableV42">
-        <div class="head">สินค้า</div><div class="head num">จำนวน</div><div class="head num">ราคา</div><div class="head num">รวม</div>
-        ${items.map(item => `<div>${esc(item.productName || item.name || '-')}</div><div class="num">${esc(item.quantity || '')} ${esc(item.unit || '')}</div><div class="num">${money(item.salePrice || item.price)}</div><div class="num">${money(item.lineSubtotal || item.total)}</div>`).join('')}
-      </div>
-      <div class="cmsInvoicePreviewTotalsV42"><span>ก่อน VAT ${money(invoice.beforeVat)}</span><span>VAT ${money(invoice.vatAmount)}</span><b>ยอดรวม ${money(invoice.grandTotal)}</b></div>
+      ${pageLabel}
+      <section class="cmsInvoicePreviewPaperV42" aria-label="ตัวอย่างใบกำกับภาษี ${esc(invoiceNo)}">
+        <div class="cmsInvoicePreviewShopV42">
+          <b>${esc(shopName)}</b>
+          <span>${esc(shopAddress || '-')}</span>
+          ${shopTax ? `<span>เลขผู้เสียภาษี ${esc(shopTax)}</span>` : ''}
+        </div>
+        <div class="cmsInvoicePreviewRightMetaV42">
+          <span>${esc(String(invoiceDate).slice(0, 10))}</span>
+          <b>${esc(invoiceNo)}</b>
+        </div>
+        <div class="cmsInvoicePreviewBuyerTaxV42">${esc(buyerTax)}</div>
+        <div class="cmsInvoicePreviewBuyerV42">
+          <b>${esc(buyerName)}</b>
+          ${buyerAddressLines.length ? buyerAddressLines.map(line => `<span>${esc(line)}</span>`).join('') : '<span>-</span>'}
+          <span>${esc(buyerTax)}</span>
+        </div>
+        <div class="cmsInvoicePreviewDueV42">
+          <span>${esc(String(invoiceDate).slice(0, 10))}</span>
+          <b>เครดิต ${esc(creditDays || 0)} วัน</b>
+        </div>
+        <div class="cmsInvoicePreviewTableV42">
+          ${items.map((item, itemIndex) => {
+            const qty = item.quantity ?? item.qty ?? '';
+            const price = +(item.salePrice ?? item.price ?? 0);
+            const lineTotal = +(item.lineSubtotal ?? item.total ?? ((+qty || 0) * price));
+            return `<div class="seq">${itemIndex + 1}</div><div>${esc(item.productName || item.name || '-')}</div><div class="num">${esc(qty)}</div><div>${esc(item.unit || '')}</div><div class="num">${money(price)}</div><div class="num">${money(lineTotal)}</div>`;
+          }).join('')}
+        </div>
+        <div class="cmsInvoicePreviewWordsV42">${esc(totalText)}</div>
+        <div class="cmsInvoicePreviewTotalsV42">
+          <span>${money(beforeVat)}</span>
+          <span><small>7 %</small>${money(vatAmount)}</span>
+          <b>${money(grandTotal)}</b>
+        </div>
+      </section>
     </article>`;
   }
 
   async function openPreview(requestId){
     const row = store.listProductionRequests().find(item => item.requestId === requestId);
-    if (!requestIsReady(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์');
+    if (!requestIsReady(row) && !requestIsPrinted(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
     try {
       const invoices = await fetchPreviewInvoices(row);
       const payload = window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.requestPreviewPayload === 'function'
@@ -994,7 +1144,7 @@
       const modal = document.getElementById('cmsInvoicePreviewModalV42') || document.createElement('div');
       modal.id = 'cmsInvoicePreviewModalV42';
       modal.className = 'cmsInvoicePreviewModalV42';
-      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map(previewInvoiceHtml).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
+      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map((invoice, index) => previewInvoiceHtml(invoice, index, payload.invoices.length)).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
       if (!modal.parentElement) document.body.appendChild(modal);
       document.documentElement.classList.add('cmsInvoicePreviewOpenV42');
     } catch (error) {
@@ -1070,6 +1220,8 @@
     openStatus,
     openHistory,
     backHome,
+    beginComposition,
+    endComposition,
     searchCustomer,
     selectCustomer,
     searchProduct,
@@ -1080,6 +1232,8 @@
     addNewProduct,
     updateItem,
     focusItem,
+    closeItemMenus,
+    toggleItemMenu,
     quantityKey,
     removeItem,
     setNote,
@@ -1095,6 +1249,9 @@
   };
 
   window.addEventListener('chokanan-customer-master-updated', refreshCustomerSuggestions);
+  document.addEventListener('click', event => {
+    if (!event.target?.closest?.('.cmsInvoiceItemMenuWrapV42')) closeItemMenus();
+  });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
