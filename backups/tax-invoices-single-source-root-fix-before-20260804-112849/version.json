@@ -1,0 +1,6 @@
+{
+  "version": "7.91",
+  "label": "V7.91",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Unified desktop invoice history reads employee requests from primary Firestore path."
+}
