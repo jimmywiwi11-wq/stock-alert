@@ -1,0 +1,322 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserProfile() {
+      return signedIn() && exists(userPath());
+    }
+
+    function userData() {
+      return get(userPath()).data;
+    }
+
+    function isEnabledUser() {
+      return hasUserProfile() && userData().active == true;
+    }
+
+    function isEmployee() {
+      return isEnabledUser() && userData().role in ['employee', 'admin', 'owner'];
+    }
+
+    function isAdmin() {
+      return isEnabledUser() && userData().role in ['admin', 'owner'];
+    }
+
+    function assignedBranch() {
+      return userData().branch;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && uid == request.auth.uid;
+    }
+
+    function isString(value) {
+      return value is string;
+    }
+
+    function isOptionalString(value) {
+      return value == null || value is string;
+    }
+
+    function isOptionalNumber(value) {
+      return value == null || value is int || value is float;
+    }
+
+    function isOptionalDateLike(value) {
+      return value == null || value is timestamp || value is string || value is int || value is float;
+    }
+
+    function validPmCode(code) {
+      return code is string && code.matches('^PM[0-9]{5}$');
+    }
+
+    function validProductCreate(productId) {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly([
+          'id', 'productId', 'code', 'productCode', 'name', 'productName', 'search',
+          'unit', 'price', 'salePrice', 'cost', 'costPrice', 'category', 'supplier',
+          'active', 'createdFrom', 'source', 'createdByUid', 'ownerUid', 'createdBy',
+          'nickname', 'requestedBranch', 'branch', 'createdAt', 'createdDate',
+          'createdAtServer', 'updatedByUid', 'updatedBy', 'updatedAt', 'updatedDate',
+          'updatedAtServer', 'liveProductMaster', 'notes'
+        ])
+        && data.id == productId
+        && data.productId == productId
+        && validPmCode(data.productCode)
+        && data.code == data.productCode
+        && isString(data.name)
+        && isString(data.productName)
+        && data.createdFrom == 'invoice-request'
+        && data.source == 'invoice-request'
+        && data.createdByUid == request.auth.uid
+        && data.ownerUid == request.auth.uid
+        && data.active is bool
+        && isOptionalString(data.unit)
+        && isOptionalNumber(data.price)
+        && isOptionalNumber(data.salePrice)
+        && isOptionalNumber(data.cost)
+        && isOptionalNumber(data.costPrice)
+        && isOptionalDateLike(data.createdAt)
+        && isOptionalDateLike(data.updatedAt);
+    }
+
+    function validProductEmployeeUpdate() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return isEmployee()
+        && changed.hasOnly([
+          'name', 'productName', 'search', 'unit', 'price', 'salePrice',
+          'cost', 'costPrice', 'category', 'supplier', 'active', 'updatedBy',
+          'updatedByUid', 'updatedAt', 'updatedDate', 'updatedAtServer', 'notes'
+        ])
+        && request.resource.data.productCode == resource.data.productCode
+        && request.resource.data.code == resource.data.code
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdByUid == resource.data.createdByUid
+        && isOptionalNumber(request.resource.data.price)
+        && isOptionalNumber(request.resource.data.salePrice)
+        && isOptionalNumber(request.resource.data.cost)
+        && isOptionalNumber(request.resource.data.costPrice);
+    }
+
+    function validCounterCreate(prefix) {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly(['prefix', 'dateKey', 'lastSequence', 'updatedAt'])
+        && data.lastSequence is int
+        && data.lastSequence > 0
+        && (prefix == 'PM' || prefix.matches('^[0-9]{8}$'))
+        && (!('prefix' in data) || data.prefix == prefix)
+        && (!('dateKey' in data) || data.dateKey == prefix);
+    }
+
+    function validCounterUpdate(prefix) {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly(['prefix', 'dateKey', 'lastSequence', 'updatedAt'])
+        && data.lastSequence is int
+        && resource.data.lastSequence is int
+        && data.lastSequence > resource.data.lastSequence
+        && (prefix == 'PM' || prefix.matches('^[0-9]{8}$'))
+        && (!('prefix' in data) || data.prefix == prefix)
+        && (!('dateKey' in data) || data.dateKey == prefix);
+    }
+
+    function validDraftCreate() {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.ownerUid == request.auth.uid
+        && data.requestedByUid == request.auth.uid
+        && data.testMode == false
+        && data.generationState == 'not-started'
+        && data.generatedInvoiceIds is list
+        && data.generatedInvoiceIds.size() == 0
+        && data.printedInvoiceCount == 0;
+    }
+
+    function validDraftUpdate() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.requestedByUid == resource.data.requestedByUid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && changed.hasOnly([
+          'customerSnapshot', 'customer', 'invoiceSettings', 'items', 'itemSnapshots',
+          'itemCount', 'expectedInvoiceCount', 'subtotal', 'subtotalPreview', 'vatAmount',
+          'grandTotal', 'note', 'updatedAt', 'auditLog', 'idempotencyKey'
+        ]);
+    }
+
+    function validRequestCreate(requestId) {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly([
+          'idempotencyKey', 'testMode', 'ownerUid', 'requestedByUid', 'requestedBy',
+          'requestedByNickname', 'requestedBranch', 'requestedAt', 'createdAt',
+          'updatedAt', 'customerSnapshot', 'customer', 'invoiceSettings', 'items',
+          'itemSnapshots', 'itemCount', 'expectedInvoiceCount', 'subtotal',
+          'subtotalPreview', 'vatAmount', 'grandTotal', 'note', 'generationState',
+          'generatedInvoiceIds', 'printedInvoiceCount', 'createdFrom', 'appVersion',
+          'status', 'auditLog', 'requestId', 'requestNumber', 'syncStatus'
+        ])
+        && data.requestId == requestId
+        && data.ownerUid == request.auth.uid
+        && data.requestedByUid == request.auth.uid
+        && data.testMode == false
+        && data.status == 'กำลังดำเนินการ'
+        && data.generationState == 'not-started'
+        && data.generatedInvoiceIds is list
+        && data.generatedInvoiceIds.size() == 0
+        && data.printedInvoiceCount == 0
+        && data.syncStatus == 'synced'
+        && data.requestNumber is string
+        && data.requestNumber.matches('^REQ-[0-9]{8}-[0-9]{6}$')
+        && data.itemCount is int
+        && data.itemCount > 0
+        && isOptionalNumber(data.subtotal)
+        && isOptionalNumber(data.vatAmount)
+        && isOptionalNumber(data.grandTotal);
+    }
+
+    function canReadRequest() {
+      return isAdmin()
+        || isOwner(resource.data.ownerUid)
+        || (isEmployee() && resource.data.requestedBranch == assignedBranch());
+    }
+
+    function validAdminRequestUpdate() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return isAdmin()
+        && changed.hasOnly([
+          'status', 'generationState', 'generatedInvoiceIds', 'printedInvoiceCount',
+          'generatedAt', 'generatedBy', 'printedAt', 'printedBy', 'updatedAt'
+        ])
+        && request.resource.data.requestId == resource.data.requestId
+        && request.resource.data.requestNumber == resource.data.requestNumber
+        && request.resource.data.requestedByUid == resource.data.requestedByUid
+        && request.resource.data.generatedInvoiceIds is list
+        && request.resource.data.printedInvoiceCount is int;
+    }
+
+    function validIdempotencyCreate() {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly([
+          'idempotencyKey', 'requestId', 'requestNumber', 'ownerUid',
+          'requestedByUid', 'createdAt'
+        ])
+        && data.ownerUid == request.auth.uid
+        && data.requestedByUid == request.auth.uid
+        && data.idempotencyKey is string
+        && data.requestId is string
+        && data.requestNumber is string;
+    }
+
+    function validAuditCreate() {
+      let data = request.resource.data;
+      return isEmployee()
+        && data.keys().hasOnly([
+          'requestId', 'requestNumber', 'action', 'actorUid', 'by',
+          'branch', 'at', 'metadata'
+        ])
+        && data.actorUid == request.auth.uid
+        && data.action in ['submitted', 'draft-created', 'draft-updated', 'draft-deleted', 'product-created']
+        && data.requestId is string
+        && data.at is string;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /stock_alert_beta1_products/{productId} {
+      allow read: if isEmployee();
+      allow create: if validProductCreate(productId);
+      allow update: if isAdmin() || validProductEmployeeUpdate();
+      allow delete: if false;
+    }
+
+    match /products/{productId} {
+      allow read: if isEmployee();
+      allow create: if validProductCreate(productId);
+      allow update: if isAdmin() || validProductEmployeeUpdate();
+      allow delete: if false;
+    }
+
+    match /productCodeCounters/{prefix} {
+      allow read: if isEmployee();
+      allow create: if validCounterCreate(prefix);
+      allow update: if validCounterUpdate(prefix);
+      allow delete: if false;
+    }
+
+    match /invoiceRequestDrafts/{draftId} {
+      allow read: if isAdmin() || isOwner(resource.data.ownerUid);
+      allow create: if validDraftCreate();
+      allow update: if validDraftUpdate();
+      allow delete: if isOwner(resource.data.ownerUid);
+    }
+
+    match /invoiceRequests/{requestId} {
+      allow read: if canReadRequest();
+      allow create: if validRequestCreate(requestId);
+      allow update: if validAdminRequestUpdate();
+      allow delete: if false;
+    }
+
+    match /invoiceRequestCounters/{dateKey} {
+      allow read: if isEmployee();
+      allow create: if validCounterCreate(dateKey);
+      allow update: if validCounterUpdate(dateKey);
+      allow delete: if false;
+    }
+
+    match /invoiceRequestIdempotency/{key} {
+      allow read: if isAdmin() || isOwner(resource.data.ownerUid);
+      allow create: if validIdempotencyCreate();
+      allow update, delete: if false;
+    }
+
+    match /invoiceRequestAuditLogs/{auditId} {
+      allow read: if isAdmin() || isOwner(resource.data.actorUid);
+      allow create: if validAuditCreate();
+      allow update, delete: if false;
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /taxInvoices/{invoiceId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /invoiceHistory/{historyId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /taxInvoiceHistory/{historyId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

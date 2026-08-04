@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tax Invoice App V22</title>
+<link rel="icon" href="./assets/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#14264b">
+<style>
+  *{box-sizing:border-box} body{font-family:Tahoma,Arial,sans-serif;margin:0;background:#f4f6f8;color:#1f2937} header{background:#1e3a8a;color:white;padding:14px 22px;font-size:22px;font-weight:bold} nav{display:flex;gap:8px;background:#fff;padding:10px;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:10} nav button{padding:10px 16px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:8px;cursor:pointer} nav button.active{background:#2563eb;color:white;border-color:#2563eb}.page{display:none;padding:18px}.page.active{display:block}.card{background:white;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px #0001}label{display:block;font-size:13px;margin-top:8px;color:#374151}input,select,textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;margin-top:3px;font-family:inherit}textarea{min-height:62px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.btn{background:#2563eb;color:white;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;margin-top:10px}.btn.secondary{background:#64748b}.btn.danger{background:#dc2626}.btn.green{background:#16a34a}table{width:100%;border-collapse:collapse;background:white;margin-top:10px}th,td{border:1px solid #e5e7eb;padding:8px;font-size:13px;vertical-align:top}th{background:#eff6ff}.right{text-align:right}.center{text-align:center}.small{font-size:12px;color:#64748b}.invoice-box{background:white;padding:18px;border:1px solid #111;max-width:980px;margin:auto;color:#000}.invoice-title{text-align:center;font-size:22px;font-weight:bold}.invoice-sub{text-align:center;font-size:16px;margin-bottom:8px}.invoice-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}.invoice-total{max-width:420px;margin-left:auto}.hidden-print{}@media print{body{background:white}header,nav,.hidden-print,.page:not(.active) .invoice-box{display:none!important}.page{display:block;padding:0}.card:not(.print-card){display:none}.print-card{padding:0!important;margin:0!important;box-shadow:none!important}.invoice-box{border:0;margin:0;max-width:none;padding:0;font-size:12px;line-height:1.12}.invoice-title{font-size:18px;line-height:1;margin:0}.invoice-sub{font-size:14px;line-height:1.05;margin:0 0 2px}.invoice-box hr{margin:2px 0;border:0;border-top:1px solid #000}.invoice-meta{gap:5px;margin:2px 0;line-height:1.12}.invoice-box table{margin-top:2px}.invoice-box th,.invoice-box td{padding:2px 4px;font-size:12px;line-height:1.12;border-color:#111}.invoice-box p{margin:3px 0}.invoice-total{max-width:330px}.signature-row{margin-top:4px}.compact-note{display:none}@page{size:9in 5.5in;margin:0}}.notice{background:#fff7ed;border:1px solid #fed7aa;padding:10px;border-radius:8px;color:#9a3412}.pill{display:inline-block;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:99px;padding:2px 8px;font-size:12px}.autocomplete-wrap{position:relative}.suggestions{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 18px #0002;max-height:260px;overflow:auto;z-index:50;display:none}.suggestion-item{padding:9px 10px;cursor:pointer;border-bottom:1px solid #eef2f7;font-size:13px}.suggestion-item:hover,.suggestion-item.active{background:#eff6ff}.suggestion-code{font-weight:bold;color:#1e40af}.suggestion-price{float:right;color:#166534}.suggestion-empty{padding:10px;color:#64748b;font-size:13px}.mini-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid #000;border-bottom:1px solid #000;padding:3px 0;margin:3px 0;font-size:12px}.buyer-field.hidden{display:none}@media print{.mini-meta{font-size:11px;line-height:1.05;margin:1px 0;padding:1px 0}.tax-short .invoice-title{font-size:17px}.tax-short .invoice-sub{font-size:13px}.tax-short table th,.tax-short table td{padding:2px 3px}.tax-short p{margin:2px 0}.tax-short .invoice-total{max-width:310px}}
+/* V11 fixed-bottom invoice footer */
+.invoice-lines{width:100%;}
+.invoice-footer{width:100%;}
+.invoice-summary-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,330px);align-items:end;width:100%;}
+.invoice-summary-row .invoice-total{width:100%;max-width:none;margin-left:0;}
+.invoice-summary-row .invoice-total table{margin:0;}
+.invoice-amount-words{align-self:end;min-width:0;margin:0!important;padding:0 8px 2px 0;border-bottom:1px solid #111;line-height:1.12;overflow-wrap:anywhere;}
+@media screen{.invoice-box.paper-9x55,.invoice-box.paper-9x11{display:flex;flex-direction:column}.invoice-box.paper-9x55{min-height:5.5in}.invoice-box.paper-9x11{min-height:11in}.invoice-lines{flex:1 1 auto}.invoice-footer{margin-top:auto;border-top:0 solid transparent}}
+@media print{
+  .invoice-box{display:flex;flex-direction:column;overflow:hidden;break-after:page;page-break-after:always;}
+  .invoice-box.paper-9x55{height:calc(5.5in - 6mm);}
+  .invoice-box.paper-9x11{height:calc(11in - 6mm);}
+  .invoice-lines{flex:1 1 auto;min-height:0;overflow:hidden;}
+  .invoice-footer{margin-top:auto;flex:0 0 auto;}
+  .invoice-footer .invoice-summary-row{align-items:end;}
+  .invoice-footer .invoice-total table{margin:0;}
+  .invoice-footer p{margin:2px 0;}
+  .signature-row{margin-top:3px!important;min-height:2cm;align-items:flex-end;}
+}
+
+/* V23: isolated automatic training invoices */
+.training-banner{background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:12px;border-radius:10px;margin-bottom:12px}
+.training-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.training-stat{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.training-stat>div{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:10px}
+.training-badge{display:inline-block;padding:2px 7px;border-radius:99px;background:#dcfce7;color:#166534;font-size:11px;margin-left:5px}
+.training-print-panel{margin-top:14px;padding:14px;border:2px solid #93c5fd;border-radius:12px;background:#eff6ff}
+.training-print-status{font-size:16px;line-height:1.7;margin:8px 0;color:#1e3a8a}
+.status-unprinted{color:#92400e}.status-printed{color:#166534}.status-skipped{color:#6b7280}.status-reprinted{color:#7e22ce}
+.backup-status{background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:12px;line-height:1.8;margin:10px 0}
+.backup-warning{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:10px;padding:10px;margin:8px 0}
+#trainingPrintArea{display:none}
+@media print{
+  body.training-print header,body.training-print nav,body.training-print .page,body.training-print #invoicePreview{display:none!important}
+  body.training-print #autoInvoice{display:block!important;padding:0!important}
+  body.training-print #autoInvoice .card{display:none!important}
+  body.training-print #trainingPrintArea{display:block!important}
+  body.training-print #trainingPrintArea .invoice-box{display:flex!important}
+  body.training-print #trainingPrintArea .invoice-box{break-after:page;page-break-after:always}
+  body.training-print #trainingPrintArea .invoice-box:last-child{break-after:auto;page-break-after:auto}
+}
+@media(max-width:900px){.training-stat{grid-template-columns:1fr 1fr}}
+
+
+/* V16 print controls */
+@media print{
+  html,body{margin:0!important;padding:0!important;width:100%!important;height:auto!important;}
+  body{print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+  .invoice-box{transform-origin:top left;}
+}
+.print-settings{border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:12px;margin-top:10px}
+.print-settings h3{margin:0 0 6px 0}
+.print-note{font-size:12px;color:#1e40af;margin-top:6px}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:9999;align-items:center;justify-content:center;padding:18px}
+.modal-backdrop.show{display:flex}
+.modal-box{background:white;border-radius:14px;box-shadow:0 20px 45px #0004;width:min(1100px,96vw);max-height:90vh;overflow:auto;padding:16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #e5e7eb;padding-bottom:8px;margin-bottom:8px}
+.modal-head h3{margin:0}.xbtn{background:#e5e7eb;color:#111;border:0;border-radius:8px;padding:8px 10px;cursor:pointer}.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+@media print{.modal-backdrop{display:none!important}}
+.bulk-print-options label{font-size:14px;margin:8px 0}.bulk-print-options input[type=radio]{width:auto;margin-right:6px}.bulk-print-range{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.bulk-print-progress{margin-top:12px;padding:12px;border:1px solid #bfdbfe;border-radius:10px;background:#eff6ff;display:none}.bulk-print-bar{height:14px;border-radius:99px;background:#dbeafe;overflow:hidden;margin-top:8px}.bulk-print-bar span{display:block;height:100%;width:0;background:#2563eb;transition:width .2s}
+
+
+/* V16: wider product search and full product detail dropdown in invoice page */
+#invoice .product-invoice-search{grid-column:1 / -1;}
+#invoice #productSearchInvoice{font-size:15px;padding:11px 12px;}
+#productSuggestions{min-width:760px;max-height:360px;}
+.product-suggestion-header,.product-suggestion-row{display:grid;grid-template-columns:110px minmax(320px,1fr) 90px 100px 100px;gap:8px;align-items:center;}
+.product-suggestion-header{padding:8px 10px;background:#dbeafe;color:#1e3a8a;font-weight:bold;border-bottom:1px solid #bfdbfe;font-size:12px;position:sticky;top:0;z-index:1;}
+.product-suggestion-name{white-space:normal;word-break:break-word;}
+.customer-name-autocomplete-wrap{position:relative;}
+#customerSuggestions,#buyerNameSuggestions{min-width:520px;max-height:360px;}
+.customer-suggestion-section{padding:7px 10px;background:#f8fafc;color:#475569;font-size:12px;font-weight:bold;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:1;}
+.customer-suggestion-main{display:flex;gap:8px;align-items:baseline;line-height:1.3;}
+.customer-suggestion-name{font-weight:bold;color:#111827;word-break:break-word;}
+.customer-suggestion-tax,.customer-suggestion-address{margin-top:3px;color:#64748b;line-height:1.35;}
+.customer-selection-status{min-height:16px;margin-top:3px;font-size:12px;color:#64748b;}
+.customer-selection-status.selected{color:#166534;}
+.customer-selection-status.unselected{color:#9a3412;}
+.customer-suggestion-add{display:block;width:100%;padding:9px 10px;border:0;background:#eff6ff;color:#1e40af;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;}
+.customer-suggestion-add:hover{background:#dbeafe;}
+.invoice-items-edit-table col.col-code{width:110px}.invoice-items-edit-table col.col-name{width:46%}.invoice-items-edit-table col.col-qty{width:100px}.invoice-items-edit-table col.col-unit{width:100px}.invoice-items-edit-table col.col-price{width:120px}.invoice-items-edit-table col.col-total{width:120px}.invoice-items-edit-table col.col-action{width:70px}
+@media(max-width:900px){#productSuggestions{min-width:100%;}.product-suggestion-header,.product-suggestion-row{grid-template-columns:90px minmax(180px,1fr) 70px 80px 80px;font-size:12px;gap:5px}}
+
+/* Inline editing on product table */
+.app-brand{display:flex;align-items:center;gap:12px;background:#14264b;color:white;padding:12px 20px}
+.app-logo{width:42px;height:42px;border-radius:10px;box-shadow:0 0 0 2px #fff3;flex:0 0 auto}
+.app-title{display:flex;flex-direction:column;line-height:1.15}
+.app-title strong{font-size:21px}
+.app-title span{font-size:12px;color:#dbeafe}
+.product-edit-hint{margin:6px 0 2px;color:#475569}
+.product-table tbody tr{transition:background-color .12s ease,box-shadow .12s ease}
+.product-table tbody tr:hover>td{background-color:#eaf3ff!important;border-top-color:#8ebcff!important;border-bottom-color:#8ebcff!important}
+.product-table tbody tr:hover>td:first-child{border-left:2px solid #4f8fe8!important}
+.product-table tbody tr:hover>td:last-child{border-right:2px solid #4f8fe8!important}
+.product-table tbody tr:focus-within>td{background-color:#eef6ff;border-top-color:#6aa4ee;border-bottom-color:#6aa4ee}
+.product-table tbody tr.selected>td{background-color:#cfe3ff!important;border-color:#4f8fe8!important}
+.product-table tbody tr.selected:hover>td{background-color:#bfd9ff!important}
+.product-table tbody tr.touch-active>td{background-color:#eaf3ff!important;border-color:#8ebcff!important}
+.editable-cell{cursor:text;background:#fbfdff;box-shadow:inset 0 0 0 1px transparent}
+.inline-edit-input{width:100%;margin:0;padding:5px 7px;border-radius:6px;font-size:13px;background:white;border:2px solid #1d4ed8;box-shadow:0 0 0 3px #bfdbfe;color:#111827}
+.product-inline-message td{border-top:0;background:#fff7ed;color:#9a3412;font-size:12px;padding:6px 8px}
+.product-inline-message.saved td{background:#f0fdf4;color:#166534}
+@media print{.app-brand,.app-logo,.app-title{display:none!important}}
+
+
+/* V17: clearer shop header for printed invoice */
+.invoice-head{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;gap:8px;margin-bottom:2px;color:#000;}
+.shop-block{text-align:left;color:#000;line-height:1.05;min-width:0;}
+.shop-title{font-size:24px;font-weight:900;color:#000;line-height:1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shop-address-line{font-size:12px;font-weight:700;color:#000;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-decoration:none;}
+.doc-title-block{text-align:center;color:#000;line-height:1.05;}
+.doc-title{font-size:20px;font-weight:900;color:#000;line-height:1;margin:0;}
+.doc-copy{font-size:13px;font-weight:800;color:#000;margin-top:2px;}
+.head-spacer{min-height:1px;}
+@media print{
+  .invoice-head{margin-bottom:1px;gap:6px;}
+  .shop-title{font-size:22px!important;font-weight:900!important;color:#000!important;line-height:0.96!important;}
+  .shop-address-line{font-size:11px!important;font-weight:800!important;color:#000!important;line-height:1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-title{font-size:17px!important;font-weight:900!important;color:#000!important;}
+  .doc-copy{font-size:12px!important;font-weight:800!important;color:#000!important;}
+  .tax-short .invoice-title{font-size:17px!important;}
+}
+
+
+
+/* V20: move invoice type to right and give shop address the full width of the bill */
+.invoice-head{
+  display:grid!important;
+  grid-template-columns: 1fr 250px!important;
+  grid-template-rows:auto auto!important;
+  column-gap:8px!important;
+  row-gap:0!important;
+  align-items:start!important;
+  width:100%!important;
+}
+.invoice-head .shop-title{
+  grid-column:1!important;
+  grid-row:1!important;
+  text-align:left!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1!important;
+  margin:0!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.invoice-head .doc-title-block{
+  grid-column:2!important;
+  grid-row:1!important;
+  text-align:right!important;
+  color:#000!important;
+  line-height:1!important;
+  padding-top:2px!important;
+}
+.invoice-head .doc-title{
+  font-size:15px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1!important;
+  margin:0!important;
+  white-space:nowrap!important;
+}
+.invoice-head .doc-copy-inline{font-size:14px!important;font-weight:900!important;}
+.invoice-head .shop-address-line{
+  grid-column:1 / -1!important;
+  grid-row:2!important;
+  width:100%!important;
+  max-width:100%!important;
+  text-align:left!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1.05!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  margin-top:1px!important;
+  padding:0!important;
+  text-decoration:none!important;
+  -webkit-print-color-adjust:exact!important;
+  print-color-adjust:exact!important;
+}
+@media print{
+  .invoice-head{grid-template-columns:1fr 210px!important;column-gap:6px!important;}
+  .invoice-head .shop-title{font-size:21px!important;line-height:.95!important;}
+  .invoice-head .doc-title{font-size:14px!important;line-height:.95!important;}
+  .invoice-head .doc-copy-inline{font-size:13px!important;}
+  .invoice-head .shop-address-line{font-size:10.2px!important;line-height:1!important;letter-spacing:-0.15px!important;text-align:left!important;}
+}
+
+
+
+/* V20: move invoice title to the right and let shop address use full bill width */
+.invoice-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto auto!important;
+  column-gap:8px!important;
+  row-gap:0!important;
+  align-items:start!important;
+  width:100%!important;
+}
+.invoice-head .shop-title{
+  grid-column:1!important;
+  grid-row:1!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.invoice-head .doc-title-block{
+  grid-column:2!important;
+  grid-row:1!important;
+  justify-self:end!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+}
+.invoice-head .head-spacer{display:none!important;}
+.invoice-head .shop-address-line{
+  grid-column:1 / -1!important;
+  grid-row:2!important;
+  width:100%!important;
+  max-width:none!important;
+  display:block!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  color:#000!important;
+  font-weight:900!important;
+  text-decoration:none!important;
+}
+@media print{
+  .invoice-head{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    column-gap:6px!important;
+    row-gap:0!important;
+  }
+  .invoice-head .shop-title{
+    font-size:22px!important;
+    line-height:.96!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  .invoice-head .doc-title-block{
+    justify-self:end!important;
+    text-align:right!important;
+  }
+  .invoice-head .doc-title{
+    font-size:15px!important;
+    line-height:.96!important;
+    white-space:nowrap!important;
+  }
+  .invoice-head .doc-copy-inline{
+    font-size:13px!important;
+    font-weight:900!important;
+  }
+  .invoice-head .shop-address-line{
+    font-size:10.5px!important;
+    line-height:1!important;
+    letter-spacing:-0.2px!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    text-align:left!important;
+    color:#000!important;
+    font-weight:900!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+}
+/* Full Tax Invoice 9x11 configurable layout engine */
+.layout-shell{display:grid;grid-template-columns:300px minmax(0,1fr) 320px;gap:12px;align-items:start}
+.layout-panel{background:#fff;border:1px solid #d7dee8;border-radius:8px;padding:12px}
+.layout-panel h3{margin:0 0 8px 0;font-size:16px}
+.layout-toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.layout-toolbar button,.layout-panel button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:7px;padding:7px 9px;cursor:pointer}
+.layout-toolbar button.primary,.layout-panel button.primary{background:#2563eb;color:white;border-color:#2563eb}
+.layout-toolbar button.danger,.layout-panel button.danger{background:#dc2626;color:white;border-color:#dc2626}
+.layout-page-wrap{overflow:auto;background:#e9eef5;border:1px solid #cbd5e1;border-radius:8px;padding:18px;max-height:calc(100vh - 170px)}
+.full-layout-page{position:relative;width:229mm;height:279.4mm;background:#fff;margin:auto;color:#000;overflow:hidden;box-shadow:0 8px 24px #0002;border:1px solid #111;font-family:"TH Sarabun New",Tahoma,Arial,sans-serif}
+.full-layout-page.design-grid.grid-05{background-image:linear-gradient(to right,rgba(37,99,235,.16) 1px,transparent 1px),linear-gradient(to bottom,rgba(37,99,235,.16) 1px,transparent 1px);background-size:.5mm .5mm}
+.full-layout-page.design-grid.grid-1{background-image:linear-gradient(to right,rgba(37,99,235,.18) 1px,transparent 1px),linear-gradient(to bottom,rgba(37,99,235,.18) 1px,transparent 1px);background-size:1mm 1mm}
+.full-layout-page.design-grid.grid-2{background-image:linear-gradient(to right,rgba(37,99,235,.2) 1px,transparent 1px),linear-gradient(to bottom,rgba(37,99,235,.2) 1px,transparent 1px);background-size:2mm 2mm}
+.layout-overlay{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:0}
+.print-object{position:absolute;z-index:1;white-space:pre-wrap;overflow:hidden;padding:0 1mm;border:1px dashed transparent;background:transparent;line-height:1.05;cursor:default}
+.print-object.design{border-color:#94a3b8;background:rgba(255,255,255,.35);cursor:move}
+.print-object.selected{border:2px solid #2563eb;background:rgba(219,234,254,.45)}
+.print-object.locked{cursor:not-allowed;border-style:dotted}
+.print-object .resize-handle{position:absolute;right:-4px;bottom:-4px;width:9px;height:9px;border:1px solid #1d4ed8;background:white;border-radius:2px;display:none;cursor:nwse-resize}
+.print-object.selected .resize-handle{display:block}
+.object-list{max-height:330px;overflow:auto;border:1px solid #e2e8f0;border-radius:8px;margin-top:8px}
+.object-list button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #e2e8f0;background:#fff;border-radius:0;padding:8px 10px}
+.object-list button.active{background:#dbeafe;color:#1e3a8a;font-weight:bold}
+.designer-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.designer-form .wide{grid-column:1 / -1}
+.designer-form label{margin-top:0}
+.designer-form input[type=checkbox]{width:auto}
+#layoutImportInput,#calibrationImportInput,#overlayImageInput{display:none}
+#templatePrintCanvas{display:none}
+@media(max-width:1100px){.layout-shell{grid-template-columns:1fr}.layout-page-wrap{max-height:none}}
+@media print{
+  .full-layout-page.invoice-box{width:229mm!important;height:279.4mm!important;max-width:none!important;min-height:0!important;border:0!important;margin:0!important;padding:0!important;box-shadow:none!important;display:block!important;transform-origin:top left;overflow:hidden!important}
+  .full-layout-page .print-object{border:0!important;background:transparent!important}
+  .full-layout-page .resize-handle{display:none!important}
+  .full-layout-page.design-grid{background-image:none!important}
+  body.invoice-clean-print header,body.invoice-clean-print nav,body.invoice-clean-print .page{display:none!important}
+  body.invoice-clean-print #invoice{display:block!important;padding:0!important}
+  body.invoice-clean-print #invoice .hidden-print{display:none!important}
+  body.invoice-clean-print #invoice .print-card{display:block!important;padding:0!important;margin:0!important;box-shadow:none!important}
+  body.invoice-clean-print #invoicePreview{display:block!important}
+  body.invoice-clean-print #invoicePreview .invoice-box{break-after:auto!important;page-break-after:auto!important}
+  body.full-tax-test-print header,body.full-tax-test-print nav,body.full-tax-test-print .page{display:none!important}
+  body.full-tax-test-print #templatePrintCanvas{display:block!important;margin:0!important;padding:0!important}
+  body.full-tax-test-print #templatePrintCanvas .invoice-box{break-after:auto!important;page-break-after:auto!important}
+}
+</style>
+<style id="dynamicPageStyle">
+/* V16: wider product search and full product detail dropdown in invoice page */
+#invoice .product-invoice-search{grid-column:1 / -1;}
+#invoice #productSearchInvoice{font-size:15px;padding:11px 12px;}
+#productSuggestions{min-width:760px;max-height:360px;}
+.product-suggestion-header,.product-suggestion-row{display:grid;grid-template-columns:110px minmax(320px,1fr) 90px 100px 100px;gap:8px;align-items:center;}
+.product-suggestion-header{padding:8px 10px;background:#dbeafe;color:#1e3a8a;font-weight:bold;border-bottom:1px solid #bfdbfe;font-size:12px;position:sticky;top:0;z-index:1;}
+.product-suggestion-name{white-space:normal;word-break:break-word;}
+.invoice-items-edit-table col.col-code{width:110px}.invoice-items-edit-table col.col-name{width:46%}.invoice-items-edit-table col.col-qty{width:100px}.invoice-items-edit-table col.col-unit{width:100px}.invoice-items-edit-table col.col-price{width:120px}.invoice-items-edit-table col.col-total{width:120px}.invoice-items-edit-table col.col-action{width:70px}
+@media(max-width:900px){#productSuggestions{min-width:100%;}.product-suggestion-header,.product-suggestion-row{grid-template-columns:90px minmax(180px,1fr) 70px 80px 80px;font-size:12px;gap:5px}}
+
+
+/* V17: clearer shop header for printed invoice */
+.invoice-head{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:start;gap:8px;margin-bottom:2px;color:#000;}
+.shop-block{text-align:left;color:#000;line-height:1.05;min-width:0;}
+.shop-title{font-size:24px;font-weight:900;color:#000;line-height:1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shop-address-line{font-size:12px;font-weight:700;color:#000;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-decoration:none;}
+.doc-title-block{text-align:center;color:#000;line-height:1.05;}
+.doc-title{font-size:20px;font-weight:900;color:#000;line-height:1;margin:0;}
+.doc-copy{font-size:13px;font-weight:800;color:#000;margin-top:2px;}
+.head-spacer{min-height:1px;}
+@media print{
+  .invoice-head{margin-bottom:1px;gap:6px;}
+  .shop-title{font-size:22px!important;font-weight:900!important;color:#000!important;line-height:0.96!important;}
+  .shop-address-line{font-size:11px!important;font-weight:800!important;color:#000!important;line-height:1!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .doc-title{font-size:17px!important;font-weight:900!important;color:#000!important;}
+  .doc-copy{font-size:12px!important;font-weight:800!important;color:#000!important;}
+  .tax-short .invoice-title{font-size:17px!important;}
+}
+
+
+/* V20: full-width shop address and inline copy text */
+.invoice-head{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;align-items:start!important;gap:4px 8px!important;margin-bottom:2px!important;color:#000!important;}
+.invoice-head .shop-title{grid-column:1!important;grid-row:1!important;text-align:left!important;font-size:24px;font-weight:900;color:#000;line-height:1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.invoice-head .doc-title-block{grid-column:2!important;grid-row:1!important;text-align:center!important;color:#000!important;line-height:1!important;}
+.invoice-head .head-spacer{grid-column:3!important;grid-row:1!important;}
+.invoice-head .shop-address-line{grid-column:1 / -1!important;grid-row:2!important;width:100%!important;text-align:center!important;font-size:12px!important;font-weight:800!important;color:#000!important;line-height:1.05!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;margin-top:0!important;text-decoration:none!important;}
+.doc-title{font-size:18px!important;font-weight:900!important;color:#000!important;line-height:1!important;margin:0!important;}
+.doc-copy-inline{font-size:12px!important;font-weight:800!important;color:#000!important;margin-left:3px!important;white-space:nowrap!important;}
+@media print{
+  .invoice-head{gap:1px 6px!important;margin-bottom:1px!important;}
+  .invoice-head .shop-title{font-size:22px!important;font-weight:900!important;color:#000!important;line-height:0.96!important;}
+  .invoice-head .shop-address-line{font-size:11px!important;font-weight:900!important;color:#000!important;line-height:1!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .doc-title{font-size:16px!important;font-weight:900!important;color:#000!important;}
+  .doc-copy-inline{font-size:11px!important;font-weight:800!important;color:#000!important;}
+}
+
+
+
+/* V20: move invoice type to right and give shop address the full width of the bill */
+.invoice-head{
+  display:grid!important;
+  grid-template-columns: 1fr 250px!important;
+  grid-template-rows:auto auto!important;
+  column-gap:8px!important;
+  row-gap:0!important;
+  align-items:start!important;
+  width:100%!important;
+}
+.invoice-head .shop-title{
+  grid-column:1!important;
+  grid-row:1!important;
+  text-align:left!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1!important;
+  margin:0!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+.invoice-head .doc-title-block{
+  grid-column:2!important;
+  grid-row:1!important;
+  text-align:right!important;
+  color:#000!important;
+  line-height:1!important;
+  padding-top:2px!important;
+}
+.invoice-head .doc-title{
+  font-size:15px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1!important;
+  margin:0!important;
+  white-space:nowrap!important;
+}
+.invoice-head .doc-copy-inline{font-size:14px!important;font-weight:900!important;}
+.invoice-head .shop-address-line{
+  grid-column:1 / -1!important;
+  grid-row:2!important;
+  width:100%!important;
+  max-width:100%!important;
+  text-align:left!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  color:#000!important;
+  line-height:1.05!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  margin-top:1px!important;
+  padding:0!important;
+  text-decoration:none!important;
+  -webkit-print-color-adjust:exact!important;
+  print-color-adjust:exact!important;
+}
+@media print{
+  .invoice-head{grid-template-columns:1fr 210px!important;column-gap:6px!important;}
+  .invoice-head .shop-title{font-size:21px!important;line-height:.95!important;}
+  .invoice-head .doc-title{font-size:14px!important;line-height:.95!important;}
+  .invoice-head .doc-copy-inline{font-size:13px!important;}
+  .invoice-head .shop-address-line{font-size:10.2px!important;line-height:1!important;letter-spacing:-0.15px!important;text-align:left!important;}
+}
+
+</style>
+</head>
+<body>
+<header class="app-brand">
+  <img class="app-logo" src="./assets/icons/icon-64.png" alt="Tax Invoice App logo">
+  <div class="app-title">
+    <strong>Tax Invoice App</strong>
+    <span>โชคอนันต์ ฮาร์ดแวร์ • V22</span>
+  </div>
+</header>
+<nav class="hidden-print">
+  <button onclick="showPage('products')" class="active">สินค้า</button>
+  <button onclick="showPage('customers')">ลูกค้า</button>
+  <button onclick="showPage('invoice')">ออกบิล</button>
+  <button onclick="showPage('history')">ประวัติบิล</button>
+  <button onclick="showPage('settings')">ตั้งค่า</button>
+  <button onclick="showPage('layoutDesigner');initLayoutDesigner()">Print Layout Designer</button>
+  <button onclick="showPage('autoInvoice')">ออกบิลอัตโนมัติ</button>
+</nav>
+
+<section id="products" class="page active">
+  <div class="card">
+    <h2>บันทึกข้อมูลสินค้า</h2>
+    <div class="grid">
+      <div><label>รหัสสินค้า</label><input id="pCode" readonly /></div>
+      <div><label>ชื่อสินค้า</label><input id="pName" oninput="previewProductCode();checkProductDuplicateLive()" placeholder="เช่น ปูนซีเมนต์" /><div id="pDupMsg" class="dupmsg"></div></div>
+      <div><label>หน่วย</label><input id="pUnit" placeholder="ถุง / ชิ้น / เส้น" /></div>
+      <div><label>ราคาทุน</label><input id="pCost" type="number" step="0.01" /></div>
+      <div><label>ราคาขาย</label><input id="pPrice" type="number" step="0.01" /></div>
+    </div>
+    <button class="btn green" onclick="saveProduct()">บันทึกสินค้า</button>
+    <button class="btn secondary" onclick="clearProductForm()">ล้างฟอร์ม</button>
+  </div>
+
+  <div class="card">
+    <h3>นำเข้าสินค้าหลายรายการจาก Excel</h3>
+    <div class="notice">วิธีใช้: คัดลอกจาก Excel แล้ววางลงช่องนี้ โดยเรียงคอลัมน์เป็น <b>ชื่อสินค้า | หน่วย | ราคาทุน | ราคาขาย</b> โปรแกรมจะสร้างรหัสสินค้าให้อัตโนมัติ เช่น XX00001</div>
+    <textarea id="productBulkText" style="min-height:130px" placeholder="ตัวอย่างจาก Excel:
+ปูนซีเมนต์	ถุง	120	150
+เหล็กเส้น 12 มม.	เส้น	85	110"></textarea>
+    <button class="btn green" onclick="importProductsFromExcel()">นำเข้าสินค้าจาก Excel</button>
+    <button class="btn secondary" onclick="productBulkText.value=''">ล้างช่องวางข้อมูล</button>
+  </div>
+  <div class="card">
+    <label>ค้นหาสินค้า</label><input id="productSearch" oninput="renderProducts()" placeholder="พิมพ์ชื่อสินค้า หรือรหัสสินค้า" />
+    <div class="toolbar" style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button type="button" onclick="selectVisibleProducts(true)">เลือกสินค้าที่แสดงทั้งหมด</button>
+      <button type="button" onclick="selectVisibleProducts(false)">ยกเลิกเลือก</button>
+      <button type="button" class="danger" onclick="deleteSelectedProducts()">ลบสินค้าที่เลือก</button>
+      <span class="small">ติ๊กช่องด้านหน้ารายการ แล้วกดลบสินค้าที่เลือก เพื่อลบหลายรายการพร้อมกัน</span>
+    </div>
+    <div id="productsTable"></div>
+  </div>
+</section>
+
+<section id="customers" class="page">
+  <div class="card">
+    <h2>บันทึกข้อมูลลูกค้า</h2>
+    <div class="grid3">
+      <div><label>รหัสลูกค้า</label><input id="cCode" readonly /></div>
+      <div><label>คำนำหน้าชื่อ</label><input id="cPrefix" placeholder="บริษัท / ห้างหุ้นส่วนจำกัด / ร้าน / นาย" oninput="checkCustomerDuplicateLive()" /></div>
+      <div><label>ชื่อบริษัท / ชื่อลูกค้า</label><input id="cName" oninput="previewCustomerCode();checkCustomerDuplicateLive()" /></div>
+      <div><label>ที่อยู่ 1</label><textarea id="cAddress1" oninput="checkCustomerDuplicateLive()" placeholder="เลขที่ / หมู่ / ซอย / ถนน / ตำบล"></textarea></div>
+      <div><label>ที่อยู่ 2</label><textarea id="cAddress2" oninput="checkCustomerDuplicateLive()" placeholder="อำเภอ / จังหวัด / รหัสไปรษณีย์"></textarea></div>
+      <div><label>เลขประจำตัวผู้เสียภาษี</label><input id="cTax" type="text" inputmode="numeric" autocomplete="off" oninput="checkCustomerDuplicateLive()" /></div>
+    </div>
+    <div id="cDupMsg" class="dupmsg"></div>
+    <button class="btn green" onclick="saveCustomer()">บันทึกลูกค้า</button>
+    <button class="btn secondary" onclick="clearCustomerForm()">ล้างฟอร์ม</button>
+  </div>
+
+  <div class="card">
+    <h3>นำเข้าลูกค้าหลายรายการจาก Excel</h3>
+    <div class="notice">วิธีใช้: คัดลอกจาก Excel แล้ววางลงช่องนี้ โดยเรียงคอลัมน์เป็น <b>รหัสลูกค้า | คำนำหน้าชื่อ | ชื่อลูกค้า | ที่อยู่ 1 | ที่อยู่ 2 | เลขผู้เสียภาษี</b> ถ้าไม่มีรหัสลูกค้า โปรแกรมจะสร้างให้อัตโนมัติ</div>
+    <textarea id="customerBulkText" style="min-height:130px" placeholder="ตัวอย่างจาก Excel:
+AY006	บริษัท	สยามกลาง อยุธยา จำกัด	หมู่ 3 ต.พังพุย	อ.บางปะหัน จ.พระนครศรีอยุธยา 13220	0145550000301
+CH001	บริษัท	ศรีไพร จำหน่าย จำกัด (สำนักงานใหญ่)	700/400 หมู่ 7 ต.ดอนหัวฬ่อ	อ.เมือง จ.ชลบุรี 20000	0205551010223"></textarea>
+    <button class="btn green" onclick="importCustomersFromExcel()">นำเข้าลูกค้าจาก Excel</button>
+    <button class="btn secondary" onclick="customerBulkText.value=''">ล้างช่องวางข้อมูล</button>
+  </div>
+  <div class="card">
+    <label>ค้นหาลูกค้า</label><input id="customerSearch" oninput="renderCustomers()" placeholder="พิมพ์รหัส คำนำหน้า ชื่อ ที่อยู่ หรือเลขภาษี" />
+    <div id="customersTable"></div>
+  </div>
+</section>
+
+<section id="invoice" class="page">
+  <div class="card hidden-print">
+    <h2>ออกบิล</h2>
+    <div class="grid">
+      <div><label>ชนิดบิล</label><select id="invType" onchange="toggleBuyerFields();renderInvoicePreview()"><option>ใบกำกับภาษีเต็ม</option><option>ใบกำกับภาษีย่อ</option></select></div>
+      <div><label>รูปแบบ VAT</label><select id="vatMode" onchange="renderInvoiceItems()"><option value="included">ราคารวมภาษี</option><option value="excluded">ราคาแยกภาษี</option></select></div>
+      <div><label>ขนาดกระดาษ</label><select id="paperSize" onchange="applyPaperDefaults();renderInvoicePreview()"><option value="9x5.5" selected>9 × 5.5 นิ้ว</option><option value="9x11">9 × 11 นิ้ว</option></select></div>
+      <div><label>เลขที่บิล</label><input id="invNo" readonly /></div>
+      <div><label>วันที่</label><input id="invDate" type="date" onchange="renderInvoicePreview()" /></div>
+      <div class="buyer-field autocomplete-wrap customer-autocomplete-wrap"><label>ค้นหา/เลือกลูกค้า</label><input id="customerSearchInvoice" placeholder="พิมพ์ชื่อลูกค้า / เลขภาษี / ที่อยู่" oninput="handleCustomerSearchInput()" onfocus="showCustomerSuggestions()" onkeydown="handleCustomerSearchKey(event)" autocomplete="off" /><div id="customerSuggestions" class="suggestions"></div></div>
+    </div>
+    <div class="grid3">
+      <div class="buyer-field autocomplete-wrap customer-name-autocomplete-wrap"><label>ชื่อผู้ซื้อ</label><input id="buyerName" oninput="handleBuyerNameInput()" onfocus="showBuyerNameSuggestions()" onkeydown="handleBuyerNameKey(event)" autocomplete="off" /><div id="buyerCustomerStatus" class="customer-selection-status"></div><div id="buyerNameSuggestions" class="suggestions"></div></div>
+      <div class="buyer-field"><label>เลขประจำตัวผู้เสียภาษี</label><input id="buyerTax" oninput="renderInvoicePreview()" /></div>
+      <div class="autocomplete-wrap product-invoice-search"><label>ค้นหา/เลือกสินค้า</label><input id="productSearchInvoice" placeholder="พิมพ์ชื่อสินค้า / รหัสสินค้า / หน่วย แล้วเลือกจากรายการที่แสดงรายละเอียดครบ" oninput="showProductSuggestions()" onfocus="showProductSuggestions()" onkeydown="handleProductSearchKey(event)" autocomplete="off" /><div id="productSuggestions" class="suggestions"></div></div>
+    </div>
+    <div class="buyer-field"><label>ที่อยู่ผู้ซื้อ</label><textarea id="buyerAddress" oninput="renderInvoicePreview()"></textarea></div>
+    <div id="invoiceItemsEdit"></div>
+    <div class="btn-row">
+      <button class="btn green" onclick="saveInvoice()">บันทึกบิล</button>
+      <button class="btn" onclick="printAndSaveInvoice()">บันทึกและพิมพ์บิล</button>
+      <button class="btn secondary" onclick="printInvoiceClean()">พิมพ์อย่างเดียว</button>
+      <button class="btn secondary" onclick="openPrintSettingsModal()">ตั้งค่าหน้ากระดาษ</button>
+      <button class="btn secondary" onclick="newInvoice()">สร้างบิลใหม่</button>
+    </div>
+    <div class="small">V21: เพิ่มเลขที่บิลอัตโนมัติ เพิ่มระบบรีเซ็ตเลขบิล ดู/พิมพ์ซ้ำ ออกบิลซ้ำ และแก้ไขบิลเก่าได้จากหน้าประวัติ</div>
+    <div id="printSettingsModal" class="modal-backdrop" onclick="if(event.target===this)closePrintSettingsModal()">
+      <div class="modal-box">
+        <div class="modal-head"><h3>ตั้งค่าหน้ากระดาษก่อนพิมพ์</h3><button class="xbtn" onclick="closePrintSettingsModal()">ปิด</button></div>
+        <div class="print-settings">
+          <div class="grid">
+            <div><label>กว้างบิล (นิ้ว)</label><input id="psPaperWidth" type="number" step="0.01" value="9" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>สูงบิล (นิ้ว)</label><input id="psPaperHeight" type="number" step="0.01" value="5.5" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขอบบน (นิ้ว)</label><input id="psMarginTop" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขอบขวา (นิ้ว)</label><input id="psMarginRight" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขอบล่าง (นิ้ว)</label><input id="psMarginBottom" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขอบซ้าย (นิ้ว)</label><input id="psMarginLeft" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขยับบิลลง (นิ้ว)</label><input id="psTopOffset" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขยับบิลขวา (นิ้ว)</label><input id="psLeftOffset" type="number" step="0.01" value="0" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ย่อ/ขยายทั้งบิล (%)</label><input id="psScale" type="number" step="1" value="100" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขนาดตัวอักษรตอนพิมพ์</label><input id="psFontSize" type="number" step="0.5" value="12" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ความสูงบรรทัด</label><input id="psLineHeight" type="number" step="0.01" value="1.12" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ความสูงแถวสินค้า (px)</label><input id="psRowPadding" type="number" step="0.5" value="2" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ขนาดหัวบิล</label><input id="psTitleSize" type="number" step="0.5" value="17" oninput="savePrintSettings();renderInvoicePreview()"></div>
+            <div><label>ซ่อนคำว่ากระดาษในบิล</label><select id="psHidePaperText" onchange="savePrintSettings();renderInvoicePreview()"><option value="yes">ซ่อน</option><option value="no">แสดง</option></select></div>
+          </div>
+          <div class="print-note">ค่าเริ่มต้นตั้งไว้สำหรับกระดาษบิลภาษี 9×5.5 นิ้วแล้ว ถ้าใช้ 9×11 ให้เลือกขนาดกระดาษด้านบน โปรแกรมจะเปลี่ยนค่ากว้าง/สูงเป็นนิ้วให้อัตโนมัติ หากยังเห็นวันที่มุมบน ให้ปิด “Headers and footers / ส่วนหัวและส่วนท้าย” ในหน้าต่างพิมพ์ 1 ครั้ง</div>
+          <div class="btn-row"><button class="btn secondary" onclick="resetPrintSettings()">คืนค่าเริ่มต้นกระดาษบิลภาษี</button><button class="btn" onclick="savePrintSettings();closePrintSettingsModal();renderInvoicePreview()">บันทึกและปิด</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card print-card"><div id="invoicePreview"></div></div>
+</section>
+
+<section id="history" class="page">
+  <div class="card">
+    <h2>ประวัติการออกบิลย้อนหลัง 1 ปี</h2>
+    <div class="grid">
+      <div><label>ค้นหาประวัติ</label><input id="historySearch" oninput="renderHistory()" placeholder="เลขบิล ชื่อลูกค้า เลขภาษี" /></div>
+      <div><label>วันที่ต้องการรวมยอด</label><input id="summaryDate" type="date" onchange="renderHistory()" /></div>
+      <div><label>เดือนที่ต้องการรวมยอด</label><input id="summaryMonth" type="month" onchange="renderHistory()" /></div>
+      <div><label>ปีที่ต้องการรวมยอด</label><input id="summaryYear" type="number" min="2000" max="2500" onchange="renderHistory()" /></div>
+    </div>
+    <div class="card" style="box-shadow:none;border:1px solid #e5e7eb;background:#f8fafc">
+      <h3 style="margin:0 0 8px">ตั้งค่าเลขที่ใบกำกับภาษี</h3>
+      <div class="grid3">
+        <div><label>เลขที่บิลถัดไป</label><input id="invoiceNextSeq" type="number" min="1" value="1" /></div>
+        <div><label>ตัวอย่างเลขบิลถัดไป</label><input id="invoiceNextPreview" readonly /></div>
+        <div style="display:flex;gap:8px;align-items:end"><button class="btn" onclick="saveInvoiceNumberSettings()">บันทึกเลขถัดไป</button><button class="btn danger" onclick="resetInvoiceNumberToOne()">รีเซ็ตเริ่ม 1</button></div>
+      </div>
+      <div class="small">เลขบิลจะรันอัตโนมัติ เช่น IV69-000001, IV69-000002, IV69-000003 เมื่อกดบันทึกบิลหรือบันทึกและพิมพ์ หากต้องการเริ่มใหม่ให้กดรีเซ็ต</div>
+    </div>
+    <div id="historySummary"></div>
+    <div id="historyTable"></div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="card">
+    <h2>ตั้งค่าร้านค้า</h2>
+    <div class="grid3">
+      <div><label>ชื่อร้าน/บริษัท</label><input id="shopName" /></div>
+      <div><label>เลขประจำตัวผู้เสียภาษี</label><input id="shopTax" /></div>
+      <div><label>เบอร์โทร</label><input id="shopPhone" /></div>
+    </div>
+    <label>ที่อยู่ร้าน</label><textarea id="shopAddress"></textarea>
+    <button class="btn green" onclick="saveSettings()">บันทึกตั้งค่า</button>
+    <div class="notice" style="margin-top:12px">โปรแกรมเก็บข้อมูลในเครื่องนี้เท่านั้น กรุณาตั้งค่าโฟลเดอร์สำรองข้อมูลด้านล่าง เพื่อป้องกันข้อมูลสูญหายหากเบราว์เซอร์ถูกล้างข้อมูล</div>
+  </div>
+  <div class="card">
+    <h2>สำรองและกู้คืนข้อมูลในเครื่อง</h2>
+    <div class="backup-warning">ตั้งค่าครั้งแรก: กด “เลือกไดรฟ์ D” แล้วเลือกไดรฟ์ D โปรแกรมจะสร้างโฟลเดอร์ <b>ChokAnan_Invoice_Backup</b> ให้อัตโนมัติ หากเครื่องไม่มีไดรฟ์ D ให้กด “ใช้ไดรฟ์ C แทน”</div>
+    <div id="backupStatus" class="backup-status">กำลังตรวจสอบระบบสำรองข้อมูล...</div>
+    <div class="training-actions">
+      <button class="btn secondary" onclick="connectBackupDrive('D')">เลือกไดรฟ์ D</button>
+      <button class="btn secondary" onclick="connectBackupDrive('C')">ใช้ไดรฟ์ C แทน</button>
+      <button class="btn green" onclick="backupNow()">สำรองข้อมูลทันที</button>
+      <button class="btn" onclick="document.getElementById('restoreBackupInput').click()">กู้คืนข้อมูลจากไฟล์สำรอง</button>
+      <button class="btn secondary" onclick="createDesktopShortcut()">สร้างไอคอนโปรแกรมบน Desktop</button>
+    </div>
+    <input id="restoreBackupInput" type="file" accept=".json,application/json" style="display:none" onchange="restoreBackupFromFile(this)">
+    <div class="small" style="margin-top:10px">ข้อมูลอยู่ในเครื่องนี้เท่านั้น ไม่มีการส่งข้อมูลขึ้นอินเทอร์เน็ตหรือเซิร์ฟเวอร์ใด ๆ</div>
+  </div>
+</section>
+
+<section id="layoutDesigner" class="page">
+  <div class="card hidden-print">
+    <h2>Print Layout Designer</h2>
+    <div class="layout-toolbar">
+      <button class="primary" onclick="saveFullTaxLayout()">Save Layout</button>
+      <button onclick="duplicateFullTaxTemplate()">Duplicate Layout</button>
+      <button onclick="renameFullTaxTemplate()">Rename Layout</button>
+      <button class="danger" onclick="deleteFullTaxTemplate()">Delete Layout</button>
+      <button onclick="resetFullTaxLayout()">Reset Layout</button>
+      <button onclick="printFullTaxTest()">Print Test</button>
+      <button onclick="exportFullTaxLayout()">Export Layout</button>
+      <button onclick="document.getElementById('layoutImportInput').click()">Import Layout</button>
+      <input id="layoutImportInput" type="file" accept=".json,application/json" onchange="importFullTaxLayout(this)">
+    </div>
+  </div>
+  <div class="layout-shell">
+    <div class="layout-panel">
+      <h3>Templates</h3>
+      <label>Template</label>
+      <select id="layoutTemplateSelect" onchange="selectFullTaxTemplate(this.value)"></select>
+      <button class="primary" onclick="createFullTaxTemplate()">New Template</button>
+      <h3 style="margin-top:14px">Company Information</h3>
+      <label>Company Name</label><input id="layoutCompanyName" oninput="saveCompanyInfoFromDesigner()">
+      <label>Company Address</label><textarea id="layoutCompanyAddress" oninput="saveCompanyInfoFromDesigner()"></textarea>
+      <label>Company Tax ID</label><input id="layoutCompanyTax" oninput="saveCompanyInfoFromDesigner()">
+      <label>Phone Number</label><input id="layoutCompanyPhone" oninput="saveCompanyInfoFromDesigner()">
+      <label>Footer Notes</label><textarea id="layoutFooterNotes" oninput="saveCompanyInfoFromDesigner()"></textarea>
+      <label>Terms & Conditions</label><textarea id="layoutTerms" oninput="saveCompanyInfoFromDesigner()"></textarea>
+      <label>Payment Notes</label><textarea id="layoutPaymentNotes" oninput="saveCompanyInfoFromDesigner()"></textarea>
+      <h3 style="margin-top:14px">Overlay</h3>
+      <label><input id="overlayEnabled" type="checkbox" onchange="saveOverlaySettings()"> Enable Overlay</label>
+      <label>Opacity</label><input id="overlayOpacity" type="range" min="0" max="1" step="0.05" value="0.35" oninput="saveOverlaySettings()">
+      <button onclick="document.getElementById('overlayImageInput').click()">Choose Scanned Image</button>
+      <input id="overlayImageInput" type="file" accept="image/*" onchange="loadOverlayImage(this)">
+      <h3 style="margin-top:14px">Grid</h3>
+      <label><input id="showGrid" type="checkbox" checked onchange="saveDesignerPrefs()"> Show Grid</label>
+      <label><input id="snapGrid" type="checkbox" checked onchange="saveDesignerPrefs()"> Snap to Grid</label>
+      <label>Grid Size</label>
+      <select id="gridSize" onchange="saveDesignerPrefs()"><option value="0.5">0.5 mm</option><option value="1" selected>1 mm</option><option value="2">2 mm</option></select>
+    </div>
+    <div class="layout-page-wrap">
+      <div id="layoutCanvas" class="full-layout-page"></div>
+    </div>
+    <div class="layout-panel">
+      <h3>Objects</h3>
+      <div class="layout-toolbar">
+        <button onclick="addFullTaxObject()">Add</button>
+        <button onclick="duplicateSelectedObject()">Duplicate</button>
+        <button class="danger" onclick="deleteSelectedObject()">Delete</button>
+        <button onclick="toggleSelectedVisible()">Hide / Show</button>
+        <button onclick="toggleSelectedLocked()">Lock / Unlock</button>
+      </div>
+      <div id="layoutObjectList" class="object-list"></div>
+      <h3 style="margin-top:14px">Selected Object</h3>
+      <div class="designer-form">
+        <div class="wide"><label>Field Name</label><input id="objFieldName" oninput="updateSelectedObjectFromForm('fieldName',this.value)"></div>
+        <div class="wide"><label>Text</label><textarea id="objText" oninput="updateSelectedObjectFromForm('text',this.value)"></textarea></div>
+        <div><label>X Position</label><input id="objX" type="number" step="0.1" oninput="updateSelectedObjectFromForm('x',+this.value)"></div>
+        <div><label>Y Position</label><input id="objY" type="number" step="0.1" oninput="updateSelectedObjectFromForm('y',+this.value)"></div>
+        <div><label>Width</label><input id="objW" type="number" step="0.1" oninput="updateSelectedObjectFromForm('w',+this.value)"></div>
+        <div><label>Height</label><input id="objH" type="number" step="0.1" oninput="updateSelectedObjectFromForm('h',+this.value)"></div>
+        <div class="wide"><label>Font</label><input id="objFont" oninput="updateSelectedObjectFromForm('font',this.value)"></div>
+        <div><label>Font Size</label><input id="objFontSize" type="number" step="0.5" oninput="updateSelectedObjectFromForm('fontSize',+this.value)"></div>
+        <div><label>Alignment</label><select id="objAlign" onchange="updateSelectedObjectFromForm('align',this.value)"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+        <label><input id="objBold" type="checkbox" onchange="updateSelectedObjectFromForm('bold',this.checked)"> Bold</label>
+        <label><input id="objItalic" type="checkbox" onchange="updateSelectedObjectFromForm('italic',this.checked)"> Italic</label>
+        <label><input id="objUnderline" type="checkbox" onchange="updateSelectedObjectFromForm('underline',this.checked)"> Underline</label>
+        <label><input id="objVisible" type="checkbox" onchange="updateSelectedObjectFromForm('visible',this.checked)"> Visible</label>
+        <label><input id="objLocked" type="checkbox" onchange="updateSelectedObjectFromForm('locked',this.checked)"> Lock Position</label>
+        <div><label>Rotation</label><input id="objRotation" type="number" step="1" oninput="updateSelectedObjectFromForm('rotation',+this.value)"></div>
+      </div>
+      <h3 style="margin-top:14px">Printer Calibration</h3>
+      <div class="designer-form">
+        <div><label>Global Offset X</label><input id="calOffsetX" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Global Offset Y</label><input id="calOffsetY" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Top Margin</label><input id="calTopMargin" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Left Margin</label><input id="calLeftMargin" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Line Height</label><input id="calLineHeight" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Character Spacing</label><input id="calCharSpacing" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Column Spacing</label><input id="calColumnSpacing" type="number" step="0.1" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Scale X</label><input id="calScaleX" type="number" step="0.001" oninput="saveCalibrationFromDesigner()"></div>
+        <div><label>Scale Y</label><input id="calScaleY" type="number" step="0.001" oninput="saveCalibrationFromDesigner()"></div>
+      </div>
+      <div class="layout-toolbar" style="margin-top:8px">
+        <button onclick="exportPrinterCalibration()">Export Calibration</button>
+        <button onclick="document.getElementById('calibrationImportInput').click()">Import Calibration</button>
+        <input id="calibrationImportInput" type="file" accept=".json,application/json" onchange="importPrinterCalibration(this)">
+      </div>
+    </div>
+  </div>
+</section>
+<div id="templatePrintCanvas" aria-hidden="true"></div>
+
+<section id="autoInvoice" class="page">
+  <div class="card hidden-print">
+    <h2>ออกบิลอัตโนมัติ <span class="training-badge">โหมดฝึกซ้อม</span></h2>
+    <div class="training-banner"><b>พื้นที่ฝึกซ้อมแยกจากหน้าออกบิลปกติ</b><br>บิลชุดนี้จะเข้าประวัติและรายงานยอดขายทันทีเหมือนบิลจริง แต่มีป้ายกำกับสำหรับล้างเฉพาะข้อมูลฝึกซ้อมได้ โดยไม่ลบบิลขายจริง</div>
+    <div class="notice" id="autoInvoiceRuleHelp">ใบกำกับภาษีย่อ: รายเดือนต้องมีบิลทุกวัน<br>ใบกำกับภาษีเต็ม: ไม่จำเป็นต้องมีทุกวัน</div>
+    <div class="grid">
+      <div><label>ชนิดบิล</label><select id="autoInvoiceType" onchange="toggleAutoInvoiceMode()"><option>ใบกำกับภาษีย่อ</option><option>ใบกำกับภาษีเต็ม</option></select></div>
+      <div><label>รูปแบบการสร้างบิล</label><select id="autoMode" onchange="toggleAutoInvoiceMode()"><option value="daily">สร้างตามวันที่เดียว</option><option value="monthly">สร้างบิลอัตโนมัติแบบรายเดือน</option></select></div>
+      <div id="autoSingleDateField"><label>วันที่ออกบิล</label><input id="autoDate" type="date"></div>
+      <div id="autoMonthField" style="display:none"><label>เดือน</label><select id="autoMonth"><option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option><option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option><option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option></select></div>
+      <div id="autoYearField" style="display:none"><label>ปี พ.ศ.</label><input id="autoYearBE" type="number" min="2400" max="2800"></div>
+      <div><label id="autoTargetLabel">ยอดรวมที่ต้องการสร้างบิล</label><input id="autoTarget" type="number" min="0.01" step="0.01" value="100000"></div>
+      <div><label>จำนวนบิลที่ต้องการ</label><input id="autoCount" type="number" min="1" step="1" placeholder="เว้นว่าง = คำนวณอัตโนมัติ"></div>
+      <div><label>เลขที่บิลเริ่มต้น</label><input id="autoInvoiceStartNumber" inputmode="numeric" placeholder="เช่น IV000500 หรือ IV6902500" oninput="saveAutoInvoiceNumberSettings();updateAutoInvoiceNumberPreview()" onblur="normalizeAutoInvoiceStartInput(false)"></div>
+      <div><label>ขนาดกระดาษ</label><select id="autoPaper"><option value="9x5.5">9 × 5.5 นิ้ว</option><option value="9x11">9 × 11 นิ้ว</option></select></div>
+      <div><label>รูปแบบ VAT</label><select id="autoVat" onchange="updateAutoInvoiceNumberPreview()"><option value="included">รวม VAT</option><option value="excluded">แยก VAT</option></select></div>
+    </div>
+    <div class="card" style="box-shadow:none;border:1px solid #bfdbfe;margin-top:10px">
+      <h3 style="margin:0 0 8px 0">Invoice Number Settings</h3>
+      <div id="autoInvoiceNumberPreview" class="notice" style="margin-top:10px"></div>
+    </div>
+    <div class="grid">
+      <div><label>ยอดต่ำสุดต่อบิล</label><input id="autoMin" type="number" min="0.01" step="0.01" value="50"></div>
+      <div><label>ยอดสูงสุดต่อบิล</label><input id="autoMax" type="number" min="0.01" step="0.01" value="5000"></div>
+      <div><label><input id="autoRealistic" type="checkbox" checked style="width:auto"> ความสมจริงสูง</label></div>
+      <div><label><input id="autoRandomTime" type="checkbox" checked style="width:auto"> สุ่มเวลาในวันนั้น (08:00–18:30)</label></div>
+      <div><label>เวลาเริ่มสุ่ม</label><input id="autoTimeStart" type="time" value="08:00"></div>
+      <div><label>เวลาสิ้นสุดสุ่ม</label><input id="autoTimeEnd" type="time" value="18:30"></div>
+    </div>
+    <div class="card" style="box-shadow:none;border:1px solid #bfdbfe;margin-top:10px">
+      <h3 style="margin:0 0 8px 0">รูปแบบการกระจายบิล</h3>
+      <label><input name="autoDistributionMode" type="radio" value="realistic" checked style="width:auto" onclick="toggleAutoDistributionMode()"> กระจายอัตโนมัติแบบสมจริง</label>
+      <label><input name="autoDistributionMode" type="radio" value="average" style="width:auto" onclick="toggleAutoDistributionMode()"> กำหนดจำนวนเฉลี่ยต่อวัน</label>
+      <div id="autoDailyAverageField" style="display:none;max-width:260px"><label>จำนวนบิลเฉลี่ยต่อวัน</label><input id="autoDailyAverage" type="number" min="1" step="1" placeholder="เช่น 3"></div>
+    </div>
+    <div class="training-actions">
+      <button id="autoGenerateButton" class="btn green" onclick="generateTrainingInvoices()">สร้างบิลอัตโนมัติ</button>
+      <button class="btn" onclick="openBulkTrainingPrintDialog()">พิมพ์ทั้งหมด</button>
+      <button class="btn danger" onclick="clearTrainingInvoices()">ล้างข้อมูลฝึกซ้อมทั้งหมด</button>
+      <button class="btn danger" onclick="resetTrainingInvoiceNumber()">รีเซ็ตเลขที่บิลกลับเป็น 000001</button>
+    </div>
+    <div id="trainingSummary"></div>
+    <div id="trainingDailySummary"></div>
+    <div id="trainingPrintPanel" class="training-print-panel">
+      <h3 style="margin:0">พิมพ์บิลต่อเนื่องทีละใบ</h3>
+      <div id="trainingPrintStatus" class="training-print-status">ยังไม่มีชุดบิลพร้อมพิมพ์</div>
+      <div class="training-actions">
+        <button class="btn secondary" onclick="openPrintSettingsModal()">ตั้งค่าหน้ากระดาษ</button>
+        <button class="btn" onclick="printNextTrainingInvoice()">พิมพ์ใบถัดไป</button>
+        <button class="btn secondary" onclick="skipTrainingInvoice()">ข้ามใบนี้</button>
+        <button class="btn secondary" onclick="reprintLastTrainingInvoice()">พิมพ์ซ้ำใบล่าสุด</button>
+        <button id="trainingPauseButton" class="btn secondary" onclick="toggleTrainingPrintPause()">หยุดพิมพ์ชั่วคราว</button>
+        <button class="btn secondary" onclick="showAllTrainingInvoices()">กลับไปดูรายการบิลทั้งหมด</button>
+      </div>
+      <div class="small">ตั้งค่าหน้ากระดาษครั้งแรกเพียงครั้งเดียว โปรแกรมจะใช้ค่าเดิมกับทุกใบในชุด และจะพิมพ์เฉพาะเมื่อกด “พิมพ์ใบถัดไป” เท่านั้น</div>
+    </div>
+    <div id="bulkPrintModal" class="modal-backdrop" onclick="if(event.target===this)closeBulkTrainingPrintDialog()">
+      <div class="modal-box" style="width:min(560px,96vw)">
+        <div class="modal-head"><h3>พิมพ์ทั้งหมด</h3><button class="xbtn" onclick="closeBulkTrainingPrintDialog()">ปิด</button></div>
+        <div id="bulkPrintConfirmText" class="notice"></div>
+        <div class="bulk-print-options">
+          <label><input name="bulkPrintMode" type="radio" value="all" checked onchange="toggleBulkPrintRange()"> พิมพ์ทุกใบ</label>
+          <label><input name="bulkPrintMode" type="radio" value="short" onchange="toggleBulkPrintRange()"> พิมพ์เฉพาะใบกำกับภาษีย่อ</label>
+          <label><input name="bulkPrintMode" type="radio" value="full" onchange="toggleBulkPrintRange()"> พิมพ์เฉพาะใบกำกับภาษีเต็ม</label>
+          <label><input name="bulkPrintMode" type="radio" value="range" onchange="toggleBulkPrintRange()"> พิมพ์ช่วงเลขบิล</label>
+          <div id="bulkPrintRange" class="bulk-print-range" style="display:none">
+            <div><label>จาก</label><input id="bulkPrintFrom" placeholder="เช่น 000001 หรือ IV69-000001"></div>
+            <div><label>ถึง</label><input id="bulkPrintTo" placeholder="เช่น 000075 หรือ IV69-000075"></div>
+          </div>
+        </div>
+        <div id="bulkPrintProgress" class="bulk-print-progress">
+          <b id="bulkPrintProgressText">กำลังพิมพ์ 0 / 0</b>
+          <div class="bulk-print-bar"><span id="bulkPrintProgressBar"></span></div>
+        </div>
+        <div class="btn-row">
+          <button id="bulkPrintStartButton" class="btn green" onclick="startBulkTrainingPrint()">ยืนยัน</button>
+          <button id="bulkPrintCancelButton" class="btn secondary" onclick="cancelBulkTrainingPrint()">ยกเลิก</button>
+        </div>
+      </div>
+    </div>
+    <div id="trainingTable"></div>
+  </div>
+  <div id="trainingPrintArea"></div>
+</section>
+
+<script>
+const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[];
+const store={get(k,d){return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))},set(k,v){localStorage.setItem(k,JSON.stringify(v));scheduleAutoBackup('เปลี่ยนแปลงข้อมูล: '+k)}};
+let backupTimer=null,backupQueue=Promise.resolve(),backupFolderRecord=null;
+function backupDbOpen(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(new Error('เบราว์เซอร์ไม่รองรับการจำสิทธิ์โฟลเดอร์'));let req=indexedDB.open('ChokAnanInvoiceBackup',1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('settings'))req.result.createObjectStore('settings')};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+async function backupDbGet(){let db=await backupDbOpen();return new Promise((resolve,reject)=>{let req=db.transaction('settings','readonly').objectStore('settings').get('activeFolder');req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)})}
+async function backupDbPut(value){let db=await backupDbOpen();return new Promise((resolve,reject)=>{let tx=db.transaction('settings','readwrite');tx.objectStore('settings').put(value,'activeFolder');tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)})}
+function localBackupStamp(){let d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}-${String(d.getMilliseconds()).padStart(3,'0')}`}
+function localBackupDay(){let d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
+function collectBackupData(){let data={};for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i);if(k==='backupRuntimeStatus')continue;let raw=localStorage.getItem(k);try{data[k]=JSON.parse(raw)}catch{data[k]=raw}}let invoices=Array.isArray(data.invoices)?data.invoices:[];return {format:'ChokAnan Invoice Backup',version:1,createdAt:new Date().toISOString(),vatRate:VAT,data,summary:{products:Array.isArray(data.products)?data.products.length:0,customers:Array.isArray(data.customers)?data.customers.length:0,invoices:invoices.length,totalSales:invoices.reduce((s,x)=>s+(+x.total||0),0)}}}
+async function backupPermission(record,request=false){if(!record?.handle)return 'denied';if(!record.handle.queryPermission)return 'granted';let state=await record.handle.queryPermission({mode:'readwrite'});if(state==='prompt'&&request&&record.handle.requestPermission)state=await record.handle.requestPermission({mode:'readwrite'});return state}
+async function backupFileNames(handle){let names=[];for await(const [name,item] of handle.entries())if(item.kind==='file'&&/^(backup|before_restore)_.*\.json$/i.test(name))names.push(name);return names.sort()}
+async function trimOldBackups(handle){let names=await backupFileNames(handle);while(names.length>100){await handle.removeEntry(names.shift())}return names.length}
+async function writeLocalBackup(reason='automatic',prefix='backup'){
+  if(!backupFolderRecord)backupFolderRecord=await backupDbGet().catch(()=>null);if(!backupFolderRecord)throw new Error('ยังไม่ได้เลือกโฟลเดอร์สำรองข้อมูล');let permission=await backupPermission(backupFolderRecord,false);if(permission!=='granted')throw new Error('ยังไม่ได้อนุญาตให้เขียนโฟลเดอร์สำรอง กรุณาเลือกไดรฟ์อีกครั้ง');
+  let payload=collectBackupData();payload.reason=reason;let name=`${prefix}_${localBackupStamp()}.json`,fileHandle=await backupFolderRecord.handle.getFileHandle(name,{create:true}),writer=await fileHandle.createWritable();await writer.write(JSON.stringify(payload,null,2));await writer.close();let count=await trimOldBackups(backupFolderRecord.handle),status={path:backupFolderRecord.path,lastAt:new Date().toISOString(),lastFile:name,count};localStorage.setItem('backupRuntimeStatus',JSON.stringify(status));await refreshBackupStatus();return status;
+}
+function createLocalBackup(reason='automatic',prefix='backup'){backupQueue=backupQueue.catch(()=>{}).then(()=>writeLocalBackup(reason,prefix));return backupQueue}
+function scheduleAutoBackup(reason){clearTimeout(backupTimer);backupTimer=setTimeout(()=>{if(backupFolderRecord)createLocalBackup(reason).catch(()=>refreshBackupStatus())},700)}
+async function connectBackupDrive(drive){
+  if(!window.showDirectoryPicker)return alert('เบราว์เซอร์นี้ไม่รองรับการเขียนไฟล์สำรองอัตโนมัติ กรุณาเปิดโปรแกรมด้วย Microsoft Edge หรือ Google Chrome รุ่นปัจจุบัน');
+  try{let root=await showDirectoryPicker({id:'chokanan-backup-root',mode:'readwrite'}),handle=await root.getDirectoryHandle('ChokAnan_Invoice_Backup',{create:true});backupFolderRecord={handle,path:`${drive}:\\ChokAnan_Invoice_Backup`};await backupDbPut(backupFolderRecord);if(drive==='C')alert('ไม่พบหรือไม่ได้ใช้ไดรฟ์ D จึงสร้างโฟลเดอร์สำรองไว้ที่ไดรฟ์ C แทน');let status=await createLocalBackup('ตั้งค่าระบบสำรองข้อมูล');alert(`เชื่อมต่อโฟลเดอร์สำรองข้อมูลสำเร็จ\n${status.path}`)}catch(e){if(e?.name!=='AbortError')alert('ไม่สามารถตั้งค่าโฟลเดอร์สำรองข้อมูลได้: '+e.message)}finally{refreshBackupStatus()}
+}
+async function backupNow(){try{let status=await createLocalBackup('สำรองข้อมูลด้วยตนเอง');alert(`สำรองข้อมูลสำเร็จแล้ว\n${status.path}\\${status.lastFile}`)}catch(e){alert(e.message+'\nกรุณากดเลือกไดรฟ์ D หรือ C ก่อน')}}
+async function ensureDailyBackup(){if(!backupFolderRecord)return;let permission=await backupPermission(backupFolderRecord,false);if(permission!=='granted')return;let names=await backupFileNames(backupFolderRecord.handle),today=localBackupDay();if(!names.some(n=>n.startsWith('backup_'+today+'_')))await createLocalBackup('สำรองข้อมูลรายวันเมื่อเปิดโปรแกรม')}
+async function refreshBackupStatus(){
+  if(!window.backupStatus)return;try{if(!backupFolderRecord)backupFolderRecord=await backupDbGet().catch(()=>null);if(!backupFolderRecord){backupStatus.innerHTML='<b>ยังไม่ได้ตั้งค่าโฟลเดอร์สำรองข้อมูล</b><br>กรุณาเลือกไดรฟ์ D หรือเลือกไดรฟ์ C แทน';return}let permission=await backupPermission(backupFolderRecord,false),runtime=store.get('backupRuntimeStatus',{});if(permission!=='granted'){backupStatus.innerHTML=`<b>โฟลเดอร์สำรองข้อมูล:</b> ${backupFolderRecord.path}<br><span class="status-unprinted">ต้องอนุญาตโฟลเดอร์อีกครั้ง กรุณากดเลือกไดรฟ์</span>`;return}let names=await backupFileNames(backupFolderRecord.handle),latest=runtime.lastAt?new Date(runtime.lastAt).toLocaleString('th-TH'):'ยังไม่มี';backupStatus.innerHTML=`<b>โฟลเดอร์สำรองข้อมูล:</b> ${backupFolderRecord.path}<br><b>สำรองข้อมูลล่าสุด:</b> ${latest}<br><b>จำนวนไฟล์สำรอง:</b> ${names.length} ไฟล์`}catch(e){backupStatus.innerHTML='<span class="status-unprinted">ไม่สามารถอ่านสถานะสำรองข้อมูลได้: '+e.message+'</span>'}
+}
+async function initializeBackupSystem(){
+  backupFolderRecord=await backupDbGet().catch(()=>null);await refreshBackupStatus();if(backupFolderRecord)await ensureDailyBackup().catch(()=>{});else if(!localStorage.getItem('backupSetupNoticeShown')){localStorage.setItem('backupSetupNoticeShown','true');setTimeout(()=>alert('กรุณาตั้งค่าโฟลเดอร์สำรองข้อมูลในหน้า “ตั้งค่า”\nเลือกไดรฟ์ D เป็นหลัก หรือเลือกไดรฟ์ C หากเครื่องไม่มีไดรฟ์ D'),400)}
+}
+async function restoreBackupFromFile(input){
+  let file=input.files?.[0];input.value='';if(!file)return;if(!confirm('การกู้คืนข้อมูลจะเขียนทับข้อมูลปัจจุบันทั้งหมด ต้องการดำเนินการต่อหรือไม่?'))return;
+  try{await createLocalBackup('สำรองก่อนกู้คืนข้อมูล','before_restore');let parsed=JSON.parse(await file.text()),data=parsed?.data;if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('รูปแบบไฟล์สำรองไม่ถูกต้อง');clearTimeout(backupTimer);localStorage.clear();Object.entries(data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));localStorage.setItem('backupRuntimeStatus',JSON.stringify({path:backupFolderRecord.path,lastAt:new Date().toISOString(),lastFile:'before_restore',count:0}));alert('กู้คืนข้อมูลสำเร็จ โปรแกรมจะโหลดข้อมูลใหม่ทั้งหมด');location.reload()}catch(e){alert('ไม่สามารถกู้คืนข้อมูลได้: '+e.message+'\nข้อมูลปัจจุบันยังไม่ถูกเขียนทับ')}
+}
+async function createDesktopShortcut(){
+  try{let appUrl=location.href.split('#')[0].split('?')[0];if(!appUrl.startsWith('file:'))return alert('กรุณาเปิดโปรแกรมจากไฟล์ tax_invoice_app.html โดยตรงก่อนสร้าง Shortcut');let appPath=decodeURIComponent(new URL(appUrl).pathname).replace(/^\/([A-Za-z]:)/,'$1').replace(/\//g,'\\'),installDir=appPath.replace(/\\tax_invoice_app\.html$/i,''),scriptPath=installDir+'\\Create_Tax_Invoice_App_Shortcut.ps1',batPath=installDir+'\\install_desktop_shortcut.bat';
+    alert('ระบบเตรียมตัวติดตั้ง Shortcut แบบ .lnk จริงไว้แล้ว\n\nให้รันไฟล์นี้ในโฟลเดอร์โปรแกรม:\n'+batPath+'\n\nหรือรัน PowerShell:\n'+scriptPath+'\n\nShortcut ที่สร้างจะใช้ไอคอน assets\\icons\\icon.ico ของโปรแกรม');
+  }catch(e){if(e?.name!=='AbortError')alert('ไม่สามารถสร้าง Shortcut ได้: '+e.message)}
+}
+function thaiInitials(name){const m={ก:'K',ข:'K',ค:'K',ฆ:'K',ง:'N',จ:'J',ฉ:'C',ช:'C',ซ:'S',ฌ:'C',ญ:'Y',ฎ:'D',ฏ:'T',ฐ:'T',ฑ:'T',ฒ:'T',ณ:'N',ด:'D',ต:'T',ถ:'T',ท:'T',ธ:'T',น:'N',บ:'B',ป:'P',ผ:'P',ฝ:'F',พ:'P',ฟ:'F',ภ:'P',ม:'M',ย:'Y',ร:'R',ล:'L',ว:'W',ศ:'S',ษ:'S',ส:'S',ห:'H',ฬ:'L',อ:'A',ฮ:'H'};let clean=(name||'').trim();let letters=[];for(const ch of clean){if(/[A-Za-z]/.test(ch))letters.push(ch.toUpperCase());else if(m[ch])letters.push(m[ch]);if(letters.length>=2)break;}return (letters.join('')+'XX').slice(0,2)}
+function nextCode(prefix, arr, width){let max=0;arr.forEach(x=>{let n=parseInt((x.code||'').match(/(\d+)$/)?.[1]||0); if(n>max)max=n});return prefix+String(max+1).padStart(width,'0')}
+function previewProductCode(){if(editProductIndex===null){pCode.value=nextCode(thaiInitials(pName.value),store.get('products',[]),5)}}
+function normalizeCustomer(c={}){
+  let address1=c.address1!==undefined?c.address1:(c.address||''),address2=c.address2||'',taxId=c.taxId!==undefined?c.taxId:(c.tax||'');
+  return {...c,code:c.code||'',prefix:c.prefix||'',name:c.name||'',address1,address2,taxId:String(taxId||''),tax:String(taxId||''),address:[address1,address2].filter(Boolean).join(' ').trim()};
+}
+function customerFullName(c){c=normalizeCustomer(c);return [c.prefix,c.name].filter(Boolean).join(' ').trim()}
+function customerFullAddress(c){c=normalizeCustomer(c);return [c.address1,c.address2].filter(Boolean).join(' ').trim()}
+function customerAddress1ForInvoice(address1=''){
+  let text=String(address1||'').replace(/\r/g,'').trim();
+  let cut=text.search(/(?:อำเภอ|อําเภอ|อ\.|เขต|จังหวัด|จ\.)/u);
+  return (cut>=0?text.slice(0,cut):text).replace(/[ \t]+\n/g,'\n').replace(/\n[ \t]+/g,'\n').replace(/[ \t]+$/gm,'').trim();
+}
+function getCustomers(){return store.get('customers',[]).map(normalizeCustomer)}
+function migrateCustomers(){let raw=store.get('customers',[]),normalized=raw.map(normalizeCustomer),changed=JSON.stringify(raw)!==JSON.stringify(normalized);if(changed)store.set('customers',normalized);return normalized}
+function previewCustomerCode(){if(editCustomerIndex===null){cCode.value=nextCode(thaiInitials(cName.value||'CU'),getCustomers(),3)}}
+function normText(v){return String(v||'').toLowerCase().replace(/\s+/g,' ').trim()}
+function normTax(v){return String(v||'').replace(/\D/g,'')}
+function matchScore(item,q,fields){
+  q=normText(q); if(!q)return 0;
+  const vals=fields.map(f=>normText(item[f]));
+  if(vals.some(v=>v===q))return 0;
+  if(vals.some(v=>v.startsWith(q)))return 1;
+  if(vals.some(v=>v.split(' ').some(part=>part.startsWith(q))))return 2;
+  if(vals.some(v=>v.includes(q)))return 3;
+  return 99;
+}
+function sortByFrontMatch(rows,q,fields){
+  q=normText(q); if(!q)return rows;
+  return rows.map((x,order)=>({...x,_score:matchScore(x,q,fields),_order:order}))
+    .filter(x=>x._score<99)
+    .sort((a,b)=>a._score-b._score || normText(a[fields[0]]).localeCompare(normText(b[fields[0]]),'th') || a._order-b._order);
+}
+function findDuplicateProduct(item, arr, ignoreIndex=null){
+  let name=normText(item.name), code=normText(item.code);
+  if(!name && !code) return null;
+  return arr.find((x,i)=>i!==ignoreIndex && ((name && normText(x.name)===name) || (code && normText(x.code)===code))) || null;
+}
+function findDuplicateCustomer(item, arr, ignoreIndex=null){
+  item=normalizeCustomer(item);arr=arr.map(normalizeCustomer);
+  let name=normText(item.name), tax=normTax(item.taxId), address1=normText(item.address1), address2=normText(item.address2);
+  if(!name && !tax && !address1 && !address2) return null;
+  return arr.find((x,i)=>{
+    if(i===ignoreIndex) return false;
+    let sameTax=tax && normTax(x.taxId)===tax;
+    let sameNameAddress=name && (address1||address2) && normText(x.name)===name && normText(x.address1)===address1 && normText(x.address2)===address2;
+    return sameTax || sameNameAddress;
+  }) || null;
+}
+function checkProductDuplicateLive(){
+  let arr=store.get('products',[]); let dup=findDuplicateProduct({code:pCode.value,name:pName.value},arr,editProductIndex);
+  if(typeof pDupMsg!=='undefined') pDupMsg.textContent=dup?`พบสินค้าซ้ำ: ${dup.code} ${dup.name} มีอยู่แล้ว`:'';
+  return dup;
+}
+function checkCustomerDuplicateLive(){
+  let arr=getCustomers(); let dup=findDuplicateCustomer({code:cCode.value,prefix:cPrefix.value,name:cName.value,taxId:cTax.value,address1:cAddress1.value,address2:cAddress2.value},arr,editCustomerIndex);
+  if(typeof cDupMsg!=='undefined') cDupMsg.textContent=dup?`พบข้อมูลลูกค้าซ้ำ: ${dup.code} ${customerFullName(dup)||dup.name} มีอยู่แล้ว`:'';
+  return dup;
+}
+function showPage(id){document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));event?.target?.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active'); if(id==='invoice'){refreshInvoiceSelects();renderInvoiceItems()} if(id==='history')renderHistory(); if(id==='autoInvoice')renderTrainingInvoices(); if(id==='settings')refreshBackupStatus();}
+function saveProduct(){let arr=store.get('products',[]);let item={code:pCode.value||nextCode(thaiInitials(pName.value),arr,5),name:pName.value,unit:pUnit.value,cost:+pCost.value||0,price:+pPrice.value||0}; if(!item.name)return alert('กรุณาใส่ชื่อสินค้า'); let dup=findDuplicateProduct(item,arr,editProductIndex); if(dup)return alert('ไม่สามารถบันทึกได้ เพราะมีสินค้านี้อยู่แล้ว: '+dup.code+' '+dup.name); if(editProductIndex!==null)arr[editProductIndex]=item; else arr.push(item); store.set('products',arr); clearProductForm();renderProducts();refreshInvoiceSelects();}
+function clearProductForm(){editProductIndex=null;pCode.value='';pName.value='';pUnit.value='';pCost.value='';pPrice.value='';if(typeof pDupMsg!=='undefined')pDupMsg.textContent='';previewProductCode()}
+function editProduct(i){let x=store.get('products',[])[i];editProductIndex=i;pCode.value=x.code;pName.value=x.name;pUnit.value=x.unit;pCost.value=x.cost;pPrice.value=x.price;scrollTo(0,0)}
+function deleteProduct(i){if(confirm('ลบสินค้านี้?')){let a=store.get('products',[]);a.splice(i,1);store.set('products',a);renderProducts();refreshInvoiceSelects()}}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function productStableKey(x){return x?.id!==undefined&&x?.id!==null&&x?.id!==''?'id:'+x.id:'code:'+String(x?.code||'')}
+function findProductSourceIndex(originalIndex,stableKey,originalCode){
+  let arr=store.get('products',[]);
+  if(arr[originalIndex]&&productStableKey(arr[originalIndex])===stableKey)return originalIndex;
+  let byKey=arr.findIndex(x=>productStableKey(x)===stableKey);
+  if(byKey>=0)return byKey;
+  if(originalCode){
+    let byCode=arr.findIndex(x=>normText(x.code)===normText(originalCode));
+    if(byCode>=0)return byCode;
+  }
+  return -1;
+}
+function productCellText(product,field){return field==='cost'||field==='price'?money(product[field]):escapeHtml(product[field]||'')}
+function productInputType(field){return 'text'}
+function showProductInlineMessage(row,message,saved=false){
+  clearProductInlineMessage(row);
+  row.insertAdjacentHTML('afterend',`<tr class="product-inline-message${saved?' saved':''}"><td colspan="7">${escapeHtml(message)}</td></tr>`);
+  if(saved)setTimeout(()=>{let msg=row.nextElementSibling;if(msg?.classList.contains('product-inline-message'))msg.remove()},1200);
+}
+function clearProductInlineMessage(row){
+  let msg=row.nextElementSibling;
+  if(msg?.classList.contains('product-inline-message'))msg.remove();
+}
+function recordProductPriceHistory(oldProduct,newProduct,field,oldValue,newValue){
+  let history=store.get('productPriceHistory',[]);
+  history.push({
+    id:Date.now()+'-'+Math.random().toString(36).slice(2,7),
+    productId:oldProduct.id??newProduct.id??null,
+    productCodeBefore:oldProduct.code||'',
+    productCodeAfter:newProduct.code||'',
+    productName:newProduct.name||oldProduct.name||'',
+    field,
+    oldValue:+oldValue||0,
+    newValue:+newValue||0,
+    changedAt:new Date().toISOString(),
+    changedAtText:new Date().toLocaleString('th-TH')
+  });
+  store.set('productPriceHistory',history);
+}
+function updateProductRowKeys(row,index,product){
+  row.querySelectorAll('.editable-cell').forEach(td=>{
+    td.dataset.index=index;
+    td.dataset.key=productStableKey(product);
+    td.dataset.code=product.code||'';
+  });
+}
+function validateInlineProductValue(products,index,field,value){
+  let original=products[index];
+  if(!original)return {ok:false,message:'ไม่พบสินค้าต้นฉบับ กรุณาค้นหาใหม่อีกครั้ง'};
+  let next={...original};
+  if(field==='cost'||field==='price'){
+    let raw=String(value).trim();
+    if(raw===''||!Number.isFinite(Number(raw))||Number(raw)<0)return {ok:false,message:'ราคาทุนและราคาขายต้องเป็นตัวเลขตั้งแต่ 0 ขึ้นไป'};
+    next[field]=Number(raw);
+  }else{
+    next[field]=String(value).trim();
+    if((field==='name'||field==='unit')&&!next[field])return {ok:false,message:'ชื่อสินค้าและหน่วยห้ามเป็นค่าว่าง'};
+    if(field==='code'&&!next.code)return {ok:false,message:'รหัสสินค้าห้ามเป็นค่าว่าง'};
+  }
+  if(field==='code'){
+    let dup=products.find((x,i)=>i!==index&&normText(x.code)===normText(next.code));
+    if(dup)return {ok:false,message:'รหัสสินค้าซ้ำกับรายการอื่น: '+(dup.code||'')+' '+(dup.name||'')};
+  }
+  if(field==='name'){
+    let dup=products.find((x,i)=>i!==index&&normText(x.name)===normText(next.name));
+    if(dup)return {ok:false,message:'ชื่อสินค้าซ้ำกับรายการอื่น: '+(dup.code||'')+' '+(dup.name||'')};
+  }
+  return {ok:true,next};
+}
+function commitProductInlineEdit(cell,input,originalValue){
+  let row=cell.closest('tr'),field=cell.dataset.field,index=findProductSourceIndex(+cell.dataset.index,cell.dataset.key,cell.dataset.code),products=store.get('products',[]);
+  let result=validateInlineProductValue(products,index,field,input.value);
+  if(!result.ok){
+    cell.innerHTML=productCellText({[field]:originalValue},field);
+    showProductInlineMessage(row,result.message,false);
+    return;
+  }
+  let oldProduct={...products[index]},oldValue=oldProduct[field],newProduct=result.next;
+  products[index]=newProduct;
+  store.set('products',products);
+  if((field==='cost'||field==='price')&&Number(oldValue)!==Number(newProduct[field]))recordProductPriceHistory(oldProduct,newProduct,field,oldValue,newProduct[field]);
+  updateProductRowKeys(row,index,newProduct);
+  cell.innerHTML=productCellText(newProduct,field);
+  showProductInlineMessage(row,'บันทึกแล้ว',true);
+}
+function startProductInlineEdit(cell){
+  if(cell.querySelector('input'))return;
+  let field=cell.dataset.field,index=findProductSourceIndex(+cell.dataset.index,cell.dataset.key,cell.dataset.code),products=store.get('products',[]),product=products[index];
+  if(!product){showProductInlineMessage(cell.closest('tr'),'ไม่พบสินค้าต้นฉบับ กรุณาค้นหาใหม่อีกครั้ง');return;}
+  let originalValue=field==='cost'||field==='price'?String(+product[field]||0):String(product[field]||''),done=false;
+  clearProductInlineMessage(cell.closest('tr'));
+  cell.innerHTML=`<input class="inline-edit-input" type="${productInputType(field)}" step="0.01" value="${escapeHtml(originalValue)}">`;
+  let input=cell.querySelector('input');
+  input.focus();input.select();
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();if(done)return;done=true;commitProductInlineEdit(cell,input,originalValue)}
+    if(e.key==='Escape'){e.preventDefault();done=true;cell.innerHTML=productCellText({[field]:originalValue},field)}
+  });
+  input.addEventListener('blur',()=>{if(done)return;done=true;commitProductInlineEdit(cell,input,originalValue)});
+}
+function updateProductRowSelected(cb){cb.closest('tr')?.classList.toggle('selected',cb.checked)}
+function productRowTouchStart(row,e){
+  row.classList.add('touch-active');
+  if(e?.target?.closest('input,button'))return;
+  clearTimeout(row._touchTimer);
+  row._touchTimer=setTimeout(()=>{let cb=row.querySelector('.product-delete-check');if(cb){cb.checked=!cb.checked;updateProductRowSelected(cb)}},650);
+}
+function productRowTouchMove(row){clearTimeout(row._touchTimer)}
+function productRowTouchEnd(row){clearTimeout(row._touchTimer);setTimeout(()=>row.classList.remove('touch-active'),180)}
+function renderProducts(){let q=(productSearch.value||'');let arr=store.get('products',[]);let rows=sortByFrontMatch(arr.map((x,i)=>({...x,i})),q,['name','code','unit']);window.visibleProductIndexes=rows.map(x=>x.i);productsTable.innerHTML=`<div class="small product-edit-hint">ดับเบิลคลิกชื่อสินค้า หน่วย หรือราคา เพื่อแก้ไขได้ทันที</div><table class="product-table"><thead><tr><th style="width:42px">เลือก</th><th>รหัส</th><th>ชื่อสินค้า</th><th>หน่วย</th><th>ราคาทุน</th><th>ราคาขาย</th><th></th></tr></thead><tbody>${rows.map(x=>`<tr ontouchstart="productRowTouchStart(this,event)" ontouchmove="productRowTouchMove(this)" ontouchend="productRowTouchEnd(this)" ontouchcancel="productRowTouchEnd(this)"><td class=center><input type="checkbox" class="product-delete-check" value="${x.i}" onchange="updateProductRowSelected(this)"></td><td class="editable-cell" ondblclick="startProductInlineEdit(this)" data-field="code" data-index="${x.i}" data-key="${escapeHtml(productStableKey(x))}" data-code="${escapeHtml(x.code||'')}">${escapeHtml(x.code||'')}</td><td class="editable-cell" ondblclick="startProductInlineEdit(this)" data-field="name" data-index="${x.i}" data-key="${escapeHtml(productStableKey(x))}" data-code="${escapeHtml(x.code||'')}">${escapeHtml(x.name||'')}</td><td class="editable-cell" ondblclick="startProductInlineEdit(this)" data-field="unit" data-index="${x.i}" data-key="${escapeHtml(productStableKey(x))}" data-code="${escapeHtml(x.code||'')}">${escapeHtml(x.unit||'')}</td><td class="right editable-cell" ondblclick="startProductInlineEdit(this)" data-field="cost" data-index="${x.i}" data-key="${escapeHtml(productStableKey(x))}" data-code="${escapeHtml(x.code||'')}">${money(x.cost)}</td><td class="right editable-cell" ondblclick="startProductInlineEdit(this)" data-field="price" data-index="${x.i}" data-key="${escapeHtml(productStableKey(x))}" data-code="${escapeHtml(x.code||'')}">${money(x.price)}</td><td><button onclick="deleteProduct(${x.i})">ลบ</button></td></tr>`).join('')}</tbody></table><div class="small">ผลค้นหาเรียงโดยให้รายการที่ขึ้นต้นตรงกับคำค้นหาอยู่บนสุด เช่น พิมพ์ “ท่อ” รายการที่ขึ้นต้นด้วย “ท่อ” จะมาก่อน</div>`}
+function selectVisibleProducts(checked){document.querySelectorAll('.product-delete-check').forEach(cb=>{cb.checked=checked;updateProductRowSelected(cb)})}
+function deleteSelectedProducts(){let selected=[...document.querySelectorAll('.product-delete-check:checked')].map(cb=>+cb.value); if(!selected.length){alert('กรุณาเลือกรายการสินค้าที่ต้องการลบก่อน');return;} let products=store.get('products',[]); let names=selected.slice(0,8).map(i=>products[i]?.name).filter(Boolean).join(', '); let msg='ต้องการลบสินค้าที่เลือก '+selected.length+' รายการใช่ไหม?'; if(names)msg+='\n\nตัวอย่าง: '+names+(selected.length>8?' ...':''); if(!confirm(msg))return; let set=new Set(selected); products=products.filter((_,i)=>!set.has(i)); store.set('products',products); renderProducts(); refreshInvoiceSelects(); alert('ลบสินค้าแล้ว '+selected.length+' รายการ');}
+function saveCustomer(){let arr=getCustomers();let item=normalizeCustomer({code:cCode.value||nextCode(thaiInitials(cName.value||'CU'),arr,3),prefix:cPrefix.value,name:cName.value,taxId:cTax.value,address1:cAddress1.value,address2:cAddress2.value}); if(!item.name)return alert('กรุณาใส่ชื่อลูกค้า'); let dup=findDuplicateCustomer(item,arr,editCustomerIndex); if(dup)return alert('ไม่สามารถบันทึกได้ เพราะมีข้อมูลลูกค้านี้อยู่แล้ว: '+dup.code+' '+customerFullName(dup)); if(editCustomerIndex!==null)arr[editCustomerIndex]=item; else arr.push(item); store.set('customers',arr); clearCustomerForm();renderCustomers();refreshInvoiceSelects();}
+function clearCustomerForm(){editCustomerIndex=null;cCode.value='';cPrefix.value='';cName.value='';cTax.value='';cAddress1.value='';cAddress2.value='';if(typeof cDupMsg!=='undefined')cDupMsg.textContent='';previewCustomerCode()}
+function editCustomer(i){let x=getCustomers()[i];editCustomerIndex=i;cCode.value=x.code;cPrefix.value=x.prefix;cName.value=x.name;cTax.value=x.taxId;cAddress1.value=x.address1;cAddress2.value=x.address2;scrollTo(0,0)}
+function deleteCustomer(i){if(confirm('ลบลูกค้านี้?')){let a=getCustomers();a.splice(i,1);store.set('customers',a);renderCustomers();refreshInvoiceSelects()}}
+function renderCustomers(){let q=(customerSearch.value||'');let arr=getCustomers();let rows=sortByFrontMatch(arr.map((x,i)=>({...x,fullName:customerFullName(x),fullAddress:customerFullAddress(x),i})),q,['code','prefix','name','fullName','address1','address2','fullAddress','taxId']);customersTable.innerHTML=`<table><tr><th>รหัส</th><th>คำนำหน้า</th><th>ชื่อลูกค้า</th><th>ที่อยู่ 1</th><th>ที่อยู่ 2</th><th>เลขผู้เสียภาษี</th><th></th></tr>${rows.map(x=>`<tr><td>${x.code}</td><td>${x.prefix||''}</td><td>${x.name}</td><td>${x.address1||''}</td><td>${x.address2||''}</td><td>${x.taxId||''}</td><td><button onclick="editCustomer(${x.i})">แก้ไข</button> <button onclick="deleteCustomer(${x.i})">ลบ</button></td></tr>`).join('')}</table><div class="small">ผลค้นหาเรียงโดยให้รหัส/คำนำหน้า/ชื่อ/ที่อยู่/เลขภาษีที่ขึ้นต้นตรงกับคำค้นหาอยู่บนสุด</div>`}
+
+function parseExcelRows(text){
+  return (text||'').replace(/\r/g,'').split('\n').map(line=>line.split('\t').map(v=>v.trim())).filter(cols=>cols.some(v=>v!==''));
+}
+function looksLikeHeader(cols, type){
+  let joined=cols.join(' ').toLowerCase();
+  if(type==='product') return /ชื่อสินค้า|สินค้า|หน่วย|ราคาทุน|ราคาขาย|product|unit|cost|price/.test(joined);
+  return /รหัสลูกค้า|ชื่อลูกค้า|เลขผู้เสียภาษี|taxid|customer\s*id|customer|address1|address2/.test(joined);
+}
+function importProductsFromExcel(){
+  let rows=parseExcelRows(productBulkText.value);
+  if(rows.length && looksLikeHeader(rows[0],'product')) rows.shift();
+  let arr=store.get('products',[]), added=0, skipped=0, duplicates=[];
+  rows.forEach((cols,idx)=>{
+    let [name,unit,cost,price]=cols;
+    if(!name){skipped++;return;}
+    let item={
+      code:nextCode(thaiInitials(name),arr,5),
+      name:name,
+      unit:unit||'',
+      cost:parseFloat(String(cost||'0').replace(/,/g,''))||0,
+      price:parseFloat(String(price||'0').replace(/,/g,''))||0
+    };
+    let dup=findDuplicateProduct(item,arr,null);
+    if(dup){skipped++;duplicates.push(`${name} → ซ้ำกับ ${dup.code} ${dup.name}`);return;}
+    arr.push(item); added++;
+  });
+  store.set('products',arr); productBulkText.value=''; renderProducts(); refreshInvoiceSelects(); clearProductForm();
+  let msg='นำเข้าสินค้าแล้ว '+added+' รายการ'+(skipped?' / ข้าม '+skipped+' รายการ':'');
+  if(duplicates.length) msg+='\n\nรายการที่ซ้ำ:\n- '+duplicates.slice(0,20).join('\n- ')+(duplicates.length>20?'\n...และรายการซ้ำอื่น ๆ อีก '+(duplicates.length-20)+' รายการ':'');
+  alert(msg);
+}
+function importCustomersFromExcel(){
+  let rows=parseExcelRows(customerBulkText.value);
+  if(rows.length && looksLikeHeader(rows[0],'customer')) rows.shift();
+  let arr=getCustomers(), added=0, skipped=0, duplicates=[];
+  rows.forEach(cols=>{
+    let code='',prefix='',name='',address1='',address2='',taxId='';
+    if(cols.length>=6){[code,prefix,name,address1,address2,taxId]=cols}
+    else{[name,taxId,address1]=cols}
+    if(!name){skipped++;return;}
+    let item=normalizeCustomer({code:code||nextCode(thaiInitials(name||'CU'),arr,3),prefix,name,address1,address2,taxId});
+    let dup=findDuplicateCustomer(item,arr,null);
+    if(dup){skipped++;duplicates.push(`${customerFullName(item)||name} → ซ้ำกับ ${dup.code} ${customerFullName(dup)||dup.name}`);return;}
+    arr.push(item); added++;
+  });
+  store.set('customers',arr); customerBulkText.value=''; renderCustomers(); refreshInvoiceSelects(); clearCustomerForm();
+  let msg='นำเข้าลูกค้าแล้ว '+added+' รายการ'+(skipped?' / ข้าม '+skipped+' รายการ':'');
+  if(duplicates.length) msg+='\n\nข้ามข้อมูลซ้ำ '+duplicates.length+' รายการ:\n- '+duplicates.slice(0,20).join('\n- ')+(duplicates.length>20?'\n...และรายการซ้ำอื่น ๆ อีก '+(duplicates.length-20)+' รายการ':'');
+  alert(msg);
+}
+
+function invoicePrefix(){let y=new Date().getFullYear()+543;return 'IV'+String(y).slice(-2)+'-'}
+function getInvoiceNumberSettings(){
+  let s=store.get('invoiceNumberSettings',null);
+  if(!s){let max=0;store.get('invoices',[]).forEach(x=>{let n=parseInt((x.no||'').match(/(\d+)$/)?.[1]||0);if(n>max)max=n});s={next:max+1,width:6,prefix:invoicePrefix()};store.set('invoiceNumberSettings',s)}
+  if(!s.prefix)s.prefix=invoicePrefix(); if(!s.width)s.width=6; if(!s.next||s.next<1)s.next=1; return s;
+}
+function formatInvoiceNo(seq){let s=getInvoiceNumberSettings();return (s.prefix||invoicePrefix())+String(seq||s.next||1).padStart(s.width||5,'0')}
+function nextInvoiceNo(){let s=getInvoiceNumberSettings();return formatInvoiceNo(s.next)}
+function advanceInvoiceCounterFromNo(no){let n=parseInt((no||'').match(/(\d+)$/)?.[1]||0);let s=getInvoiceNumberSettings();if(n>=s.next){s.next=n+1;store.set('invoiceNumberSettings',s)}updateInvoiceNumberSettingUI()}
+function updateInvoiceNumberSettingUI(){let s=getInvoiceNumberSettings();if(window.invoiceNextSeq)invoiceNextSeq.value=s.next;if(window.invoiceNextPreview)invoiceNextPreview.value=formatInvoiceNo(s.next)}
+function saveInvoiceNumberSettings(){let s=getInvoiceNumberSettings();let n=parseInt(invoiceNextSeq.value||'1');if(!n||n<1)n=1;s.next=n;store.set('invoiceNumberSettings',s);updateInvoiceNumberSettingUI();if(!editInvoiceId&&window.invNo)invNo.value=nextInvoiceNo();renderInvoicePreview();alert('บันทึกเลขที่บิลถัดไปแล้ว')}
+function resetInvoiceNumberToOne(){if(confirm('ต้องการรีเซ็ตเลขที่บิลให้เริ่มจาก 1 ใช่ไหม?\nหมายเหตุ: บิลเก่าจะยังอยู่ในประวัติ')){let s=getInvoiceNumberSettings();s.next=1;store.set('invoiceNumberSettings',s);updateInvoiceNumberSettingUI();if(!editInvoiceId&&window.invNo)invNo.value=nextInvoiceNo();renderInvoicePreview();}}
+function invoiceNoExists(no, ignoreId=null){let text=String(no||''),m=text.match(/(\d+)$/),prefix=m?text.slice(0,-m[1].length):text,seq=m?parseInt(m[1]):null;return store.get('invoices',[]).some(x=>{if(x.id===ignoreId)return false;let t=String(x.no||''),xm=t.match(/(\d+)$/);return t===text||(m&&xm&&t.slice(0,-xm[1].length)===prefix&&parseInt(xm[1])===seq)})}
+function toggleBuyerFields(){let hide=invType.value==='ใบกำกับภาษีย่อ';document.querySelectorAll('.buyer-field').forEach(el=>el.classList.toggle('hidden',hide));}
+function refreshInvoiceSelects(){if(window.customerSearchInvoice){customerSearchInvoice.value=''; hideCustomerSuggestions();} hideBuyerNameSuggestions(); if(window.productSearchInvoice){productSearchInvoice.value=''; hideProductSuggestions();}}
+function fillCustomerByIndex(i){selectCustomerForInvoice(i,'search')}
+function fillCustomer(){return;}
+
+let customerSuggestIndex=-1,buyerNameSuggestIndex=-1,selectedInvoiceCustomerId='',selectedInvoiceCustomerName='',customerSearchDebounce=null,buyerNameDebounce=null;
+const customerUsageKey='invoiceCustomerUsageV1';
+function customerStableId(c){c=normalizeCustomer(c);return c.code||c.taxId||`${customerFullName(c)}|${customerFullAddress(c)}`}
+function getCustomerUsage(){let x=store.get(customerUsageKey,{});return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}
+function setCustomerUsage(x){store.set(customerUsageKey,x)}
+function normalizeCustomerSearchText(v){return String(v||'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').replace(/\s+/g,' ').trim()}
+function compactCustomerSearchText(v){return normalizeCustomerSearchText(v).replace(/\s+/g,'')}
+function customerSearchFields(c){c=normalizeCustomer(c);return [c.code,customerFullName(c),c.name,c.prefix,c.taxId,c.tax,customerFullAddress(c),c.address1,c.address2,c.phone,c.tel,c.branch,c.remark,c.note].filter(Boolean).map(String)}
+function customerFuzzyHit(query,text){query=compactCustomerSearchText(query);text=compactCustomerSearchText(text);if(!query||!text||query.length<2)return false;let pos=0;for(const ch of query){pos=text.indexOf(ch,pos);if(pos<0)return false;pos++}return true}
+function customerScore(c,q){
+  q=normalizeCustomerSearchText(q);if(!q)return 0;
+  let fields=customerSearchFields(c),norms=fields.map(normalizeCustomerSearchText),compactQ=compactCustomerSearchText(q),taxQ=normTax(q);
+  if(norms.some(v=>v===q))return 0;
+  if(c.code&&normalizeCustomerSearchText(c.code)===q)return 1;
+  if(taxQ&&normTax(c.taxId).includes(taxQ))return 2;
+  if(norms.some(v=>v.startsWith(q)))return 3;
+  if(norms.some(v=>v.split(' ').some(part=>part.startsWith(q))))return 4;
+  if(norms.some(v=>v.includes(q)||compactCustomerSearchText(v).includes(compactQ)))return 5;
+  if(fields.some(v=>customerFuzzyHit(q,v)))return 6;
+  return 99;
+}
+function allCustomerRows(){
+  let usage=getCustomerUsage();
+  return getCustomers().map((x,i)=>{let id=customerStableId(x),u=usage[id]||{};return {...x,fullName:customerFullName(x),fullAddress:customerFullAddress(x),i,_customerId:id,_lastUsed:+u.lastUsed||0,_usedCount:+u.count||0}});
+}
+function sortCustomerRows(rows,q){
+  if(!q)return rows;
+  return rows.map((x,order)=>({...x,_score:customerScore(x,q),_order:order})).filter(x=>x._score<99).sort((a,b)=>a._score-b._score||b._lastUsed-a._lastUsed||b._usedCount-a._usedCount||normalizeCustomerSearchText(a.fullName).localeCompare(normalizeCustomerSearchText(b.fullName),'th')||a._order-b._order).slice(0,50);
+}
+function getCustomerMatches(source='search'){
+  let input=source==='buyerName'?buyerName:customerSearchInvoice,q=(input?.value||'').trim(),rows=allCustomerRows();
+  if(q)return sortCustomerRows(rows,q);
+  let seen=new Set(),sections=[];
+  let recent=rows.filter(x=>x._lastUsed).sort((a,b)=>b._lastUsed-a._lastUsed).slice(0,8).filter(x=>!seen.has(x._customerId)&&seen.add(x._customerId));
+  if(recent.length)sections.push({title:'Recent Customers',rows:recent});
+  let frequent=rows.filter(x=>x._usedCount).sort((a,b)=>b._usedCount-a._usedCount||b._lastUsed-a._lastUsed).slice(0,8).filter(x=>!seen.has(x._customerId)&&seen.add(x._customerId));
+  if(frequent.length)sections.push({title:'Frequently Used Customers',rows:frequent});
+  if(!sections.length)sections.push({title:'Customers',rows:rows.slice(0,30)});
+  return sections;
+}
+function flattenCustomerMatches(matches){return Array.isArray(matches)&&matches[0]?.rows?matches.flatMap(s=>s.rows):matches}
+function renderCustomerSuggestionRows(matches,source){
+  let sections=Array.isArray(matches)&&matches[0]?.rows?matches:[{title:'Search Results',rows:matches}],order=0;
+  return sections.map(section=>`<div class="customer-suggestion-section">${escapeHtml(section.title)}</div>`+section.rows.map(x=>{let html=`<div class="suggestion-item customer-suggestion-item" data-idx="${order}" onmousedown="selectCustomerForInvoice(${x.i},'${source}')"><div class="customer-suggestion-main"><span class="suggestion-code">${escapeHtml(x.code||'')}</span><span class="customer-suggestion-name">${escapeHtml(x.fullName||x.name||'')}</span></div><div class="customer-suggestion-tax">${escapeHtml(x.taxId||'')}</div><div class="customer-suggestion-address">${escapeHtml(x.fullAddress||x.phone||x.tel||'')}</div></div>`;order++;return html}).join('')).join('');
+}
+function showCustomerSuggestions(source='search'){
+  let box=document.getElementById(source==='buyerName'?'buyerNameSuggestions':'customerSuggestions');if(!box)return;
+  let matches=getCustomerMatches(source),rows=flattenCustomerMatches(matches);
+  if(source==='buyerName')buyerNameSuggestIndex=-1;else customerSuggestIndex=-1;
+  if(rows.length===0){box.innerHTML='<div class="suggestion-empty">&#3652;&#3617;&#3656;&#3614;&#3610;&#3586;&#3657;&#3629;&#3617;&#3641;&#3621;&#3621;&#3641;&#3585;&#3588;&#3657;&#3634;</div><button type="button" class="customer-suggestion-add" onmousedown="openExistingCustomerForm()">+ &#3648;&#3614;&#3636;&#3656;&#3617;&#3621;&#3641;&#3585;&#3588;&#3657;&#3634;&#3651;&#3627;&#3617;&#3656;</button>';box.style.display='block';return;}
+  box.innerHTML=renderCustomerSuggestionRows(matches,source);box.style.display='block';
+}
+function showBuyerNameSuggestions(){showCustomerSuggestions('buyerName')}
+function hideCustomerSuggestions(){let box=document.getElementById('customerSuggestions'); if(box)box.style.display='none'; customerSuggestIndex=-1;}
+function hideBuyerNameSuggestions(){let box=document.getElementById('buyerNameSuggestions'); if(box)box.style.display='none'; buyerNameSuggestIndex=-1;}
+function updateCustomerSuggestionActive(source='search'){let box=document.getElementById(source==='buyerName'?'buyerNameSuggestions':'customerSuggestions'),idx=source==='buyerName'?buyerNameSuggestIndex:customerSuggestIndex;if(!box)return;[...box.querySelectorAll('.customer-suggestion-item')].forEach((el,i)=>el.classList.toggle('active',i===idx))}
+function recordCustomerUse(c){let id=customerStableId(c),usage=getCustomerUsage(),u=usage[id]||{id,count:0,lastUsed:0};usage[id]={...u,id,count:(+u.count||0)+1,lastUsed:Date.now()};setCustomerUsage(usage)}
+function updateBuyerCustomerStatus(state=''){if(!window.buyerCustomerStatus)return;buyerCustomerStatus.className='customer-selection-status'+(state?' '+state:'');buyerCustomerStatus.textContent=state==='selected'?'Selected from customer database':state==='unselected'?'Not selected from customer database':''}
+function findCustomerByStableId(id){if(!id)return null;return getCustomers().find(c=>customerStableId(c)===id)||null}
+function invoiceCustomerAddressParts(customerId,fullAddress=''){
+  let c=findCustomerByStableId(customerId);
+  if(c){c=normalizeCustomer(c);return {buyerAddress:customerFullAddress(c),buyerAddress1:customerAddress1ForInvoice(c.address1),buyerAddress2:c.address2||''}}
+  return {buyerAddress:fullAddress||'',buyerAddress1:customerAddress1ForInvoice(fullAddress),buyerAddress2:''}
+}
+function selectCustomerForInvoice(i,source='search'){
+  let c=getCustomers()[i];if(!c)return;c=normalizeCustomer(c);
+  selectedInvoiceCustomerId=customerStableId(c);selectedInvoiceCustomerName=customerFullName(c);
+  buyerName.value=selectedInvoiceCustomerName;buyerTax.value=c.taxId;buyerAddress.value=customerFullAddress(c);
+  if(window.customerSearchInvoice)customerSearchInvoice.value=`${c.code} ${selectedInvoiceCustomerName}`.trim();
+  recordCustomerUse(c);updateBuyerCustomerStatus('selected');hideCustomerSuggestions();hideBuyerNameSuggestions();renderInvoiceItems();
+}
+function clearSelectedInvoiceCustomer(){selectedInvoiceCustomerId='';selectedInvoiceCustomerName='';updateBuyerCustomerStatus(buyerName?.value?'unselected':'')}
+function handleCustomerSearchInput(){clearTimeout(customerSearchDebounce);customerSearchDebounce=setTimeout(()=>showCustomerSuggestions(),150)}
+function handleBuyerNameInput(){if(selectedInvoiceCustomerId&&normalizeCustomerSearchText(buyerName.value)!==normalizeCustomerSearchText(selectedInvoiceCustomerName))clearSelectedInvoiceCustomer();renderInvoicePreview();clearTimeout(buyerNameDebounce);buyerNameDebounce=setTimeout(()=>showBuyerNameSuggestions(),150)}
+function handleCustomerSearchKey(e){handleCustomerPickerKey(e,'search')}
+function handleBuyerNameKey(e){handleCustomerPickerKey(e,'buyerName')}
+function handleCustomerPickerKey(e,source='search'){
+  let rows=flattenCustomerMatches(getCustomerMatches(source)),current=source==='buyerName'?buyerNameSuggestIndex:customerSuggestIndex;
+  if(e.key==='ArrowDown'){e.preventDefault();showCustomerSuggestions(source);current=Math.min(current+1,rows.length-1)}
+  else if(e.key==='ArrowUp'){e.preventDefault();current=Math.max(current-1,0)}
+  else if(e.key==='Enter'){e.preventDefault();if(rows.length){let pick=rows[current>=0?current:0];selectCustomerForInvoice(pick.i,source)}return}
+  else if(e.key==='Escape'){source==='buyerName'?hideBuyerNameSuggestions():hideCustomerSuggestions();return}
+  else return;
+  if(source==='buyerName')buyerNameSuggestIndex=current;else customerSuggestIndex=current;updateCustomerSuggestionActive(source);
+}
+function openExistingCustomerForm(){hideCustomerSuggestions();hideBuyerNameSuggestions();showPage('customers');if(window.cName&&window.buyerName&&!cName.value)cName.value=buyerName.value;if(window.cTax&&window.buyerTax&&!cTax.value)cTax.value=buyerTax.value;if(window.cAddress1&&window.buyerAddress&&!cAddress1.value)cAddress1.value=buyerAddress.value;previewCustomerCode();checkCustomerDuplicateLive()}
+let productSuggestIndex=-1;
+function getProductMatches(){let q=(productSearchInvoice?.value||'').trim();let arr=store.get('products',[]).map((x,i)=>({...x,i})); if(!q)return arr.slice(0,30); return sortByFrontMatch(arr,q,['name','code','unit']).slice(0,50)}
+function showProductSuggestions(){let box=document.getElementById('productSuggestions'); if(!box)return; let rows=getProductMatches(); productSuggestIndex=-1; if(rows.length===0){box.innerHTML='<div class="suggestion-empty">ไม่พบสินค้าที่ตรงกับคำค้นหา</div>';box.style.display='block';return;} box.innerHTML=`<div class="product-suggestion-header"><div>รหัส</div><div>ชื่อสินค้า</div><div>หน่วย</div><div class="right">ราคาทุน</div><div class="right">ราคาขาย</div></div>`+rows.map((x,idx)=>`<div class="suggestion-item product-suggestion-row" data-idx="${idx}" onmousedown="selectProductFromSearch(${x.i})"><div class="suggestion-code">${x.code||''}</div><div class="product-suggestion-name">${x.name||''}</div><div>${x.unit||''}</div><div class="right small">${money(x.cost||0)}</div><div class="right suggestion-price">${money(x.price||0)}</div></div>`).join(''); box.style.display='block';}
+function hideProductSuggestions(){let box=document.getElementById('productSuggestions'); if(box)box.style.display='none'; productSuggestIndex=-1;}
+function updateProductSuggestionActive(){let box=document.getElementById('productSuggestions'); if(!box)return; [...box.querySelectorAll('.suggestion-item')].forEach((el,i)=>el.classList.toggle('active',i===productSuggestIndex));}
+function handleProductSearchKey(e){let rows=getProductMatches(); if(e.key==='ArrowDown'){e.preventDefault(); if(!document.getElementById('productSuggestions').style.display || document.getElementById('productSuggestions').style.display==='none')showProductSuggestions(); productSuggestIndex=Math.min(productSuggestIndex+1,rows.length-1); updateProductSuggestionActive();} else if(e.key==='ArrowUp'){e.preventDefault(); productSuggestIndex=Math.max(productSuggestIndex-1,0); updateProductSuggestionActive();} else if(e.key==='Enter'){e.preventDefault(); if(rows.length){let pick=rows[productSuggestIndex>=0?productSuggestIndex:0]; selectProductFromSearch(pick.i);}} else if(e.key==='Escape'){hideProductSuggestions();}}
+function selectProductFromSearch(i){let p=store.get('products',[])[i]; if(!p)return; invoiceItems.push({code:p.code,name:p.name,unit:p.unit,qty:1,price:p.price,cost:p.cost||0}); productSearchInvoice.value=''; hideProductSuggestions(); renderInvoiceItems(); productSearchInvoice.focus();}
+document.addEventListener('click',e=>{let pw=document.querySelector('.autocomplete-wrap:not(.customer-autocomplete-wrap):not(.customer-name-autocomplete-wrap)'); let cw=document.querySelector('.customer-autocomplete-wrap'),bw=document.querySelector('.customer-name-autocomplete-wrap'); if(pw && !pw.contains(e.target))hideProductSuggestions(); if(cw && !cw.contains(e.target))hideCustomerSuggestions(); if(bw && !bw.contains(e.target))hideBuyerNameSuggestions();});
+function calc(){let subtotal=invoiceItems.reduce((s,x)=>s+(+x.qty||0)*(+x.price||0),0);let beforeVat,vat,total;if(vatMode.value==='included'){total=subtotal;beforeVat=total/(1+VAT);vat=total-beforeVat}else{beforeVat=subtotal;vat=beforeVat*VAT;total=beforeVat+vat}return {beforeVat,vat,total}}
+function renderInvoiceItems(){invoiceItemsEdit.innerHTML=`<table class="invoice-items-edit-table"><colgroup><col class="col-code"><col class="col-name"><col class="col-qty"><col class="col-unit"><col class="col-price"><col class="col-total"><col class="col-action"></colgroup><tr><th>รหัส</th><th>สินค้า</th><th>จำนวน</th><th>หน่วย</th><th>ราคา</th><th>รวม</th><th></th></tr>${invoiceItems.map((x,i)=>`<tr><td>${x.code}</td><td><input value="${x.name}" onchange="invoiceItems[${i}].name=this.value;renderInvoiceItems()"></td><td><input type=number min=0 step=.01 value="${x.qty}" onkeydown="if(event.key==='Enter'){event.preventDefault();this.closest('tr').querySelector('.price-input')?.focus()}" onchange="invoiceItems[${i}].qty=+this.value;renderInvoiceItems()"></td><td><input value="${x.unit}" readonly title="หน่วยดึงอัตโนมัติจากหน้าสินค้า ถ้าต้องการแก้ไขให้ไปแก้ที่หน้าบันทึกสินค้า"></td><td><input class="price-input" type=number step=.01 value="${x.price}" onchange="invoiceItems[${i}].price=+this.value;renderInvoiceItems()"></td><td class=right>${money(x.qty*x.price)}</td><td><button onclick="invoiceItems.splice(${i},1);renderInvoiceItems()">ลบ</button></td></tr>`).join('')}</table><div class="small">V16: ช่องสินค้าในหน้าออกบิลกว้างขึ้น และรายการค้นหาสินค้าจะแสดงรหัสสินค้า ชื่อสินค้า หน่วย ราคาทุน และราคาขายครบเหมือนหน้าบันทึกสินค้า</div>`; renderInvoicePreview()}
+
+function defaultPrintSettings(){let h=(window.paperSize&&paperSize.value==='9x11')?11:5.5;return {w:9,h:h,mt:0,mr:0,mb:0,ml:0,top:0,left:0,scale:100,font:12,line:1.12,row:2,title:17,hidePaper:'yes'}}
+function getPrintSettings(){return Object.assign(defaultPrintSettings(), store.get('printSettings',{}))}
+function selectedPrintPaperSize(){if(document.getElementById('autoInvoice')?.classList.contains('active')&&window.autoPaper)return autoPaper.value;return window.paperSize?paperSize.value:'9x5.5'}
+function loadPrintSettings(){let p=getPrintSettings(); if(!window.psMarginTop)return; if(window.psPaperWidth)psPaperWidth.value=p.w||9; if(window.psPaperHeight)psPaperHeight.value=p.h||((window.paperSize&&paperSize.value==='9x11')?11:5.5); psMarginTop.value=p.mt;psMarginRight.value=p.mr;psMarginBottom.value=p.mb;psMarginLeft.value=p.ml;psTopOffset.value=p.top;psLeftOffset.value=p.left;psScale.value=p.scale;psFontSize.value=p.font;psLineHeight.value=p.line;psRowPadding.value=p.row;psTitleSize.value=p.title;psHidePaperText.value=p.hidePaper;applyDynamicPageStyle()}
+function savePrintSettings(){if(!window.psMarginTop)return; store.set('printSettings',{w:+(window.psPaperWidth?psPaperWidth.value:9)||9,h:+(window.psPaperHeight?psPaperHeight.value:5.5)||5.5,mt:+psMarginTop.value||0,mr:+psMarginRight.value||0,mb:+psMarginBottom.value||0,ml:+psMarginLeft.value||0,top:+psTopOffset.value||0,left:+psLeftOffset.value||0,scale:+psScale.value||100,font:+psFontSize.value||12,line:+psLineHeight.value||1.12,row:+psRowPadding.value||2,title:+psTitleSize.value||17,hidePaper:psHidePaperText.value||'yes'});applyDynamicPageStyle()}
+function resetPrintSettings(){store.set('printSettings', defaultPrintSettings());loadPrintSettings();renderInvoicePreview();alert('คืนค่าเริ่มต้นสำหรับกระดาษบิลภาษีแล้ว')}
+function applyPaperDefaults(){let p=getPrintSettings(); p.w=9; p.h=(paperSize.value==='9x11')?11:5.5; store.set('printSettings',p); loadPrintSettings(); renderInvoicePreview();}
+function applyDynamicPageStyle(forcedPaper=null){let p=getPrintSettings(); let w=forcedPaper?9:+(p.w||9), h=forcedPaper?(forcedPaper==='9x11'?11:5.5):+(p.h||((window.paperSize&&paperSize.value==='9x11')?11:5.5)); let css=`@media print{@page{size:${w}in ${h}in;margin:${p.mt}in ${p.mr}in ${p.mb}in ${p.ml}in;} .invoice-box{width:calc(${w}in - ${(+p.ml)+(+p.mr)}in)!important;height:calc(${h}in - ${(+p.mt)+(+p.mb)}in)!important;padding:${p.top}in 0 0 ${p.left}in!important;font-size:${p.font}px!important;line-height:${p.line}!important;transform:scale(${(p.scale||100)/100});} .full-layout-page.invoice-box{width:229mm!important;height:279.4mm!important;padding:0!important;font-size:12px!important;line-height:1.05!important;transform:none!important;} .invoice-title{font-size:${p.title}px!important;} .invoice-box th,.invoice-box td{padding:${p.row}px 3px!important;font-size:${p.font}px!important;line-height:${p.line}!important;} }`; if(window.dynamicPageStyle) dynamicPageStyle.textContent=css;}
+function openPrintSettingsModal(){let m=document.getElementById('printSettingsModal');if(!m)return;window.printSettingsHome=m.parentNode;if(document.getElementById('autoInvoice')?.classList.contains('active'))document.body.appendChild(m);loadPrintSettings();m.classList.add('show')}
+function closePrintSettingsModal(){let m=document.getElementById('printSettingsModal');if(!m)return;m.classList.remove('show');if(window.printSettingsHome&&m.parentNode!==window.printSettingsHome)window.printSettingsHome.appendChild(m)}
+function printInvoiceClean(){savePrintSettings();renderInvoicePreview();let oldTitle=document.title;document.title=' ';document.body.classList.add('invoice-clean-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('invoice-clean-print');document.title=oldTitle},800)},80)}
+function renderInvoicePreview(){let s=store.get('settings',{}),c=calc(),isShort=invType.value==='ใบกำกับภาษีย่อ',ps=getPrintSettings();let paperTxt=ps.hidePaper==='no'?`<div><b>กระดาษ:</b> ${paperSize.value}</div>`:'';let shopLine=`${s.shopAddress||'ที่อยู่ร้าน'} โทร ${s.shopPhone||'-'} เลขภาษี ${s.shopTax||'-'}`;let head=`<div class="invoice-head"><div class="shop-title">${s.shopName||'ชื่อร้าน/บริษัท'}</div><div class="doc-title-block"><div class="doc-title">${invType.value}${isShort?' <span class="doc-copy-inline">(ต้นฉบับ)</span>':''}</div></div><div class="head-spacer"></div><div class="shop-address-line">${shopLine}</div></div>`;let meta=`<div class="mini-meta"><div><b>เลขที่:</b> ${invNo.value}</div><div><b>วันที่:</b> ${invDate.value}</div><div><b>VAT:</b> ${vatMode.value==='included'?'รวมภาษี':'แยกภาษี'}</div>${paperTxt}</div>`;let buyer=isShort?'':`<div class="invoice-meta"><div><b>ลูกค้า:</b> ${buyerName.value||'-'}<br><b>ที่อยู่:</b> ${buyerAddress.value||'-'}<br><b>เลขภาษี:</b> ${buyerTax.value||'-'}</div><div><b>เลขที่:</b> ${invNo.value}<br><b>วันที่:</b> ${invDate.value}<br><b>VAT:</b> ${vatMode.value==='included'?'ราคารวมภาษี':'ราคาแยกภาษี'}</div></div>`;let paperClass=paperSize.value==='9x11'?'paper-9x11':'paper-9x55';invoicePreview.innerHTML=`<div class="invoice-box ${paperClass} ${isShort?'tax-short':''}">${head}${isShort?meta:'<hr>'+buyer}<div class="invoice-lines"><table><tr><th>ลำดับ</th><th>รหัส</th><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา</th><th>จำนวนเงิน</th></tr>${invoiceItems.map((x,i)=>`<tr><td class=center>${i+1}</td><td>${x.code}</td><td>${x.name}</td><td class=right>${x.qty}</td><td>${x.unit}</td><td class=right>${money(x.price)}</td><td class=right>${money(x.qty*x.price)}</td></tr>`).join('')}</table></div><div class="invoice-footer"><div class="invoice-summary-row"><p class="invoice-amount-words"><b>จำนวนเงินตัวอักษร:</b> ${thaiBahtText(c.total)}</p><div class="invoice-total"><table><tr><td>มูลค่าก่อนภาษี</td><td class=right>${money(c.beforeVat)}</td></tr><tr><td>VAT 7%</td><td class=right>${money(c.vat)}</td></tr><tr><th>ยอดรวมสุทธิ</th><th class=right>${money(c.total)}</th></tr></table></div></div><div class="invoice-meta signature-row"><div>ผู้รับสินค้า/บริการ ____________________</div><div>ผู้รับเงิน/ผู้ขาย ____________________</div></div></div></div>`}
+function saveInvoice(silent=false, keepFormAfterSave=false){
+  if(invoiceItems.length===0){alert('กรุณาเพิ่มสินค้าในบิล');return false}
+  let a=store.get('invoices',[]);let c=calc();
+  if(!editInvoiceId && invoiceNoExists(invNo.value,null)){alert('เลขที่บิลนี้ถูกใช้แล้ว โปรแกรมจะสร้างเลขใหม่ให้');invNo.value=nextInvoiceNo();renderInvoicePreview();return false}
+  let currentItems=JSON.parse(JSON.stringify(invoiceItems));
+  let addressParts=invoiceCustomerAddressParts(selectedInvoiceCustomerId,buyerAddress.value);
+  let inv={id:editInvoiceId||Date.now(),no:invNo.value,date:invDate.value,type:invType.value,vatMode:vatMode.value,paperSize:paperSize.value,buyerName:buyerName.value,buyerTax:buyerTax.value,buyerAddress:buyerAddress.value,customerId:selectedInvoiceCustomerId||'',buyerAddress1:addressParts.buyerAddress1,buyerAddress2:addressParts.buyerAddress2,items:currentItems,total:c.total,updatedAt:new Date().toISOString()};
+  let idx=a.findIndex(x=>x.id===editInvoiceId);
+  if(idx>=0){a[idx]=inv}else{a.push(inv);advanceInvoiceCounterFromNo(inv.no);editInvoiceId=inv.id}
+  store.set('invoices',a);
+  renderHistory();
+  if(!silent)alert('บันทึกบิลแล้ว');
+  if(!keepFormAfterSave){newInvoice();}
+  else{invoiceItems=currentItems;renderInvoiceItems();renderInvoicePreview();}
+  return true;
+}
+function printAndSaveInvoice(){
+  let ok=saveInvoice(true,true);
+  if(ok){setTimeout(()=>{printInvoiceClean()},120)}
+}
+function newInvoice(){editInvoiceId=null;invNo.value=nextInvoiceNo();invDate.value=new Date().toISOString().slice(0,10);if(window.paperSize)paperSize.value='9x5.5';applyDynamicPageStyle();buyerName.value='';buyerTax.value='';buyerAddress.value='';clearSelectedInvoiceCustomer();if(window.customerSearchInvoice)customerSearchInvoice.value='';hideBuyerNameSuggestions();if(window.productSearchInvoice){productSearchInvoice.value='';hideProductSuggestions();}invoiceItems=[];renderInvoiceItems();updateInvoiceNumberSettingUI()}
+function loadInvoiceToForm(x, editMode=true){showPage('invoice');editInvoiceId=editMode?x.id:null;invNo.value=editMode?x.no:nextInvoiceNo();invDate.value=editMode?x.date:new Date().toISOString().slice(0,10);invType.value=x.type||'ใบกำกับภาษีย่อ';vatMode.value=x.vatMode||'included';paperSize.value=x.paperSize||'9x5.5';buyerName.value=x.buyerName||'';buyerTax.value=x.buyerTax||'';buyerAddress.value=x.buyerAddress||'';selectedInvoiceCustomerId=x.customerId||'';selectedInvoiceCustomerName=x.buyerName||'';updateBuyerCustomerStatus(selectedInvoiceCustomerId?'selected':(buyerName.value?'unselected':''));invoiceItems=JSON.parse(JSON.stringify(x.items||[]));renderInvoiceItems()}
+function editInvoice(id){let x=store.get('invoices',[]).find(v=>v.id===id);if(!x)return;loadInvoiceToForm(x,true)}
+function viewInvoice(id){let x=store.get('invoices',[]).find(v=>v.id===id);if(!x)return;loadInvoiceToForm(x,true);setTimeout(()=>window.scrollTo(0,document.body.scrollHeight),50)}
+function duplicateInvoice(id){let x=store.get('invoices',[]).find(v=>v.id===id);if(!x)return;loadInvoiceToForm(x,false);alert('คัดลอกข้อมูลบิลเดิมมาแล้ว โปรแกรมสร้างเลขที่บิลใหม่ให้ สามารถแก้ไขแล้วกดบันทึก/พิมพ์ได้เลย')}
+function deleteInvoice(id){if(confirm('ลบบิลนี้?')){let a=store.get('invoices',[]).filter(x=>x.id!==id);store.set('invoices',a);renderHistory()}}
+function initHistorySummaryDefaults(){let d=new Date(),today=d.toISOString().slice(0,10);if(summaryDate&&!summaryDate.value)summaryDate.value=today;if(summaryMonth&&!summaryMonth.value)summaryMonth.value=today.slice(0,7);if(summaryYear&&!summaryYear.value)summaryYear.value=d.getFullYear()}
+function invoiceProfit(inv){let products=store.get('products',[]);return (inv.items||[]).reduce((sum,it)=>{let p=products.find(x=>x.code===it.code)||products.find(x=>normalizeName(x.name)===normalizeName(it.name))||{};let qty=+it.qty||0;let sale=+it.price||0;let cost=(it.cost!==undefined&&it.cost!==null&&it.cost!=='')?(+it.cost||0):(+p.cost||0);return sum+((sale-cost)*qty);},0)}
+function invoiceHasMissingCost(inv){let products=store.get('products',[]);return (inv.items||[]).some(it=>{let p=products.find(x=>x.code===it.code)||products.find(x=>normalizeName(x.name)===normalizeName(it.name))||{};let cost=(it.cost!==undefined&&it.cost!==null&&it.cost!=='')?+it.cost:+p.cost;return !(cost>0)})}
+function invoiceProfitDisplay(rows,profit){return rows.some(invoiceHasMissingCost)?'ยังไม่ครบข้อมูลต้นทุน':money(profit)+' บาท'}
+function renderHistory(){initHistorySummaryDefaults();updateInvoiceNumberSettingUI();let q=(historySearch.value||'').toLowerCase(),now=new Date();let cutoff=new Date(now);cutoff.setFullYear(now.getFullYear()-1);let all=store.get('invoices',[]).filter(x=>new Date(x.date)>=cutoff);let rows=all.filter(x=>(x.no+x.buyerName+x.buyerTax).toLowerCase().includes(q)).sort((a,b)=>b.id-a.id);let monthKey=summaryMonth.value;let yearKey=String(summaryYear.value||new Date().getFullYear());let monthRows=all.filter(x=>(x.date||'').slice(0,7)===monthKey);let yearRows=all.filter(x=>(x.date||'').slice(0,4)===yearKey);let monthTotal=monthRows.reduce((s,x)=>s+(+x.total||0),0);let yearTotal=yearRows.reduce((s,x)=>s+(+x.total||0),0);let filteredTotal=rows.reduce((s,x)=>s+(+x.total||0),0);let monthProfit=monthRows.reduce((s,x)=>s+invoiceProfit(x),0);let yearProfit=yearRows.reduce((s,x)=>s+invoiceProfit(x),0);let filteredProfit=rows.reduce((s,x)=>s+invoiceProfit(x),0);historySummary.innerHTML=`<div class="grid3"><div class="card"><b>ยอดรวมรายเดือน</b><br><span class="small">เดือน ${monthKey||'-'} จำนวน ${monthRows.length} บิล</span><h2>${money(monthTotal)} บาท</h2><b>กำไรรายเดือน</b><h2>${invoiceProfitDisplay(monthRows,monthProfit)}</h2></div><div class="card"><b>ยอดรวมรายปี</b><br><span class="small">ปี ${yearKey||'-'} จำนวน ${yearRows.length} บิล</span><h2>${money(yearTotal)} บาท</h2><b>กำไรรายปี</b><h2>${invoiceProfitDisplay(yearRows,yearProfit)}</h2></div><div class="card"><b>ยอดรวมตามรายการที่ค้นหา</b><br><span class="small">จำนวน ${rows.length} บิล</span><h2>${money(filteredTotal)} บาท</h2><b>กำไรตามรายการที่ค้นหา</b><h2>${invoiceProfitDisplay(rows,filteredProfit)}</h2></div></div><div class="notice">กำไรคำนวณจาก (ราคาขาย - ราคาทุน) × จำนวน ของสินค้าแต่ละรายการในบิล ถ้าบิลเก่าไม่มีต้นทุนในบิล โปรแกรมจะดึงต้นทุนล่าสุดจากหน้าสินค้ามาช่วยคำนวณ หากยังไม่มีต้นทุนจะแสดงว่ายังไม่ครบข้อมูลต้นทุน แต่ยอดรวมบิลยังถูกนับตามปกติ</div>`;historyTable.innerHTML=`<table><tr><th>วันที่</th><th>เลขบิล</th><th>ชนิด</th><th>ลูกค้า</th><th>ยอดรวม</th><th>กำไร</th><th></th></tr>${rows.map(x=>`<tr><td>${x.date}${x.time?' '+x.time:''}</td><td>${x.no}</td><td>${x.type}${x.training?' <span class="training-badge">ฝึกซ้อม</span>':''}</td><td>${x.buyerName}</td><td class=right>${money(x.total)}</td><td class=right>${invoiceHasMissingCost(x)?'ยังไม่ครบข้อมูลต้นทุน':money(invoiceProfit(x))}</td><td><button onclick="viewInvoice(${x.id})">ดู/พิมพ์ซ้ำ</button> <button onclick="duplicateInvoice(${x.id})">ออกซ้ำ</button> <button onclick="editInvoice(${x.id})">แก้ไข</button> <button onclick="deleteInvoice(${x.id})">ลบ</button></td></tr>`).join('')}</table>`}
+
+let renderHistoryV22=renderHistory;
+renderHistory=function(){renderHistoryV22();if(!window.summaryDate||!window.historySummary)return;let key=summaryDate.value,rows=store.get('invoices',[]).filter(x=>x.date===key),total=rows.reduce((s,x)=>s+(+x.total||0),0),profit=rows.reduce((s,x)=>s+invoiceProfit(x),0);historySummary.insertAdjacentHTML('afterbegin',`<div class="card" style="border:1px solid #bfdbfe;box-shadow:none"><b>ยอดขายรายวัน</b> <span class="small">วันที่ ${key||'-'} จำนวน ${rows.length} บิล</span><h2>${money(total)} บาท</h2><b>กำไรรายวัน:</b> ${invoiceProfitDisplay(rows,profit)}</div>`)};
+function randomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function shuffleCopy(arr){let a=arr.slice();for(let i=a.length-1;i>0;i--){let j=randomInt(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function trainingBillCategoryRatios(min=50,max=5000){let low=max>=Math.max(min,100)&&min<=799.99,mid=max>=Math.max(min,1000)&&min<=2299.99,high=max>=4000&&max>=Math.max(min,3000)&&min<=4499.99;if(high&&mid&&low)return {low:.70,mid:.20,high:.10};if(mid&&low)return {low:.70,mid:.30,high:0};if(low)return {low:1,mid:0,high:0};if(mid)return {low:0,mid:1,high:0};if(high)return {low:0,mid:0,high:1};return {low:0,mid:0,high:0}}
+function trainingCategoryCounts(count,min=50,max=5000){let ratio=trainingBillCategoryRatios(min,max),high=Math.round(count*ratio.high),mid=Math.round(count*ratio.mid),low=count-high-mid;if(!ratio.low&&low){if(ratio.mid)mid+=low;else high+=low;low=0}return {low,mid,high}}
+function trainingCategoryRanges(min,max){return {
+  low:{min:Math.max(min,100),max:Math.min(max,799.99),label:'หลักร้อย'},
+  mid:{min:Math.max(min,1000),max:Math.min(max,2299.99),label:'หลักพันต้น'},
+  high:{min:Math.max(min,3000),max:Math.min(max,4499.99),label:'ยอดสูง'}
+}}
+function trainingBoundsForCount(count,min,max){let c=trainingCategoryCounts(count,min,max),r=trainingCategoryRanges(min,max),valid=Object.keys(c).every(k=>!c[k]||r[k].max>=r[k].min);return {counts:c,ranges:r,valid,minTotal:Object.keys(c).reduce((s,k)=>s+c[k]*r[k].min,0),maxTotal:Object.keys(c).reduce((s,k)=>s+c[k]*r[k].max,0)}}
+function autoBillCount(target,min,max){
+  let ratio=trainingBillCategoryRatios(min,max),ranges=trainingCategoryRanges(min,max),average=['low','mid','high'].reduce((s,k)=>s+ratio[k]*((ranges[k].min+ranges[k].max)/2),0);if(!(average>0))return 0;let guess=Math.max(1,Math.round(target/average)),best=null;
+  for(let n=Math.max(1,guess-250);n<=guess+250;n++){let b=trainingBoundsForCount(n,min,max);if(b.valid&&target>=b.minTotal-.001&&target<=b.maxTotal+.001){let score=Math.abs(n-guess);if(!best||score<best.score)best={count:n,score}}}
+  return best?best.count:0;
+}
+function makeBillAmounts(targetCents,count,minCents,maxCents,realistic){
+  let min=minCents/100,max=maxCents/100,b=trainingBoundsForCount(count,min,max),spec=[];
+  if(!b.valid||targetCents<b.minTotal*100||targetCents>b.maxTotal*100)return makeRealisticAmountsExact(targetCents,count,minCents,maxCents,realistic);
+  ['low','mid','high'].forEach(kind=>{for(let i=0;i<b.counts[kind];i++)spec.push({kind,min:Math.round(b.ranges[kind].min*100),max:Math.round(b.ranges[kind].max*100)})});
+  return makeAmountsForSpecs(targetCents,spec,realistic);
+}
+function billCountRelationMessage(){return 'จำนวนบิลและช่วงยอดต่อบิลไม่สัมพันธ์กัน กรุณาปรับค่าใหม่'}
+function amountKindFromCents(cents,minCents,maxCents){let span=Math.max(1,maxCents-minCents),pos=(cents-minCents)/span;return pos<.34?'low':pos<.72?'mid':'high'}
+function canMakeCountTotal(targetCents,count,minCents,maxCents){return count>0&&minCents>0&&maxCents>=minCents&&targetCents>=count*minCents&&targetCents<=count*maxCents}
+function makeRealisticAmountsExact(targetCents,count,minCents,maxCents,realistic=true){
+  if(!canMakeCountTotal(targetCents,count,minCents,maxCents))return null;
+  let out=Array.from({length:count},()=>minCents),remaining=targetCents-count*minCents,caps=out.map(()=>maxCents-minCents);
+  while(remaining>0){
+    let open=caps.map((cap,i)=>({i,cap})).filter(x=>x.cap>0);if(!open.length)return null;
+    let weights=open.map(x=>realistic?Math.pow(Math.random(),1.7)+Math.random()*.45:.25+Math.random()),sum=weights.reduce((s,x)=>s+x,0),moved=0;
+    open.forEach((x,j)=>{let add=Math.min(x.cap,Math.floor(remaining*(weights[j]/sum)/100)*100);if(add>0){out[x.i]+=add;caps[x.i]-=add;remaining-=add;moved+=add}});
+    if(!moved){let x=open[randomInt(0,open.length-1)],add=Math.min(x.cap,remaining);out[x.i]+=add;caps[x.i]-=add;remaining-=add}
+  }
+  out=shuffleCopy(out);
+  for(let i=1;i<out.length;i++)if(out[i]===out[i-1]){let donor=out.findIndex((v,j)=>j!==i&&v>minCents&&out[i]<maxCents);if(donor>=0){out[donor]-=100;out[i]+=100}}
+  return out.map(cents=>({cents,kind:amountKindFromCents(cents,minCents,maxCents)}));
+}
+function makeTrainingAmountPlan(targetCents,count,min,max,realistic,manualCount){
+  let minCents=Math.round(min*100),maxCents=Math.round(max*100);
+  if(manualCount)return makeRealisticAmountsExact(targetCents,count,minCents,maxCents,realistic);
+  return makeBillAmounts(targetCents,count,minCents,maxCents,realistic);
+}
+function autoCountFromRange(target,min,max,minimumCount=1){
+  let count=autoBillCount(target,min,max),minCount=Math.max(minimumCount,Math.ceil(target/max)),maxCount=Math.floor(target/min);
+  if(count&&count>=minCount&&count<=maxCount)return count;
+  if(minCount>maxCount)return 0;
+  let avg=Math.max(min,Math.min(max,min*.35+max*.65)),guess=Math.round(target/avg);
+  return Math.max(minCount,Math.min(maxCount,guess));
+}
+function makeAmountsForSpecs(targetCents,spec,realistic){
+  spec=shuffleCopy(spec);let remaining=targetCents,out=[];
+  spec.forEach((item,i)=>{let rest=spec.slice(i+1),restMin=rest.reduce((s,x)=>s+x.min,0),restMax=rest.reduce((s,x)=>s+x.max,0),low=Math.max(item.min,remaining-restMax),high=Math.min(item.max,remaining-restMin),value;
+    if(i===spec.length-1)value=remaining;else{let fraction=realistic ? .15+Math.random()*.70 : Math.random();value=Math.round((low+(high-low)*fraction)/100)*100;value=Math.max(low,Math.min(high,value))}
+    out.push({cents:value,kind:item.kind});remaining-=value;
+  });
+  return out;
+}
+function adaptiveDailyPlan(targetCents,count,min,max){
+  let r=trainingCategoryRanges(min,max),ratio=trainingBillCategoryRatios(min,max),best=null,lowOK=r.low.max>=r.low.min,midOK=r.mid.max>=r.mid.min,highOK=ratio.high>0&&r.high.max>=r.high.min;
+  for(let high=0;high<=(highOK?count:0);high++)for(let mid=0;mid<=(midOK?count-high:0);mid++){let low=count-high-mid;if((low&&!lowOK)||(!low&&!mid&&!high))continue;let minTotal=Math.round((low*r.low.min+mid*r.mid.min+high*r.high.min)*100),maxTotal=Math.round((low*r.low.max+mid*r.mid.max+high*r.high.max)*100);if(targetCents<minTotal||targetCents>maxTotal)continue;let score=Math.abs(low/count-ratio.low)*5+Math.abs(mid/count-ratio.mid)*3+Math.abs(high/count-ratio.high)*4+(targetCents<300000&&high?10:0);if(!best||score<best.score)best={low,mid,high,ranges:r,score,minTotal,maxTotal}}
+  return best;
+}
+function recommendedDailyCountRange(total){return {min:Math.max(1,Math.floor(total/500)),max:Math.max(1,Math.ceil(total/300))}}
+function validDailyPlans(targetCents,min,max){let range=recommendedDailyCountRange(targetCents/100),plans=[];for(let n=range.min;n<=range.max;n++){let p=adaptiveDailyPlan(targetCents,n,min,max);if(p)plans.push({count:n,plan:p})}if(!plans.length)for(let n=1;n<=Math.min(100,Math.max(1,Math.ceil(targetCents/Math.max(1,min*100))));n++){let p=adaptiveDailyPlan(targetCents,n,min,max);if(p)plans.push({count:n,plan:p})}return plans}
+function makeAdaptiveDailyAmounts(targetCents,count,min,max,realistic){let plan=adaptiveDailyPlan(targetCents,count,min,max);if(!plan)return null;let spec=[];['low','mid','high'].forEach(kind=>{for(let i=0;i<plan[kind];i++)spec.push({kind,min:Math.round(plan.ranges[kind].min*100),max:Math.round(plan.ranges[kind].max*100)})});return makeAmountsForSpecs(targetCents,spec,realistic)}
+function trainingItemCount(total,productCount,paper){let n=total<500?randomInt(1,3):total<1500?randomInt(3,6):total<3000?randomInt(4,7):total<5000?randomInt(7,8):randomInt(5,paper==='9x11'?15:8);return Math.max(1,Math.min(productCount,n))}
+function trainingProductProfile(product){
+  let text=String(`${product.name||''} ${product.code||''} ${product.unit||''}`).toLowerCase(),has=words=>words.some(word=>text.includes(word));
+  let electrical=has(['ไฟฟ้า','สายไฟ','ปลั๊ก','สวิตช์','เต้ารับ','เบรกเกอร์','หลอดไฟ','โคมไฟ','ฟิวส์','ตู้ไฟ','รางไฟ','เทปพันสาย','เคเบิล','cable','wire','switch','socket','breaker','lamp','electrical','conduit','ท่อร้อยสาย']);
+  let plumbing=has(['ประปา','พีวีซี','pvc','ท่อ','ข้องอ','ข้อต่อ','สามทาง','ข้อลด','ต่อตรง','ยูเนี่ยน','นิปเปิล','วาล์ว','ก๊อกน้ำ','กาวทาท่อ','ฝาปิดท่อ','แคล้มป์','แคลมป์','คลิปรัดท่อ','pipe','elbow','joint','coupling','reducer','fitting']);
+  if(has(['ท่อร้อยสาย','conduit']))plumbing=false;
+  let plumbingAccessory=has(['กาวทาท่อ','กาว pvc','ข้องอ','ข้อต่อ','สามทาง','ข้อลด','ต่อตรง','ยูเนี่ยน','นิปเปิล','วาล์ว','ก๊อกน้ำ','ฝาปิดท่อ','อุปกรณ์ท่อ','แคล้มป์','แคลมป์','คลิปรัดท่อ','elbow','joint','coupling','reducer','fitting','glue']);
+  let tools=has(['เครื่องมือช่าง','ค้อน','ตะปู','ตลับเมตร','สิ่ว','ตะไบ','เลื่อย','ไขควง','คีม','ประแจ','สว่าน','ดอกสว่าน','คัตเตอร์','ระดับน้ำ','hammer','nail','tape measure','chisel','file','saw','screwdriver','pliers','wrench','drill','tool']);
+  let sizes=(text.match(/(?:\d+\s*\/\s*\d+|\d+(?:\.\d+)?)\s*(?:นิ้ว|หุน|มม\.?|mm|cm|inch|in\b|″|")/g)||[]).map(trainingNormalizeSize);
+  return {electrical,plumbing,plumbingAccessory,tools,sizes:[...new Set(sizes)]};
+}
+function trainingNormalizeSize(value){
+  let s=String(value||'').toLowerCase().replace(/\s+/g,'').replace(/นิ้ว|inch|″|"/g,'in').replace(/มม\.?/g,'mm');
+  let m=s.match(/(\d+)\/(\d+)/);if(m)return `${+m[1]}/${+m[2]}${s.endsWith('หุน')?'หุน':s.endsWith('mm')?'mm':s.endsWith('cm')?'cm':'in'}`;
+  let n=s.match(/\d+(?:\.\d+)?/);return n?`${+n[0]}${s.endsWith('หุน')?'หุน':s.endsWith('mm')?'mm':s.endsWith('cm')?'cm':'in'}`:s;
+}
+function trainingProfilesShareSize(a,b){return a.sizes.length>0&&b.sizes.length>0&&a.sizes.some(size=>b.sizes.includes(size))}
+function trainingThemeSequence(count,products){
+  let profiles=products.map(trainingProductProfile),available=[];
+  if(profiles.filter(x=>x.electrical).length>=2)available.push('electrical');
+  if(profiles.filter(x=>x.plumbing).length>=2)available.push('plumbing');
+  if(profiles.filter(x=>x.tools).length>=2)available.push('tools');
+  if(!available.length)return Array(count).fill(null);
+  let weights={electrical:4,plumbing:3,tools:3},cycle=[];available.forEach(theme=>{for(let i=0;i<weights[theme];i++)cycle.push(theme)});
+  let out=[];while(out.length<count)out.push(...shuffleCopy(cycle));return out.slice(0,count);
+}
+function trainingNaturalQuantity(maxAffordable,priceCents,remainingCents,slotsLeft,forceMultiple=false){
+  let cap=Math.max(1,Math.min(8,maxAffordable)),targetQty=Math.max(1,Math.min(cap,Math.round((remainingCents/Math.max(1,slotsLeft))/priceCents))),choices=[1,1,2,2,2,3,3,4,5,6].filter(q=>q<=cap);
+  if(forceMultiple&&cap>=2)choices=choices.filter(q=>q>=2);
+  let natural=choices[randomInt(0,choices.length-1)];return Math.max(1,Math.min(cap,Math.random()<.65?natural:targetQty));
+}
+function trainingQuantityLimit(ref){let price=ref.cents/100;if(price<=25)return ref.profile.plumbingAccessory?30:20;if(price<=50)return 20;if(price<=100)return 12;if(price<=500)return 8;return 5}
+function makeTrainingItems(targetCents,products,realistic,paper,preferredTheme=null){
+  let eligible=products.map((p,i)=>({p,key:i,cents:Math.round((+p.price||0)*100),profile:trainingProductProfile(p)})).filter(x=>x.cents>0);if(!eligible.length)return [];
+  let desired=trainingItemCount(targetCents/100,eligible.length,paper),best=null,trials=realistic?100:40,groups={electrical:eligible.filter(x=>x.profile.electrical),plumbing:eligible.filter(x=>x.profile.plumbing),tools:eligible.filter(x=>x.profile.tools)},themes=Object.keys(groups).filter(key=>groups[key].length>=2),theme=themes.includes(preferredTheme)?preferredTheme:(themes.length?themes[randomInt(0,themes.length-1)]:null),themeAnchor=null,themeSize=null;
+  if(theme==='plumbing'){
+    let sized=groups.plumbing.filter(x=>x.profile.sizes.length),sizeCounts={};sized.forEach(x=>x.profile.sizes.forEach(size=>sizeCounts[size]=(sizeCounts[size]||0)+1));let usable=Object.keys(sizeCounts).filter(size=>sizeCounts[size]>=2);
+    if(usable.length)themeSize=usable[randomInt(0,usable.length-1)];themeAnchor=sized.find(x=>x.profile.sizes.includes(themeSize))||null;
+  }
+  let themed=theme?groups[theme].filter(x=>theme!=='plumbing'||!themeSize||!x.profile.sizes.length||x.profile.sizes.includes(themeSize)):eligible;
+  if(theme&&themed.length<2){theme=null;themed=eligible;themeSize=null}
+  let outsiderLimit=theme&&desired>=5?Math.min(2,Math.max(1,Math.round(desired*.1))):0;
+  for(let trial=0;trial<trials;trial++){
+    let outsiderPool=eligible.filter(x=>!themed.some(t=>t.key===x.key)&&(theme!=='plumbing'||!x.profile.plumbing)),pool=shuffleCopy(themed.concat(outsiderPool)),lines=new Map(),sum=0;
+    while(lines.size<desired){
+      let remaining=targetCents-sum,slots=Math.max(1,desired-lines.size),outsiders=[...lines.values()].filter(line=>!themed.some(t=>t.key===line.ref.key)).length,choices=pool.filter(x=>!lines.has(x.key)&&x.cents<=remaining&&(themed.some(t=>t.key===x.key)||outsiders<outsiderLimit));if(!choices.length)break;
+      let related=choices.filter(x=>themed.some(t=>t.key===x.key)),source=related.length&&(outsiders>=outsiderLimit||Math.random()<.9)?related:choices;
+      source=source.map(x=>({x,score:(themed.some(t=>t.key===x.key)?12:0)+(theme==='plumbing'&&themeAnchor&&trainingProfilesShareSize(x.profile,themeAnchor.profile)?8:0)+(theme==='plumbing'&&x.profile.plumbingAccessory?2:0)+Math.random()*3-Math.abs(remaining/slots-x.cents)/Math.max(1,remaining/slots)})).sort((a,b)=>b.score-a.score);
+      let pick=source[randomInt(0,Math.min(3,source.length)-1)].x,maxQty=Math.min(trainingQuantityLimit(pick),Math.floor(remaining/pick.cents)),hasMultiple=[...lines.values()].some(line=>line.qty>1),qty=trainingNaturalQuantity(maxQty,pick.cents,remaining,slots,!hasMultiple&&lines.size>=Math.floor(desired/2));
+      lines.set(pick.key,{ref:pick,qty});sum+=pick.cents*qty;
+    }
+    if(!lines.size){let fallback=themed.length?themed:eligible,pick=fallback.reduce((a,b)=>Math.abs(b.cents-targetCents)<Math.abs(a.cents-targetCents)?b:a);lines.set(pick.key,{ref:pick,qty:1});sum=pick.cents}
+    for(let step=0;step<1000;step++){let currentDiff=Math.abs(targetCents-sum),options=[],outsiders=[...lines.values()].filter(line=>!themed.some(t=>t.key===line.ref.key)).length;for(const line of lines.values())if(line.qty<trainingQuantityLimit(line.ref))options.push({line,newSum:sum+line.ref.cents});if(lines.size<desired)for(const x of pool)if(!lines.has(x.key)&&(themed.some(t=>t.key===x.key)||outsiders<outsiderLimit))options.push({add:x,newSum:sum+x.cents});options.sort((a,b)=>Math.abs(targetCents-a.newSum)-Math.abs(targetCents-b.newSum));let option=options[0];if(!option||Math.abs(targetCents-option.newSum)>=currentDiff)break;if(option.add)lines.set(option.add.key,{ref:option.add,qty:1});else option.line.qty++;sum=option.newSum;if(sum===targetCents)break}
+    for(let step=0;step<100;step++){let currentDiff=Math.abs(targetCents-sum),move=null;for(const line of lines.values()){if(line.qty>1){let ns=sum-line.ref.cents;if(Math.abs(targetCents-ns)<currentDiff)move={line,delta:-line.ref.cents}}if(line.qty<trainingQuantityLimit(line.ref)){let ns=sum+line.ref.cents;if(Math.abs(targetCents-ns)<currentDiff)move={line,delta:line.ref.cents}}}if(!move)break;move.line.qty+=move.delta>0?1:-1;sum+=move.delta}
+    let multi=[...lines.values()].filter(line=>line.qty>1).length,relatedCount=theme?[...lines.values()].filter(line=>line.ref.profile[theme]).length:0,score=Math.abs(targetCents-sum)*100-lines.size*2-multi*4-relatedCount*2,candidate={score,sum,lines};if(!best||candidate.score<best.score)best=candidate;if(sum===targetCents&&lines.size>=desired&&multi>0)break;
+  }
+  return [...best.lines.values()].map(x=>({code:x.ref.p.code||'',name:x.ref.p.name||'สินค้า',unit:x.ref.p.unit||'ชิ้น',qty:x.qty,price:+x.ref.p.price,cost:+x.ref.p.cost||0}));
+}
+function calcTrainingInvoiceAmounts(items,vatMode){let subtotal=Math.round(items.reduce((s,x)=>s+(+x.qty||0)*(+x.price||0),0)*100)/100;if(vatMode==='excluded'){let beforeVat=subtotal,vat=Math.round(beforeVat*VAT*100)/100,total=Math.round((beforeVat+vat)*100)/100;return {beforeVat,vat,total}}let total=subtotal,beforeVat=Math.round(total/(1+VAT)*100)/100,vat=Math.round((total-beforeVat)*100)/100;return {beforeVat,vat,total}}
+function makeTrainingTimes(count,randomize){
+  if(!randomize)return Array.from({length:count},()=> '12:00');
+  let parseTime=v=>{let m=String(v||'').match(/^(\d{1,2}):(\d{2})$/);return m?(+m[1])*60+(+m[2]):null},start=parseTime(window.autoTimeStart?autoTimeStart.value:'08:00'),end=parseTime(window.autoTimeEnd?autoTimeEnd.value:'18:30');
+  if(start===null)start=8*60;if(end===null)end=18*60+30;if(end<start){let t=start;start=end;end=t}
+  let times=Array.from({length:count},()=>randomInt(start,end)).sort((a,b)=>a-b);
+  return times.map(v=>String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0'));
+}
+function invoiceItemsSubtotalCents(items){return Math.round((items||[]).reduce((s,x)=>s+(+x.qty||0)*(+x.price||0),0)*100)}
+function subtotalCentsForTrainingGross(grossCents,vatMode){
+  if(vatMode!=='excluded')return grossCents;
+  let guess=Math.round(grossCents/(1+VAT)),best=guess,bestDiff=Infinity;
+  for(let cents=Math.max(1,guess-20);cents<=guess+20;cents++){let vat=Math.round(cents*VAT),total=cents+vat,diff=Math.abs(total-grossCents);if(diff<bestDiff){best=cents;bestDiff=diff;if(!diff)break}}
+  return best;
+}
+function balanceItemsToSubtotal(items,subtotalCents,products){
+  items=Array.isArray(items)?items.slice():[];
+  if(!items.length){let p=(products||[]).find(x=>(+x.price||0)>0)||{};items=[{code:p.code||'',name:p.name||'สินค้า',unit:p.unit||'ชิ้น',qty:1,price:subtotalCents/100,cost:+p.cost||0}]}
+  let diff=subtotalCents-invoiceItemsSubtotalCents(items);if(!diff)return items;
+  let idx=items.length-1,line={...items[idx]},lineTotal=Math.round((+line.qty||0)*(+line.price||0)*100);
+  if(lineTotal+diff>0){line.qty=1;line.price=(lineTotal+diff)/100;items[idx]=line}
+  else items.push({code:'',name:'ปรับยอดตามบิล',unit:'รายการ',qty:1,price:diff/100,cost:0});
+  return items;
+}
+function makeBalancedTrainingItems(grossCents,products,realistic,paper,theme,vatMode){
+  let subtotalTarget=subtotalCentsForTrainingGross(grossCents,vatMode),items=makeTrainingItems(subtotalTarget,products,realistic,paper,theme);
+  return balanceItemsToSubtotal(items,subtotalTarget,products);
+}
+function nextUnusedInvoiceNo(settings,invoices){let prefix=String(settings.prefix||invoicePrefix()),build=()=>prefix+String(settings.next).padStart(settings.width||6,'0'),used=()=>invoices.some(x=>{let t=String(x.no||''),m=t.match(/(\d+)$/);return m&&t.slice(0,-m[1].length)===prefix&&parseInt(m[1])===settings.next}),no=build();while(used()){settings.next++;no=build()}return no}
+const AUTO_INVOICE_NUMBER_SETTINGS_KEY='autoInvoiceNumberSettings';
+const AUTO_INVOICE_PREFIX='IV';
+function getAutoInvoiceNumberSettings(){let s=store.get(AUTO_INVOICE_NUMBER_SETTINGS_KEY,{start:'',width:5});s.start=String(s.start||'').replace(/\D/g,'');s.width=Math.max(5,+s.width||5,s.start.length||0);return s}
+function saveAutoInvoiceNumberSettings(){let current=getAutoInvoiceNumberSettings(),digits=String(window.autoInvoiceStartNumber?autoInvoiceStartNumber.value:current.start||'').replace(/\D/g,''),s={start:digits,width:Math.max(5,digits.length,current.width||5)};store.set(AUTO_INVOICE_NUMBER_SETTINGS_KEY,s);return s}
+function loadAutoInvoiceNumberSettingsUI(){let s=getAutoInvoiceNumberSettings();if(window.autoInvoiceStartNumber)autoInvoiceStartNumber.value=s.start?AUTO_INVOICE_PREFIX+s.start:'';toggleAutoInvoiceNumberSettings()}
+function toggleAutoInvoiceNumberSettings(){saveAutoInvoiceNumberSettings();updateAutoInvoiceNumberPreview()}
+function normalizeAutoInvoiceStartInput(pad=true){let s=saveAutoInvoiceNumberSettings();if(window.autoInvoiceStartNumber)autoInvoiceStartNumber.value=s.start?AUTO_INVOICE_PREFIX+(pad?s.start.padStart(s.width,'0'):s.start):'';updateAutoInvoiceNumberPreview()}
+function autoInvoiceNumberParts(no){let m=String(no||'').match(/(\d+)$/);return m?{prefix:String(no).slice(0,-m[1].length),seq:parseInt(m[1]),width:m[1].length}:null}
+function autoInvoiceNoExists(no,invoices){let text=String(no||''),p=autoInvoiceNumberParts(text);return (invoices||store.get('invoices',[])).some(x=>{let t=String(x.no||''),xp=autoInvoiceNumberParts(t);return t===text||(p&&xp&&p.prefix===xp.prefix&&p.seq===xp.seq)})}
+function latestAutoInvoiceNumberBase(type,invoices){let s=getInvoiceNumberSettings(),best=null,prefix=AUTO_INVOICE_PREFIX;(invoices||store.get('invoices',[])).filter(x=>x.type===type).forEach(x=>{let p=autoInvoiceNumberParts(x.no);if(p&&p.prefix===prefix&&(!best||p.seq>best.seq))best=p});return best?{prefix:best.prefix,seq:best.seq+1,width:Math.max(5,best.width)}:{prefix,seq:s.next||1,width:Math.max(5,s.width||5)}}
+function buildAutoInvoiceNo(prefix,seq,width){return String(prefix||AUTO_INVOICE_PREFIX)+String(seq||1).padStart(Math.max(5,width||5),'0')}
+function autoInvoiceRange(prefix,start,width,count){return Array.from({length:Math.max(0,count||0)},(_,i)=>buildAutoInvoiceNo(prefix,start+i,width))}
+function findNextAvailableAutoInvoiceBlock(prefix,start,width,count,invoices){let seq=Math.max(1,start||1),guard=0;while(guard++<100000){let range=autoInvoiceRange(prefix,seq,width,count);if(!range.some(no=>autoInvoiceNoExists(no,invoices)))return seq;seq++}return null}
+function autoInvoicePreviewCount(){let raw=String(window.autoCount?autoCount.value:'').trim(),manual=raw!==''&&raw.toLowerCase()!=='อัตโนมัติ',n=manual?parseInt(raw):0;if(n>0)return n;let monthly=window.autoMode&&autoMode.value==='monthly',type=selectedAutoInvoiceType(),isShort=type==='ใบกำกับภาษีย่อ',target=+autoTarget.value,min=+autoMin.value,max=+autoMax.value;if(!(target>0&&min>0&&max>=min))return 0;let minimum=monthly&&isShort?new Date((+autoYearBE.value||2569)-543,+autoMonth.value||1,0).getDate():1;return autoCountFromRange(target,min,max,minimum)||0}
+function getAutoInvoiceStartPlan(type,count){let invoices=store.get('invoices',[]),s=getAutoInvoiceNumberSettings(),manual=!!s.start,base=manual?{prefix:AUTO_INVOICE_PREFIX,seq:parseInt(s.start)||1,width:Math.max(5,s.width||5)}:latestAutoInvoiceNumberBase(type,invoices),range=autoInvoiceRange(base.prefix,base.seq,base.width,count),firstDup=range.length&&autoInvoiceNoExists(range[0],invoices),overlap=range.some(no=>autoInvoiceNoExists(no,invoices));if(firstDup||overlap){alert((firstDup?'เลขที่บิลเริ่มต้นนี้มีอยู่แล้ว':'ช่วงเลขที่บิลที่จะสร้างมีเลขซ้ำกับฐานข้อมูลเดิม')+'\n\nกรุณาแก้เลขที่บิลเริ่มต้นก่อนสร้างบิล');if(window.autoInvoiceStartNumber)autoInvoiceStartNumber.focus();return null}
+return {prefix:base.prefix,start:base.seq,width:base.width,numbers:range,settings:s}}
+function finishAutoInvoiceNumberGeneration(plan,type,created){let createdCount=created?.length||0;if(createdCount)created.forEach(x=>advanceInvoiceCounterFromNo(x.no));let s=getAutoInvoiceNumberSettings();s.start='';store.set(AUTO_INVOICE_NUMBER_SETTINGS_KEY,s);if(window.autoInvoiceStartNumber)autoInvoiceStartNumber.value='';updateAutoInvoiceNumberPreview()}
+function updateAutoInvoiceNumberPreview(){if(!window.autoInvoiceNumberPreview)return;let type=selectedAutoInvoiceType(),count=autoInvoicePreviewCount(),invoices=store.get('invoices',[]),s=saveAutoInvoiceNumberSettings(),base=s.start?{prefix:AUTO_INVOICE_PREFIX,seq:parseInt(s.start)||1,width:Math.max(5,s.width||5)}:latestAutoInvoiceNumberBase(type,invoices),first=count?buildAutoInvoiceNo(base.prefix,base.seq,base.width):'-',last=count?buildAutoInvoiceNo(base.prefix,base.seq+count-1,base.width):'-',range=count?autoInvoiceRange(base.prefix,base.seq,base.width,count):[],overlap=range.some(no=>autoInvoiceNoExists(no,invoices));autoInvoiceNumberPreview.innerHTML=`<b>Invoice Preview</b><br>First Invoice<br><b>${first}</b><br>Last Invoice<br><b>${last}</b><br>Total Invoices<br><b>${count||'-'}</b>${overlap?'<br><span class="status-unprinted">คำเตือน: ช่วงเลขบิลนี้มีเลขที่ซ้ำกับประวัติเดิม</span>':''}`}
+function bindAutoInvoiceNumberPreviewEvents(){['autoCount','autoTarget','autoMin','autoMax','autoMonth','autoYearBE','autoInvoiceType','autoMode','autoInvoiceStartNumber'].forEach(id=>{let el=document.getElementById(id);if(el){el.addEventListener('input',updateAutoInvoiceNumberPreview);el.addEventListener('change',updateAutoInvoiceNumberPreview)}})}
+const thaiMonthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function selectedAutoInvoiceType(){return window.autoInvoiceType?autoInvoiceType.value:'ใบกำกับภาษีย่อ'}
+function autoBuyerForType(type){return type==='ใบกำกับภาษีเต็ม'?{buyerName:'ลูกค้าทั่วไป',buyerTax:'',buyerAddress:''}:{buyerName:'ลูกค้าทั่วไป',buyerTax:'',buyerAddress:''}}
+function toggleAutoInvoiceMode(){let monthly=autoMode.value==='monthly',type=selectedAutoInvoiceType(),isShort=type==='ใบกำกับภาษีย่อ';autoSingleDateField.style.display=monthly?'none':'';autoMonthField.style.display=monthly?'':'none';autoYearField.style.display=monthly?'':'none';autoTargetLabel.textContent=monthly?'ยอดรวมทั้งเดือน':'ยอดรวมที่ต้องการสร้างบิล';autoGenerateButton.textContent=monthly?'สร้างบิลรายเดือนอัตโนมัติ':'สร้างบิลอัตโนมัติ';toggleAutoDistributionMode();if(window.autoInvoiceRuleHelp)autoInvoiceRuleHelp.innerHTML=isShort&&monthly?'ใบกำกับภาษีย่อ: รายเดือนต้องมีบิลทุกวัน<br>ระบบจะบังคับสร้างตั้งแต่วันที่ 1 ถึงวันสุดท้ายของเดือน':'ใบกำกับภาษีย่อ: รายเดือนต้องมีบิลทุกวัน<br>ใบกำกับภาษีเต็ม: ไม่จำเป็นต้องมีทุกวัน';updateAutoInvoiceNumberPreview()}
+function autoDistributionMode(){let checked=document.querySelector('input[name="autoDistributionMode"]:checked');return checked?checked.value:'realistic'}
+function toggleAutoDistributionMode(){if(!window.autoDailyAverageField)return;autoDailyAverageField.style.display=(autoMode.value==='monthly'&&autoDistributionMode()==='average')?'block':'none'}
+function distributeCountsAcrossDays(totalCount,days,averagePerDay=0,requireEveryDay=true){
+  if(requireEveryDay&&totalCount<days)return null;
+  let counts=Array(days).fill(requireEveryDay?1:0),remaining=totalCount-counts.reduce((s,x)=>s+x,0),avg=averagePerDay>0?averagePerDay:totalCount/days;
+  while(remaining>0){
+    let scored=counts.map((count,i)=>({i,count,score:Math.abs(count-avg)+Math.random()*1.8+(Math.sin(i*1.7)+1)*.15})).sort((a,b)=>a.score-b.score);
+    let pick=scored.slice(0,Math.min(5,scored.length))[randomInt(0,Math.min(5,scored.length)-1)];
+    counts[pick.i]++;remaining--;
+  }
+  return counts;
+}
+function normalizeCentsByRatio(values,targetCents){let sum=values.reduce((s,x)=>s+x,0),out=values.map(x=>Math.floor(x*targetCents/sum/100)*100),remaining=targetCents-out.reduce((s,x)=>s+x,0),order=shuffleCopy(out.map((_,i)=>i)),pos=0;while(remaining>=100){out[order[pos++%order.length]]+=100;remaining-=100}if(remaining)out[order[0]]+=remaining;return out}
+function distributeMonthlyDailyTotals(targetCents,days){
+  if(targetCents<days*10000)return null;
+  let counts=trainingCategoryCounts(days),base=[];
+  for(let i=0;i<counts.low;i++)base.push(Math.round(randomInt(200000,280000)/100)*100);
+  for(let i=0;i<counts.mid;i++)base.push(Math.round(randomInt(400000,500000)/100)*100);
+  for(let i=0;i<counts.high;i++)base.push(Math.round(randomInt(600000,750000)/100)*100);
+  base=normalizeCentsByRatio(shuffleCopy(base),10000000);
+  let scaleFactor=targetCents/10000000,scaled=base.map(x=>Math.floor(x*scaleFactor/100)*100),remaining=targetCents-scaled.reduce((s,x)=>s+x,0),order=shuffleCopy(scaled.map((_,i)=>i)),pos=0;
+  while(remaining>=100){scaled[order[pos++%order.length]]+=100;remaining-=100}if(remaining)scaled[order[0]]+=remaining;return scaled;
+}
+function chooseMonthlyBillCounts(dailyCents,min,max,requested){
+  let choices=dailyCents.map(c=>validDailyPlans(c,min,max).map(x=>x.count).sort((a,b)=>a-b));if(choices.some(x=>!x.length))return null;
+  if(!requested)return choices.map(x=>x[randomInt(0,x.length-1)]);
+  let indexes=choices.map(()=>0),counts=choices.map(x=>x[0]),current=counts.reduce((s,x)=>s+x,0),maximum=choices.reduce((s,x)=>s+x[x.length-1],0);if(requested<current||requested>maximum)return null;
+  while(current<requested){let candidates=shuffleCopy(choices.map((x,i)=>i).filter(i=>indexes[i]<choices[i].length-1));if(!candidates.length)return null;let i=candidates[0];indexes[i]++;counts[i]=choices[i][indexes[i]];current++}return counts;
+}
+function makeMonthlyFullInvoiceDates(count,year,month){
+  let days=new Date(year,month,0).getDate(),activeDays=Math.min(days,Math.max(1,Math.round(days*(.45+Math.random()*.25)),count)),picked=shuffleCopy(Array.from({length:days},(_,i)=>i+1)).slice(0,activeDays).sort((a,b)=>a-b),dates=[];
+  for(let i=0;i<count;i++)dates.push(picked[i%picked.length]);
+  dates=dates.sort((a,b)=>a-b);
+  return dates.map(day=>`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`);
+}
+function buildTrainingInvoice({id,no,date,time,type,vatMode,paperSize,items,calculated,trainingMode,theme,category,batchId}){
+  let buyer=autoBuyerForType(type);
+  return {id,no,date,time,dateTime:`${date}T${time}:00`,type,vatMode,paperSize,...buyer,items,beforeVat:calculated.beforeVat,vat:calculated.vat,total:calculated.total,training:true,trainingMode,trainingTheme:theme,trainingCategory:category,trainingBatchId:batchId,printStatus:'unprinted',printCount:0,updatedAt:`${date}T${time}:00`};
+}
+function generateMonthlyTrainingInvoices(){
+  let products=store.get('products',[]).filter(p=>(+p.price||0)>0);if(!products.length)return alert('กรุณาบันทึกสินค้าที่มีราคาขายอย่างน้อย 1 รายการก่อนสร้างบิลฝึกซ้อม');
+  let countText=String(autoCount.value||'').trim(),manualCount=countText!=='',month=+autoMonth.value,yearBE=+autoYearBE.value,year=yearBE-543,target=+autoTarget.value,min=+autoMin.value,max=+autoMax.value,requested=manualCount?parseInt(countText):0,realistic=autoRealistic.checked,vatMode=autoVat.value,type=selectedAutoInvoiceType(),isShort=type==='ใบกำกับภาษีย่อ';
+  if(!(month>=1&&month<=12&&year>=1900&&year<=2300))return alert('กรุณาตรวจเดือนและปี พ.ศ.');if(!(target>0&&min>0&&max>=min))return alert('กรุณาตรวจยอดรวม ยอดต่ำสุด และยอดสูงสุด');
+  if(!isShort)return generateMonthlyFullTrainingInvoices({products,month,yearBE,year,target,min,max,requested,manualCount,realistic,vatMode,type});
+  let days=new Date(year,month,0).getDate(),targetCents=Math.round(target*100),count=requested||autoCountFromRange(target,min,max,days),avg=autoDistributionMode()==='average'?parseInt(autoDailyAverage.value||0):0;
+  if(!count)return alert(billCountRelationMessage());if(manualCount&&count<days)return alert(billCountRelationMessage());
+  let amounts=makeTrainingAmountPlan(targetCents,count,min,max,realistic,manualCount);if(!amounts)return alert(billCountRelationMessage());
+  let billCounts=distributeCountsAcrossDays(count,days,avg,true);if(!billCounts)return alert(billCountRelationMessage());
+  let numberPlan=getAutoInvoiceStartPlan(type,count);if(!numberPlan)return;
+  let invoices=store.get('invoices',[]),base=Date.now(),batchId='TRM-'+base,created=[],dailySummary=[],serial=0,themes=trainingThemeSequence(billCounts.reduce((s,x)=>s+x,0),products);
+  for(let day=1;day<=days;day++){let dayCount=billCounts[day-1],dayAmounts=amounts.slice(serial,serial+dayCount),times=makeTrainingTimes(dayCount,autoRandomTime.checked),date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,actualCum=0;
+    dayAmounts.forEach((amount,i)=>{let grossTarget=amount.cents,no=numberPlan.numbers[serial],theme=themes[serial]||null,items=makeBalancedTrainingItems(grossTarget,products,realistic,autoPaper.value,theme,vatMode),calculated=calcTrainingInvoiceAmounts(items,vatMode),time=times[i],inv=buildTrainingInvoice({id:base+serial,no,date,time,type,vatMode,paperSize:autoPaper.value,items,calculated,trainingMode:'monthly',theme,category:amount.kind,batchId});actualCum+=Math.round(inv.total*100);invoices.push(inv);created.push(inv);serial++});
+    dailySummary.push({date,total:actualCum/100,targetTotal:dayAmounts.reduce((s,x)=>s+x.cents,0)/100,count:dayCount});
+  }
+  store.set('invoices',invoices);finishAutoInvoiceNumberGeneration(numberPlan,type,created);store.set('lastTrainingBatch',created.map(x=>x.id));store.set('lastTrainingDailySummary',dailySummary);store.set('trainingPrintQueue',{batchId,index:0,paused:false,lastPrintedId:null});renderTrainingInvoices();renderHistory();updateInvoiceNumberSettingUI();
+  let actualMonthTotal=created.reduce((s,x)=>s+x.total,0);alert(`สร้างบิลรายเดือนอัตโนมัติสำเร็จ\nเดือน: ${thaiMonthNames[month-1]} ${yearBE}\nยอดรวมที่กำหนด: ${money(target)} บาท\nจำนวนวันที่สร้างบิล: ${days} วัน\nจำนวนบิลทั้งหมด: ${created.length} ใบ\nยอดรวมบิลที่สร้างจริง: ${money(actualMonthTotal)} บาท\nผลต่างจากยอดที่กำหนด: ${money(actualMonthTotal-target)} บาท\nเลขที่บิลเริ่มต้น: ${created[0].no}\nเลขที่บิลสุดท้าย: ${created[created.length-1].no}`);
+}
+function generateMonthlyFullTrainingInvoices({products,month,yearBE,year,target,min,max,requested,manualCount,realistic,vatMode,type}){
+  let count=requested||autoCountFromRange(target,min,max,1),targetCents=Math.round(target*100);
+  if(!count)return alert(manualCount?billCountRelationMessage():'ไม่สามารถคำนวณจำนวนบิลอัตโนมัติจากช่วงยอดที่กำหนดได้ กรุณาตรวจยอดต่ำสุดและยอดสูงสุดต่อบิล');
+  let amounts=makeTrainingAmountPlan(targetCents,count,min,max,realistic,manualCount);if(!amounts)return alert(manualCount?billCountRelationMessage():'ไม่สามารถคำนวณจำนวนบิลอัตโนมัติจากช่วงยอดที่กำหนดได้ กรุณาตรวจยอดต่ำสุดและยอดสูงสุดต่อบิล');
+  let dates=makeMonthlyFullInvoiceDates(count,year,month),dateGroups={};
+  dates.forEach((date,i)=>{(dateGroups[date]||(dateGroups[date]=[])).push(i)});
+  let timesByDate={};Object.keys(dateGroups).forEach(date=>timesByDate[date]=makeTrainingTimes(dateGroups[date].length,autoRandomTime.checked));
+  let numberPlan=getAutoInvoiceStartPlan(type,count);if(!numberPlan)return;
+  let invoices=store.get('invoices',[]),base=Date.now(),batchId='TRM-'+base,created=[],dailySummary=[],themes=trainingThemeSequence(count,products),desiredCum=0,actualCum=0;
+  dates.forEach((date,i)=>{let amount=amounts[i],grossTarget=amount.cents,no=numberPlan.numbers[i],theme=themes[i]||null,items=makeBalancedTrainingItems(grossTarget,products,realistic,autoPaper.value,theme,vatMode),calculated=calcTrainingInvoiceAmounts(items,vatMode),time=timesByDate[date].shift(),inv=buildTrainingInvoice({id:base+i,no,date,time,type,vatMode,paperSize:autoPaper.value,items,calculated,trainingMode:'monthly',theme,category:amount.kind,batchId});actualCum+=Math.round(inv.total*100);invoices.push(inv);created.push(inv)});
+  Object.keys(dateGroups).sort().forEach(date=>dailySummary.push({date,total:created.filter(x=>x.date===date).reduce((s,x)=>s+x.total,0),count:created.filter(x=>x.date===date).length}));
+  store.set('invoices',invoices);finishAutoInvoiceNumberGeneration(numberPlan,type,created);store.set('lastTrainingBatch',created.map(x=>x.id));store.set('lastTrainingDailySummary',dailySummary);store.set('trainingPrintQueue',{batchId,index:0,paused:false,lastPrintedId:null});renderTrainingInvoices();renderHistory();updateInvoiceNumberSettingUI();
+  let actualMonthTotal=created.reduce((s,x)=>s+x.total,0);alert(`สร้างบิลรายเดือนอัตโนมัติสำเร็จ\nชนิดบิล: ${type}\nเดือน: ${thaiMonthNames[month-1]} ${yearBE}\nจำนวนวันที่มีบิล: ${dailySummary.length} วัน\nจำนวนบิลทั้งหมด: ${created.length} ใบ\nยอดรวมบิลที่สร้างจริง: ${money(actualMonthTotal)} บาท\nผลต่างจากยอดที่กำหนด: ${money(actualMonthTotal-target)} บาท\nเลขที่บิลเริ่มต้น: ${created[0].no}\nเลขที่บิลสุดท้าย: ${created[created.length-1].no}`);
+}
+function generateTrainingInvoices(){
+  if(window.autoMode&&autoMode.value==='monthly')return generateMonthlyTrainingInvoices();
+  let products=store.get('products',[]).filter(p=>(+p.price||0)>0);if(!products.length)return alert('กรุณาบันทึกสินค้าที่มีราคาขายอย่างน้อย 1 รายการก่อนสร้างบิลฝึกซ้อม');
+  let date=autoDate.value,target=+autoTarget.value,min=+autoMin.value,max=+autoMax.value,countText=String(autoCount.value||'').trim(),manualCount=countText!==''&&countText.toLowerCase()!=='อัตโนมัติ',count=manualCount?parseInt(countText):0,realistic=autoRealistic.checked,vatMode=autoVat.value,type=selectedAutoInvoiceType();
+  if(!date)return alert('กรุณาเลือกวันที่ออกบิล');if(!(target>0&&min>0&&max>=min))return alert('กรุณาตรวจยอดรวม ยอดต่ำสุด และยอดสูงสุด');
+  if(!count)count=autoCountFromRange(target,min,max,1);
+  if(!count)return alert(manualCount?billCountRelationMessage():'ไม่สามารถคำนวณจำนวนบิลอัตโนมัติจากช่วงยอดที่กำหนดได้ กรุณาตรวจยอดต่ำสุดและยอดสูงสุดต่อบิล');
+  let amounts=makeTrainingAmountPlan(Math.round(target*100),count,min,max,realistic,manualCount);if(!amounts)return alert(manualCount?billCountRelationMessage():'ไม่สามารถคำนวณจำนวนบิลอัตโนมัติจากช่วงยอดที่กำหนดได้ กรุณาตรวจยอดต่ำสุดและยอดสูงสุดต่อบิล');
+  let times=makeTrainingTimes(count,autoRandomTime.checked);
+  let numberPlan=getAutoInvoiceStartPlan(type,count);if(!numberPlan)return;
+  let invoices=store.get('invoices',[]),base=Date.now(),batchId='TR-'+base,created=[],desiredCum=0,actualCum=0,themes=trainingThemeSequence(count,products);
+  amounts.forEach((amount,i)=>{let grossTarget=amount.cents,no=numberPlan.numbers[i],theme=themes[i]||null,items=makeBalancedTrainingItems(grossTarget,products,realistic,autoPaper.value,theme,vatMode),calculated=calcTrainingInvoiceAmounts(items,vatMode),time=times[i],total=calculated.total;
+    let inv=buildTrainingInvoice({id:base+i,no,date,time,type,vatMode,paperSize:autoPaper.value,items,calculated,trainingMode:'daily',theme,category:amount.kind,batchId});
+    actualCum+=Math.round(total*100);invoices.push(inv);created.push(inv);
+  });
+  let madeTotal=created.reduce((s,x)=>s+x.total,0);store.set('invoices',invoices);finishAutoInvoiceNumberGeneration(numberPlan,type,created);store.set('lastTrainingBatch',created.map(x=>x.id));store.set('lastTrainingDailySummary',[{date,total:madeTotal,count:created.length}]);store.set('trainingPrintQueue',{batchId,index:0,paused:false,lastPrintedId:null});renderTrainingInvoices();renderHistory();updateInvoiceNumberSettingUI();
+  alert(`สร้างบิลอัตโนมัติสำเร็จ\nจำนวนบิลที่สร้าง: ${created.length} ใบ\nยอดรวมที่กำหนด: ${money(target)} บาท\nยอดรวมที่สร้างจริง: ${money(madeTotal)} บาท\nผลต่างจากยอดที่กำหนด: ${money(madeTotal-target)} บาท\nเลขบิลเริ่มต้น: ${created[0].no}\nเลขบิลสุดท้าย: ${created[created.length-1].no}\nจำนวนบิลที่ยังไม่ได้พิมพ์: ${created.length} ใบ\nบันทึกเข้าประวัติแล้ว และพร้อมพิมพ์ทีละใบ`);
+}
+function currentTrainingBatch(){let ids=new Set(store.get('lastTrainingBatch',[]));return store.get('invoices',[]).filter(x=>ids.has(x.id)&&x.training).sort((a,b)=>(a.dateTime||'').localeCompare(b.dateTime||''))}
+function trainingPrintStatusText(x){if((x.printCount||0)>1)return 'พิมพ์ซ้ำแล้ว';if((x.printCount||0)===1)return 'พิมพ์แล้ว';if(x.printStatus==='skipped')return 'ข้ามแล้ว / ยังไม่ได้พิมพ์';return 'ยังไม่ได้พิมพ์'}
+function renderTrainingInvoices(){
+  if(!window.trainingSummary)return;let rows=currentTrainingBatch(),total=rows.reduce((s,x)=>s+(+x.total||0),0),profit=rows.reduce((s,x)=>s+invoiceProfit(x),0),unique=new Set(rows.map(x=>x.no)).size,counts={low:0,mid:0,high:0};rows.forEach(x=>counts[x.trainingCategory]=(counts[x.trainingCategory]||0)+1);
+  trainingSummary.innerHTML=`<div class="training-stat"><div><b>จำนวนบิลในชุดล่าสุด</b><h2>${rows.length}</h2><span class="small">หลักร้อย ${counts.low} / หลักพัน ${counts.mid} / ยอดสูง ${counts.high}</span></div><div><b>ยอดรวม</b><h2>${money(total)}</h2></div><div><b>กำไร</b><h2>${invoiceProfitDisplay(rows,profit)}</h2></div><div><b>เลขบิลไม่ซ้ำ</b><h2>${unique===rows.length?'ถูกต้อง':'พบเลขซ้ำ'}</h2></div></div>`;
+  let queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null}),printed=rows.filter(x=>(x.printCount||0)>0).length,current=rows[queue.index],remaining=Math.max(0,rows.length-queue.index);
+  if(window.trainingPrintStatus)trainingPrintStatus.innerHTML=!rows.length?'ยังไม่มีชุดบิลพร้อมพิมพ์':queue.paused?`<b>หยุดพิมพ์ชั่วคราว</b><br>พิมพ์แล้ว ${printed} ใบ เหลือในคิว ${remaining} ใบ`:current?`พร้อมพิมพ์ใบที่ ${queue.index+1} จาก ${rows.length}<br>พิมพ์แล้ว ${printed} ใบ เหลือ ${remaining} ใบ<br>ใบถัดไป: <b>${current.no}</b>`:`<b>ดำเนินการครบทุกใบในคิวแล้ว</b><br>พิมพ์แล้ว ${printed} ใบ`;
+  if(window.trainingPauseButton)trainingPauseButton.textContent=queue.paused?'พิมพ์ต่อ':'หยุดพิมพ์ชั่วคราว';
+  trainingTable.innerHTML=rows.length?`<table id="trainingInvoiceList"><tr><th>วันที่</th><th>เวลา</th><th>เลขบิล</th><th>ประเภท</th><th>รายการ</th><th>ยอดรวม</th><th>สถานะ</th></tr>${rows.map(x=>`<tr><td>${x.date}</td><td>${x.time||'-'}</td><td>${x.no}</td><td>${x.trainingCategory==='low'?'หลักร้อย':x.trainingCategory==='mid'?'หลักพันต้น':'ยอดสูง'}</td><td>${x.items.length}</td><td class="right">${money(x.total)}</td><td class="status-${(x.printCount||0)>1?'reprinted':(x.printCount||0)?'printed':x.printStatus==='skipped'?'skipped':'unprinted'}">${trainingPrintStatusText(x)}</td></tr>`).join('')}</table>`:'<div class="small" style="margin-top:12px">ยังไม่มีบิลฝึกซ้อมในชุดล่าสุด</div>';
+  let daily=store.get('lastTrainingDailySummary',[]);if(window.trainingDailySummary)trainingDailySummary.innerHTML=daily.length>1?`<div class="card" style="box-shadow:none;border:1px solid #bfdbfe"><h3 style="margin-top:0">สรุปยอดรายวันทั้งเดือน</h3><table><tr><th>วันที่</th><th>จำนวนบิล</th><th>ยอดรวมรายวัน</th></tr>${daily.map(x=>{let p=x.date.split('-');return `<tr><td>${+p[2]} ${thaiMonthNames[+p[1]-1]} ${+p[0]+543}</td><td class="right">${x.count}</td><td class="right">${money(x.total)}</td></tr>`}).join('')}</table></div>`:'';
+}
+function trainingInvoiceHtml(x){
+  let s=store.get('settings',{}),calculated=calcTrainingInvoiceAmounts(x.items||[],x.vatMode||'included'),before=calculated.beforeVat,vat=calculated.vat,isShort=x.type==='ใบกำกับภาษีย่อ',paperClass=x.paperSize==='9x11'?'paper-9x11':'paper-9x55';
+  let head=`<div class="invoice-head"><div class="shop-title">${s.shopName||'ชื่อร้าน/บริษัท'}</div><div class="doc-title-block"><div class="doc-title">${x.type} <span class="doc-copy-inline">(ต้นฉบับ)</span></div></div><div class="head-spacer"></div><div class="shop-address-line">${s.shopAddress||'ที่อยู่ร้าน'} โทร ${s.shopPhone||'-'} เลขภาษี ${s.shopTax||'-'}</div></div>`;
+  return `<div class="invoice-box ${paperClass} ${isShort?'tax-short':''}">${head}<div class="mini-meta"><div><b>เลขที่:</b> ${x.no}</div><div><b>วันที่:</b> ${x.date} ${x.time||''}</div><div><b>VAT:</b> ${x.vatMode==='excluded'?'แยก VAT':'รวม VAT'}</div></div><div class="invoice-lines"><table><tr><th>ลำดับ</th><th>รหัส</th><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา</th><th>จำนวนเงิน</th></tr>${x.items.map((it,i)=>`<tr><td class="center">${i+1}</td><td>${it.code}</td><td>${it.name}</td><td class="right">${it.qty}</td><td>${it.unit}</td><td class="right">${money(it.price)}</td><td class="right">${money(it.qty*it.price)}</td></tr>`).join('')}</table></div><div class="invoice-footer"><div class="invoice-summary-row"><p class="invoice-amount-words"><b>จำนวนเงินตัวอักษร:</b> ${thaiBahtText(x.total)}</p><div class="invoice-total"><table><tr><td>มูลค่าก่อนภาษี</td><td class="right">${money(before)}</td></tr><tr><td>VAT 7%</td><td class="right">${money(vat)}</td></tr><tr><th>ยอดรวมสุทธิ</th><th class="right">${money(x.total)}</th></tr></table></div></div><div class="invoice-meta signature-row"><div>ผู้รับสินค้า/บริการ ____________________</div><div>ผู้รับเงิน/ผู้ขาย ____________________</div></div></div></div>`;
+}
+function printTrainingInvoice(x,isRepeat=false){
+  savePrintSettings();applyDynamicPageStyle(x.paperSize||'9x5.5');trainingPrintArea.innerHTML=trainingInvoiceHtml(x);let rows=currentTrainingBatch(),queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null});trainingPrintStatus.innerHTML=`<b>กำลังพิมพ์ใบที่ ${Math.min(queue.index+1,rows.length)} จาก ${rows.length}</b><br>${x.no}`;document.body.classList.add('training-print');let oldTitle=document.title;document.title=' ';
+  setTimeout(()=>{window.print();let all=store.get('invoices',[]),saved=all.find(v=>v.id===x.id);if(saved){saved.printCount=(saved.printCount||0)+1;saved.printStatus=saved.printCount>1?'reprinted':'printed';saved.trainingPrintedAt=new Date().toISOString()}queue.lastPrintedId=x.id;if(!isRepeat)queue.index=Math.min(rows.length,queue.index+1);store.set('invoices',all);store.set('trainingPrintQueue',queue);document.body.classList.remove('training-print');document.title=oldTitle;renderTrainingInvoices();renderHistory()},80);
+}
+function printNextTrainingInvoice(){let rows=currentTrainingBatch(),queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null});if(!rows.length)return alert('ยังไม่มีบิลในชุดล่าสุดสำหรับพิมพ์');if(queue.paused)return alert('ขณะนี้หยุดพิมพ์ชั่วคราว กรุณากด “พิมพ์ต่อ” ก่อน');if(queue.index>=rows.length)return alert('ดำเนินการครบทุกใบในคิวแล้ว');printTrainingInvoice(rows[queue.index],false)}
+function skipTrainingInvoice(){let rows=currentTrainingBatch(),queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null});if(!rows.length||queue.index>=rows.length)return alert('ไม่มีบิลใบถัดไปให้ข้าม');let all=store.get('invoices',[]),x=all.find(v=>v.id===rows[queue.index].id);if(x&&!(x.printCount>0))x.printStatus='skipped';queue.index++;store.set('invoices',all);store.set('trainingPrintQueue',queue);renderTrainingInvoices();renderHistory()}
+function reprintLastTrainingInvoice(){let queue=store.get('trainingPrintQueue',{lastPrintedId:null}),x=currentTrainingBatch().find(v=>v.id===queue.lastPrintedId);if(!x)return alert('ยังไม่มีบิลที่พิมพ์ล่าสุดสำหรับพิมพ์ซ้ำ');printTrainingInvoice(x,true)}
+let bulkTrainingPrintCancelled=false;
+function invoiceNoNumber(no){let m=String(no||'').match(/(\d+)$/);return m?parseInt(m[1]):0}
+function currentTrainingBatchByNo(){return currentTrainingBatch().sort((a,b)=>invoiceNoNumber(a.no)-invoiceNoNumber(b.no)||String(a.no).localeCompare(String(b.no)))}
+function openBulkTrainingPrintDialog(){let rows=currentTrainingBatchByNo();if(!rows.length)return alert('ยังไม่มีบิลในชุดล่าสุดสำหรับพิมพ์');bulkTrainingPrintCancelled=false;bulkPrintConfirmText.innerHTML=`ต้องการพิมพ์บิลทั้งหมดจำนวน<br><b>${rows.length} ใบ</b><br>ใช่หรือไม่`;bulkPrintProgress.style.display='none';bulkPrintProgressBar.style.width='0';bulkPrintProgressText.textContent=`กำลังพิมพ์ 0 / ${rows.length}`;bulkPrintStartButton.disabled=false;bulkPrintModal.classList.add('show');toggleBulkPrintRange()}
+function closeBulkTrainingPrintDialog(){bulkPrintModal.classList.remove('show')}
+function toggleBulkPrintRange(){let mode=document.querySelector('input[name="bulkPrintMode"]:checked')?.value||'all';if(window.bulkPrintRange)bulkPrintRange.style.display=mode==='range'?'grid':'none'}
+function normalizeInvoiceNoForRange(value){let m=String(value||'').match(/(\d+)$/);return m?parseInt(m[1]):NaN}
+function selectedBulkTrainingInvoices(){
+  let rows=currentTrainingBatchByNo(),mode=document.querySelector('input[name="bulkPrintMode"]:checked')?.value||'all';
+  if(mode==='short')rows=rows.filter(x=>x.type==='ใบกำกับภาษีย่อ');
+  if(mode==='full')rows=rows.filter(x=>x.type==='ใบกำกับภาษีเต็ม');
+  if(mode==='range'){let from=normalizeInvoiceNoForRange(bulkPrintFrom.value),to=normalizeInvoiceNoForRange(bulkPrintTo.value);if(!Number.isFinite(from)||!Number.isFinite(to)||from>to)return null;rows=rows.filter(x=>{let n=invoiceNoNumber(x.no);return n>=from&&n<=to})}
+  return rows;
+}
+function cancelBulkTrainingPrint(){bulkTrainingPrintCancelled=true;closeBulkTrainingPrintDialog()}
+function startBulkTrainingPrint(){
+  let rows=selectedBulkTrainingInvoices();if(!rows)return alert('กรุณาตรวจช่วงเลขบิล จาก / ถึง');if(!rows.length)return alert('ไม่พบบิลตามเงื่อนไขที่เลือก');
+  if(!confirm(`ต้องการพิมพ์บิลทั้งหมดจำนวน\n${rows.length} ใบ\nใช่หรือไม่`))return;
+  bulkTrainingPrintCancelled=false;bulkPrintStartButton.disabled=true;bulkPrintProgress.style.display='block';bulkPrintProgressText.textContent=`กำลังพิมพ์ 0 / ${rows.length}`;bulkPrintProgressBar.style.width='0%';
+  savePrintSettings();applyDynamicPageStyle(rows[0].paperSize||'9x5.5');trainingPrintArea.innerHTML=rows.map(x=>trainingInvoiceHtml(x)).join('');document.body.classList.add('training-print');let oldTitle=document.title;document.title=' ';
+  setTimeout(()=>{if(bulkTrainingPrintCancelled){document.body.classList.remove('training-print');document.title=oldTitle;renderTrainingInvoices();return}bulkPrintProgressText.textContent=`กำลังพิมพ์ ${rows.length} / ${rows.length}`;bulkPrintProgressBar.style.width='100%';window.print();let ids=new Set(rows.map(x=>x.id)),all=store.get('invoices',[]);all.forEach(x=>{if(ids.has(x.id)){x.printCount=(x.printCount||0)+1;x.printStatus=x.printCount>1?'reprinted':'printed';x.trainingPrintedAt=new Date().toISOString()}});let queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null}),sorted=currentTrainingBatchByNo(),idx=0;while(idx<sorted.length&&(ids.has(sorted[idx].id)||(sorted[idx].printCount||0)>0))idx++;queue.index=idx;queue.lastPrintedId=rows[rows.length-1].id;store.set('invoices',all);store.set('trainingPrintQueue',queue);document.body.classList.remove('training-print');document.title=oldTitle;renderTrainingInvoices();renderHistory();closeBulkTrainingPrintDialog();alert(`พิมพ์สำเร็จ\n${rows.length} ใบ`)},120);
+}
+function toggleTrainingPrintPause(){let queue=store.get('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null});queue.paused=!queue.paused;store.set('trainingPrintQueue',queue);renderTrainingInvoices()}
+function showAllTrainingInvoices(){document.getElementById('trainingInvoiceList')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function clearTrainingInvoices(){let all=store.get('invoices',[]),count=all.filter(x=>x.training).length;if(!count)return alert('ไม่มีข้อมูลฝึกซ้อมให้ล้าง');if(!confirm(`ต้องการล้างข้อมูลฝึกซ้อมทั้งหมด ${count} บิลใช่ไหม?\nบิลขายจริงจะไม่ถูกลบ`))return;store.set('invoices',all.filter(x=>!x.training));store.set('lastTrainingBatch',[]);store.set('lastTrainingDailySummary',[]);store.set('trainingPrintQueue',{index:0,paused:false,lastPrintedId:null});renderTrainingInvoices();renderHistory();alert('ล้างเฉพาะข้อมูลฝึกซ้อมแล้ว')}
+function resetTrainingInvoiceNumber(){if(!confirm('ต้องการรีเซ็ตเลขที่บิลอัตโนมัติกลับเป็น 000001 ใช่ไหม?\nบิลเดิมจะยังอยู่ และระบบจะเตือนก่อนสร้างหากเลขซ้ำ'))return;let s=getAutoInvoiceNumberSettings();s.start='000001';s.width=6;store.set(AUTO_INVOICE_NUMBER_SETTINGS_KEY,s);loadAutoInvoiceNumberSettingsUI();alert('รีเซ็ตเลขที่บิลอัตโนมัติเป็น 000001 แล้ว')}
+function saveSettings(){store.set('settings',{shopName:shopName.value,shopTax:shopTax.value,shopPhone:shopPhone.value,shopAddress:shopAddress.value});alert('บันทึกตั้งค่าแล้ว');renderInvoicePreview()}
+function loadSettings(){let s=store.get('settings',{});shopName.value=s.shopName||'';shopTax.value=s.shopTax||'';shopPhone.value=s.shopPhone||'';shopAddress.value=s.shopAddress||''}
+function money(n){return (+n||0).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function thaiBahtText(num){num=Math.round((+num||0)*100)/100;let [b,s]=num.toFixed(2).split('.');const t=['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'],p=['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];function read(n){n=String(parseInt(n||0));if(n==='0')return 'ศูนย์';let out='';for(let i=0;i<n.length;i++){let d=+n[i],pos=n.length-i-1;if(d===0)continue;if(pos===1&&d===1)out+='สิบ';else if(pos===1&&d===2)out+='ยี่สิบ';else if(pos===0&&d===1&&n.length>1)out+='เอ็ด';else out+=t[d]+p[pos]}return out}let res=read(b)+'บาท';return s==='00'?res+'ถ้วน':res+read(s)+'สตางค์'}
+const FULL_TAX_TEMPLATE='9x11-full-tax-invoice';
+let selectedLayoutObjectId=null,layoutDrag=null,layoutResize=null;
+function defaultFullTaxCalibration(){return {offsetX:0,offsetY:0,topMargin:0,leftMargin:0,lineHeight:0,charSpacing:0,columnSpacing:0,scaleX:1,scaleY:1}}
+function nextLayoutObjectId(){return 'obj_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
+function cleanLayoutDisplayName(v){return String(v||'').replace(/\s+/g,' ').trim()||'New Object'}
+function initialLayoutDisplayName(o){let f=cleanLayoutDisplayName(o.displayName||o.fieldName||''),t=cleanLayoutDisplayName(o.text||'');return ((!f||f==='New Object')&&t&&t!=='New Object')?t:(f||t||cleanLayoutDisplayName(o.source||''))}
+function uniqueLayoutDisplayName(base,objects,selfId=null){
+  base=cleanLayoutDisplayName(base);let used=new Set((objects||[]).filter(o=>o.id!==selfId).map(o=>cleanLayoutDisplayName(o.displayName||o.fieldName||'')));
+  if(!used.has(base))return base;let i=2,name=`${base} (${i})`;while(used.has(name)){i++;name=`${base} (${i})`}return name;
+}
+function normalizeFullTaxLayoutObjects(layout){
+  if(!layout||!Array.isArray(layout.objects))return layout;
+  layout.objects.forEach(o=>{if(!o.id)o.id=nextLayoutObjectId();if(!o.displayName)o.displayName=initialLayoutDisplayName(o);if(o.manualDisplayName===undefined)o.manualDisplayName=!!o.source||!!o.displayName&&o.displayName!==o.text;o.fieldName=o.displayName});
+  layout.objects.forEach(o=>{o.displayName=uniqueLayoutDisplayName(o.displayName,layout.objects,o.id);o.fieldName=o.displayName});
+  return layout;
+}
+function autoRenameObjectFromText(layout,o,text){if(!layout||!o||o.manualDisplayName)return;o.displayName=uniqueLayoutDisplayName(text,layout.objects,o.id);o.fieldName=o.displayName}
+function fullTaxObj(fieldName,x,y,w,h,fontSize=12,align='left',bold=false,extra={}){let displayName=cleanLayoutDisplayName(fieldName);return {id:nextLayoutObjectId(),displayName,fieldName:displayName,x,y,w,h,font:'TH Sarabun New',fontSize,bold,italic:false,underline:false,align,visible:true,rotation:0,locked:false,manualDisplayName:!!extra.source,...extra}}
+function defaultFullTaxObjects(){
+  let a=[
+    fullTaxObj('Company Name',18,13,120,9,16,'left',true,{source:'companyName'}),
+    fullTaxObj('Company Address',18,23,150,12,12,'left',false,{source:'companyAddress'}),
+    fullTaxObj('Company Tax ID',150,18,55,7,12,'left',false,{source:'companyTax'}),
+    fullTaxObj('Phone Number',150,26,55,7,12,'left',false,{source:'companyPhone'}),
+    fullTaxObj('Invoice Title',137,10,70,9,15,'center',true,{text:'ใบกำกับภาษี / TAX INVOICE'}),
+    fullTaxObj('Invoice Number',164,42,42,7,12,'left',true,{source:'invoiceNo'}),
+    fullTaxObj('Date',164,51,42,7,12,'left',false,{source:'date'}),
+    fullTaxObj('Customer Name',23,48,120,7,12,'left',true,{source:'buyerName'}),
+    fullTaxObj('Customer Address',23,57,126,15,12,'left',false,{source:'buyerAddress'}),
+    fullTaxObj('Customer Tax ID',23,74,70,7,12,'left',false,{source:'buyerTax'})
+  ];
+  let rowY=100,rowH=8;
+  for(let i=0;i<10;i++){
+    let y=rowY+i*rowH;
+    a.push(fullTaxObj('No '+(i+1),14,y,10,rowH,10,'center',false,{source:'itemNo',row:i}));
+    a.push(fullTaxObj('Description '+(i+1),26,y,82,rowH,10,'left',false,{source:'itemDescription',row:i}));
+    a.push(fullTaxObj('Quantity '+(i+1),110,y,20,rowH,10,'right',false,{source:'itemQty',row:i}));
+    a.push(fullTaxObj('Unit '+(i+1),132,y,18,rowH,10,'center',false,{source:'itemUnit',row:i}));
+    a.push(fullTaxObj('Unit Price '+(i+1),151,y,26,rowH,10,'right',false,{source:'itemPrice',row:i}));
+    a.push(fullTaxObj('Amount '+(i+1),178,y,28,rowH,10,'right',false,{source:'itemAmount',row:i}));
+  }
+  return a.concat([
+    fullTaxObj('Amount In Words',24,194,106,9,11,'left',false,{source:'amountWords'}),
+    fullTaxObj('Subtotal',170,193,36,7,12,'right',true,{source:'beforeVat'}),
+    fullTaxObj('VAT',170,203,36,7,12,'right',true,{source:'vat'}),
+    fullTaxObj('Grand Total',170,214,36,8,13,'right',true,{source:'total'}),
+    fullTaxObj('Footer Notes',18,234,84,14,9,'left',false,{source:'footerNotes'}),
+    fullTaxObj('Terms & Conditions',18,249,84,14,9,'left',false,{source:'terms'}),
+    fullTaxObj('Payment Notes',112,234,84,10,9,'left',false,{source:'paymentNotes'}),
+    fullTaxObj('Receiver Signature Title',28,263,55,8,11,'center',false,{text:'ผู้รับสินค้า / Receiver'}),
+    fullTaxObj('Seller Signature Title',134,263,55,8,11,'center',false,{text:'ผู้รับเงิน / Seller'})
+  ]);
+}
+function defaultFullTaxLayout(){return {id:FULL_TAX_TEMPLATE,name:'9 x 11 Full Tax Invoice',templateType:FULL_TAX_TEMPLATE,paper:{w:229,h:279.4},objects:defaultFullTaxObjects(),overlay:{enabled:false,opacity:.35,image:''},designer:{showGrid:true,snap:true,gridSize:1},calibration:defaultFullTaxCalibration()}}
+function getFullTaxLayouts(){let layouts=store.get('fullTaxLayouts',null);if(!Array.isArray(layouts)||!layouts.length){layouts=[defaultFullTaxLayout()];store.set('fullTaxLayouts',layouts)}layouts.forEach(normalizeFullTaxLayoutObjects);return layouts}
+function setFullTaxLayouts(layouts){store.set('fullTaxLayouts',layouts)}
+function activeFullTaxLayout(){let layouts=getFullTaxLayouts(),id=store.get('activeFullTaxTemplate',FULL_TAX_TEMPLATE),layout=layouts.find(x=>x.id===id)||layouts[0];if(!layout.objects)layout.objects=[];layout.calibration=Object.assign(defaultFullTaxCalibration(),layout.calibration||{});layout.overlay=Object.assign({enabled:false,opacity:.35,image:''},layout.overlay||{});layout.designer=Object.assign({showGrid:true,snap:true,gridSize:1},layout.designer||{});normalizeFullTaxLayoutObjects(layout);return layout}
+function saveActiveFullTaxLayout(layout){let layouts=getFullTaxLayouts(),idx=layouts.findIndex(x=>x.id===layout.id);if(idx>=0)layouts[idx]=layout;else layouts.push(layout);setFullTaxLayouts(layouts);store.set('activeFullTaxTemplate',layout.id)}
+function getFullTaxCompanyInfo(){let base=store.get('settings',{}),saved=store.get('fullTaxCompanyInfo',{});return Object.assign({companyName:base.shopName||'',companyAddress:base.shopAddress||'',companyTax:base.shopTax||'',companyPhone:base.shopPhone||'',footerNotes:'',terms:'',paymentNotes:''},saved)}
+function saveFullTaxCompanyInfo(info){store.set('fullTaxCompanyInfo',Object.assign(getFullTaxCompanyInfo(),info));renderAllFullTaxLayoutSurfaces()}
+function isShortInvoiceType(){return window.invType&&invType.selectedIndex===1}
+function shouldUseFullTaxLayout(){return window.paperSize&&paperSize.value==='9x11'&&!isShortInvoiceType()}
+function shouldUseFullTaxLayoutForInvoice(x){return x&&x.paperSize==='9x11'&&String(x.type||'')!==String(document.querySelector('#invType option:nth-child(2)')?.value||'short')}
+function currentFullTaxPrintData(sample=false){
+  let c=sample?{beforeVat:12345.79,vat:864.21,total:13210}:calc(),ci=getFullTaxCompanyInfo();
+  let items=sample?Array.from({length:10},(_,i)=>({code:'P'+String(i+1).padStart(3,'0'),name:'Sample product '+(i+1),qty:i+1,unit:'pcs',price:125+i*17})):invoiceItems;
+  let address=sample?{buyerAddress:'123 Sample Road, Bangkok 10110',buyerAddress1:'123 Sample Road',buyerAddress2:'Bangkok 10110'}:invoiceCustomerAddressParts(selectedInvoiceCustomerId,buyerAddress.value);
+  return {company:ci,invoiceNo:sample?'TEST-000001':invNo.value,date:sample?(new Date().toISOString().slice(0,10)):invDate.value,buyerName:sample?'Sample Customer Co., Ltd.':buyerName.value,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:sample?'0105559999999':buyerTax.value,items,amounts:c,amountWords:thaiBahtText(c.total)}
+}
+function savedInvoiceFullTaxPrintData(x){
+  let ci=getFullTaxCompanyInfo(),oldItems=invoiceItems,oldVat=window.vatMode?vatMode.value:'included',c;
+  invoiceItems=JSON.parse(JSON.stringify(x.items||[]));if(window.vatMode)vatMode.value=x.vatMode||'included';c=calc();invoiceItems=oldItems;if(window.vatMode)vatMode.value=oldVat;
+  let address=(x.buyerAddress1!==undefined||x.buyerAddress2!==undefined)?{buyerAddress:x.buyerAddress||[x.buyerAddress1,x.buyerAddress2].filter(Boolean).join(' ').trim(),buyerAddress1:customerAddress1ForInvoice(x.buyerAddress1||''),buyerAddress2:x.buyerAddress2||''}:invoiceCustomerAddressParts(x.customerId,x.buyerAddress||'');
+  return {company:ci,invoiceNo:x.no,date:x.date,buyerName:x.buyerName,buyerAddress:address.buyerAddress,buyerAddress1:address.buyerAddress1,buyerAddress2:address.buyerAddress2,buyerTax:x.buyerTax,items:x.items||[],amounts:c,amountWords:thaiBahtText(c.total)}
+}
+function layoutObjectBindingSource(o){
+  let nameKey=String(o.displayName||o.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();
+  let key=String(o.source||o.displayName||o.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();
+  let map={customeraddress:'buyerAddress',customeraddress1:'buyerAddress1',customeraddress2:'buyerAddress2',buyeraddress1:'buyerAddress1',buyeraddress2:'buyerAddress2'};
+  if(map[nameKey]&&nameKey!=='customeraddress')return map[nameKey];
+  return map[key]||o.source||'';
+}
+function objectText(o,data){
+  let row=o.row,items=data.items||[],it=row!==undefined?items[row]||null:null,ci=data.company||{};
+  let binding=layoutObjectBindingSource(o);
+  if(binding&&binding!==o.source){
+    if(binding==='buyerAddress')return data.buyerAddress||'';
+    if(binding==='buyerAddress1')return data.buyerAddress1||'';
+    if(binding==='buyerAddress2')return data.buyerAddress2||'';
+  }
+  if(o.text!==undefined)return o.text;
+  switch(binding){
+    case 'companyName':return ci.companyName||'';
+    case 'companyAddress':return ci.companyAddress||'';
+    case 'companyTax':return ci.companyTax||'';
+    case 'companyPhone':return ci.companyPhone||'';
+    case 'footerNotes':return ci.footerNotes||'';
+    case 'terms':return ci.terms||'';
+    case 'paymentNotes':return ci.paymentNotes||'';
+    case 'invoiceNo':return data.invoiceNo||'';
+    case 'date':return data.date||'';
+    case 'buyerName':return data.buyerName||'';
+    case 'buyerAddress':return data.buyerAddress||'';
+    case 'buyerAddress1':return data.buyerAddress1||'';
+    case 'buyerAddress2':return data.buyerAddress2||'';
+    case 'buyerTax':return data.buyerTax||'';
+    case 'itemNo':return it?String(row+1):'';
+    case 'itemDescription':return it?it.name||'':'';
+    case 'itemQty':return it?String(it.qty||''):'';
+    case 'itemUnit':return it?it.unit||'':'';
+    case 'itemPrice':return it?money(it.price):'';
+    case 'itemAmount':return it?money((+it.qty||0)*(+it.price||0)):'';
+    case 'beforeVat':return money(data.amounts.beforeVat);
+    case 'vat':return money(data.amounts.vat);
+    case 'total':return money(data.amounts.total);
+    case 'amountWords':return data.amountWords||'';
+  }
+  return '';
+}
+function objectStyle(o,cal,design=false){
+  let colMap={itemNo:0,itemDescription:1,itemQty:2,itemUnit:3,itemPrice:4,itemAmount:5},sx=+cal.scaleX||1,sy=+cal.scaleY||1,columnShift=(colMap[o.source]||0)*(+cal.columnSpacing||0);
+  let x=((+o.x||0)+(+cal.offsetX||0)+(+cal.leftMargin||0)+columnShift)*sx,y=((+o.y||0)+(+cal.offsetY||0)+(+cal.topMargin||0))*sy;
+  let w=(+o.w||1)*sx,h=(+o.h||1)*sy,lh=(+cal.lineHeight||0),cs=(+cal.charSpacing||0);
+  return `left:${x}mm;top:${y}mm;width:${w}mm;height:${h}mm;font-family:${escapeHtml(o.font||'TH Sarabun New')};font-size:${+o.fontSize||12}pt;font-weight:${o.bold?'700':'400'};font-style:${o.italic?'italic':'normal'};text-decoration:${o.underline?'underline':'none'};text-align:${o.align||'left'};transform:rotate(${+o.rotation||0}deg);line-height:${lh?lh+'mm':'1.05'};letter-spacing:${cs}mm;`;
+}
+function renderFullTaxLayoutHtml(data,design=false){
+  let layout=activeFullTaxLayout(),cal=layout.calibration||defaultFullTaxCalibration(),grid=design&&layout.designer?.showGrid?`design-grid grid-${String(layout.designer.gridSize).replace('.','')}`:'',overlay=layout.overlay?.enabled&&layout.overlay.image?`<img class="layout-overlay" src="${layout.overlay.image}" style="opacity:${layout.overlay.opacity}">`:'';
+  let objects=(layout.objects||[]).filter(o=>o.visible!==false).map(o=>`<div class="print-object ${design?'design':''} ${o.id===selectedLayoutObjectId?'selected':''} ${o.locked?'locked':''}" data-id="${o.id}" style="${objectStyle(o,cal,design)}">${escapeHtml(objectText(o,data))}${design?'<span class="resize-handle"></span>':''}</div>`).join('');
+  return `<div class="invoice-box full-layout-page ${grid}" data-layout-id="${layout.id}">${overlay}${objects}</div>`;
+}
+function renderFullTaxLayoutPreview(){invoicePreview.innerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(false),false)}
+function renderAllFullTaxLayoutSurfaces(){if(shouldUseFullTaxLayout())renderFullTaxLayoutPreview();if(document.getElementById('layoutDesigner')?.classList.contains('active'))renderLayoutDesignerCanvas()}
+function initFullTaxLayoutSystem(){getFullTaxLayouts();let r=renderInvoicePreview;renderInvoicePreview=function(){if(shouldUseFullTaxLayout())return renderFullTaxLayoutPreview();return r()};let t=trainingInvoiceHtml;trainingInvoiceHtml=function(x){if(shouldUseFullTaxLayoutForInvoice(x))return renderFullTaxLayoutHtml(savedInvoiceFullTaxPrintData(x),false);return t(x)}}
+function initLayoutDesigner(){populateTemplateSelect();loadDesignerCompanyForm();loadDesignerPrefsForm();loadCalibrationForm();renderLayoutDesignerCanvas()}
+function populateTemplateSelect(){let sel=document.getElementById('layoutTemplateSelect');if(!sel)return;let active=activeFullTaxLayout();sel.innerHTML=getFullTaxLayouts().map(x=>`<option value="${x.id}" ${x.id===active.id?'selected':''}>${escapeHtml(x.name)}</option>`).join('')}
+function renderLayoutDesignerCanvas(){
+  let canvas=document.getElementById('layoutCanvas');if(!canvas)return;canvas.outerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(true),true);canvas=document.getElementById('layoutCanvas')||document.querySelector('#layoutDesigner .full-layout-page');if(canvas&&!canvas.id)canvas.id='layoutCanvas';
+  bindLayoutCanvasEvents();renderObjectList();loadSelectedObjectForm();
+}
+function bindLayoutCanvasEvents(){let canvas=document.getElementById('layoutCanvas');if(!canvas)return;canvas.querySelectorAll('.print-object').forEach(el=>{el.addEventListener('mousedown',startLayoutPointer);el.addEventListener('click',e=>{e.stopPropagation();selectLayoutObject(el.dataset.id)});});canvas.addEventListener('click',()=>selectLayoutObject(null));}
+function selectLayoutObject(id){selectedLayoutObjectId=id;renderLayoutDesignerCanvas()}
+function activeObject(){return activeFullTaxLayout().objects.find(o=>o.id===selectedLayoutObjectId)}
+function saveDesignerLayoutMutation(layout){saveActiveFullTaxLayout(layout);renderAllFullTaxLayoutSurfaces()}
+function snapValue(v){let l=activeFullTaxLayout(),g=+(l.designer?.gridSize||1);return l.designer?.snap?Math.round(v/g)*g:v}
+function pagePoint(e){let r=document.getElementById('layoutCanvas').getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*229,y:(e.clientY-r.top)/r.height*279.4}}
+function startLayoutPointer(e){let obj=activeObject();selectLayoutObject(e.currentTarget.dataset.id);obj=activeObject();if(!obj||obj.locked)return;e.preventDefault();e.stopPropagation();let p=pagePoint(e);if(e.target.classList.contains('resize-handle'))layoutResize={id:obj.id,x:p.x,y:p.y,w:obj.w,h:obj.h};else layoutDrag={id:obj.id,x:p.x,y:p.y,ox:obj.x,oy:obj.y};document.addEventListener('mousemove',moveLayoutPointer);document.addEventListener('mouseup',endLayoutPointer)}
+function moveLayoutPointer(e){let l=activeFullTaxLayout(),obj=l.objects.find(o=>o.id===(layoutDrag?.id||layoutResize?.id));if(!obj)return;let p=pagePoint(e);if(layoutDrag){obj.x=snapValue(layoutDrag.ox+p.x-layoutDrag.x);obj.y=snapValue(layoutDrag.oy+p.y-layoutDrag.y)}if(layoutResize){obj.w=Math.max(2,snapValue(layoutResize.w+p.x-layoutResize.x));obj.h=Math.max(2,snapValue(layoutResize.h+p.y-layoutResize.y))}saveActiveFullTaxLayout(l);renderLayoutDesignerCanvas();if(shouldUseFullTaxLayout())renderFullTaxLayoutPreview()}
+function endLayoutPointer(){layoutDrag=null;layoutResize=null;document.removeEventListener('mousemove',moveLayoutPointer);document.removeEventListener('mouseup',endLayoutPointer)}
+document.addEventListener('keydown',e=>{if(!document.getElementById('layoutDesigner')?.classList.contains('active'))return;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;let obj=activeObject();if(!obj||obj.locked||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;e.preventDefault();let step=e.ctrlKey?5:e.shiftKey?1:.1;if(e.key==='ArrowLeft')obj.x-=step;if(e.key==='ArrowRight')obj.x+=step;if(e.key==='ArrowUp')obj.y-=step;if(e.key==='ArrowDown')obj.y+=step;let l=activeFullTaxLayout();saveDesignerLayoutMutation(l)})
+function renderObjectList(){let box=document.getElementById('layoutObjectList'),layout=activeFullTaxLayout();if(!box)return;box.innerHTML=layout.objects.map(o=>`<button class="${o.id===selectedLayoutObjectId?'active':''}" onclick="selectLayoutObject('${o.id}')">${escapeHtml(o.displayName||o.fieldName)}${o.visible===false?' (hidden)':''}${o.locked?' (locked)':''}</button>`).join('')}
+function loadSelectedObjectForm(){let o=activeObject(),ids=['objFieldName','objText','objX','objY','objW','objH','objFont','objFontSize','objAlign','objBold','objItalic','objUnderline','objVisible','objLocked','objRotation'];ids.forEach(id=>{let el=document.getElementById(id);if(el)el.disabled=!o});if(!o)return;objFieldName.value=o.displayName||o.fieldName||'';objText.value=o.text!==undefined?o.text:'';objText.disabled=!!o.source&&o.text===undefined;objX.value=o.x;objY.value=o.y;objW.value=o.w;objH.value=o.h;objFont.value=o.font||'TH Sarabun New';objFontSize.value=o.fontSize;objAlign.value=o.align||'left';objBold.checked=!!o.bold;objItalic.checked=!!o.italic;objUnderline.checked=!!o.underline;objVisible.checked=o.visible!==false;objLocked.checked=!!o.locked;objRotation.value=o.rotation||0}
+function updateSelectedObjectFromForm(k,v){let l=activeFullTaxLayout(),o=l.objects.find(x=>x.id===selectedLayoutObjectId);if(!o)return;if(k==='fieldName'){o.displayName=uniqueLayoutDisplayName(v,l.objects,o.id);o.fieldName=o.displayName;o.manualDisplayName=true}else if(k==='text'){o.text=v;autoRenameObjectFromText(l,o,v)}else{o[k]=v;if(['x','y','w','h','fontSize','rotation'].includes(k)&&!Number.isFinite(v))o[k]=0}saveDesignerLayoutMutation(l)}
+function addFullTaxObject(){let l=activeFullTaxLayout(),o=fullTaxObj('New Object',20,20,35,8,12,'left',false,{text:'New Object'});o.displayName=uniqueLayoutDisplayName(o.text,l.objects,o.id);o.fieldName=o.displayName;o.manualDisplayName=false;l.objects.push(o);selectedLayoutObjectId=o.id;saveDesignerLayoutMutation(l)}
+function duplicateSelectedObject(){let l=activeFullTaxLayout(),o=activeObject();if(!o)return;let n={...o,id:nextLayoutObjectId(),displayName:uniqueLayoutDisplayName(o.displayName||o.fieldName,l.objects,null),x:+o.x+3,y:+o.y+3};n.fieldName=n.displayName;l.objects.push(n);selectedLayoutObjectId=n.id;saveDesignerLayoutMutation(l)}
+function deleteSelectedObject(){let l=activeFullTaxLayout();if(!selectedLayoutObjectId)return;l.objects=l.objects.filter(o=>o.id!==selectedLayoutObjectId);selectedLayoutObjectId=null;saveDesignerLayoutMutation(l)}
+function toggleSelectedVisible(){let o=activeObject();if(!o)return;o.visible=o.visible===false;saveDesignerLayoutMutation(activeFullTaxLayout())}
+function toggleSelectedLocked(){let o=activeObject();if(!o)return;o.locked=!o.locked;saveDesignerLayoutMutation(activeFullTaxLayout())}
+function saveFullTaxLayout(){saveActiveFullTaxLayout(activeFullTaxLayout());alert('Layout saved')}
+function createFullTaxTemplate(){let name=prompt('Template name','New Template');if(!name)return;let l=defaultFullTaxLayout();l.id='tpl-'+Date.now();l.name=name;saveActiveFullTaxLayout(l);populateTemplateSelect();renderLayoutDesignerCanvas()}
+function selectFullTaxTemplate(id){store.set('activeFullTaxTemplate',id);selectedLayoutObjectId=null;initLayoutDesigner();renderInvoicePreview()}
+function renameFullTaxTemplate(){let l=activeFullTaxLayout(),name=prompt('New layout name',l.name);if(!name)return;l.name=name;saveActiveFullTaxLayout(l);populateTemplateSelect()}
+function duplicateFullTaxTemplate(){let l=JSON.parse(JSON.stringify(activeFullTaxLayout()));l.id='tpl-'+Date.now();l.name=l.name+' Copy';saveActiveFullTaxLayout(l);populateTemplateSelect();renderLayoutDesignerCanvas()}
+function deleteFullTaxTemplate(){let layouts=getFullTaxLayouts();if(layouts.length<=1)return alert('At least one layout is required');let l=activeFullTaxLayout();if(!confirm('Delete layout '+l.name+'?'))return;layouts=layouts.filter(x=>x.id!==l.id);setFullTaxLayouts(layouts);store.set('activeFullTaxTemplate',layouts[0].id);initLayoutDesigner();renderInvoicePreview()}
+function resetFullTaxLayout(){if(!confirm('Reset current layout to default?'))return;let old=activeFullTaxLayout(),fresh=defaultFullTaxLayout();fresh.id=old.id;fresh.name=old.name;saveActiveFullTaxLayout(fresh);selectedLayoutObjectId=null;initLayoutDesigner();renderInvoicePreview()}
+function loadDesignerCompanyForm(){let c=getFullTaxCompanyInfo();['CompanyName','CompanyAddress','CompanyTax','CompanyPhone','FooterNotes','Terms','PaymentNotes'].forEach(k=>{let el=document.getElementById('layout'+k),key=k.charAt(0).toLowerCase()+k.slice(1);if(el)el.value=c[key]||''})}
+function saveCompanyInfoFromDesigner(){saveFullTaxCompanyInfo({companyName:layoutCompanyName.value,companyAddress:layoutCompanyAddress.value,companyTax:layoutCompanyTax.value,companyPhone:layoutCompanyPhone.value,footerNotes:layoutFooterNotes.value,terms:layoutTerms.value,paymentNotes:layoutPaymentNotes.value})}
+function loadDesignerPrefsForm(){let l=activeFullTaxLayout();showGrid.checked=!!l.designer.showGrid;snapGrid.checked=!!l.designer.snap;gridSize.value=String(l.designer.gridSize||1);overlayEnabled.checked=!!l.overlay.enabled;overlayOpacity.value=l.overlay.opacity||.35}
+function saveDesignerPrefs(){let l=activeFullTaxLayout();l.designer={showGrid:showGrid.checked,snap:snapGrid.checked,gridSize:+gridSize.value||1};saveDesignerLayoutMutation(l)}
+function saveOverlaySettings(){let l=activeFullTaxLayout();l.overlay.enabled=overlayEnabled.checked;l.overlay.opacity=+overlayOpacity.value||.35;saveDesignerLayoutMutation(l)}
+function loadOverlayImage(input){let file=input.files?.[0];input.value='';if(!file)return;let r=new FileReader();r.onload=()=>{let l=activeFullTaxLayout();l.overlay.image=r.result;l.overlay.enabled=true;saveActiveFullTaxLayout(l);initLayoutDesigner()};r.readAsDataURL(file)}
+function loadCalibrationForm(){let c=activeFullTaxLayout().calibration;calOffsetX.value=c.offsetX;calOffsetY.value=c.offsetY;calTopMargin.value=c.topMargin;calLeftMargin.value=c.leftMargin;calLineHeight.value=c.lineHeight;calCharSpacing.value=c.charSpacing;calColumnSpacing.value=c.columnSpacing;calScaleX.value=c.scaleX;calScaleY.value=c.scaleY}
+function saveCalibrationFromDesigner(){let l=activeFullTaxLayout();l.calibration={offsetX:+calOffsetX.value||0,offsetY:+calOffsetY.value||0,topMargin:+calTopMargin.value||0,leftMargin:+calLeftMargin.value||0,lineHeight:+calLineHeight.value||0,charSpacing:+calCharSpacing.value||0,columnSpacing:+calColumnSpacing.value||0,scaleX:+calScaleX.value||1,scaleY:+calScaleY.value||1};saveDesignerLayoutMutation(l)}
+function downloadJson(name,data){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function exportFullTaxLayout(){downloadJson('full-tax-layout.json',activeFullTaxLayout())}
+function importFullTaxLayout(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=JSON.parse(t);if(!l.objects)throw new Error('Invalid layout');l.id=l.id||'tpl-'+Date.now();saveActiveFullTaxLayout(l);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
+function exportPrinterCalibration(){downloadJson('printer-calibration.json',activeFullTaxLayout().calibration)}
+function importPrinterCalibration(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=activeFullTaxLayout();l.calibration=Object.assign(defaultFullTaxCalibration(),JSON.parse(t));saveActiveFullTaxLayout(l);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
+function printFullTaxTest(){let box=document.getElementById('templatePrintCanvas');if(!box)return;let oldTitle=document.title;document.title=' ';applyDynamicPageStyle('9x11');box.innerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(true),false);document.body.classList.add('full-tax-test-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('full-tax-test-print');box.innerHTML='';document.title=oldTitle;applyDynamicPageStyle();initLayoutDesigner()},800)},80)}
+window.onload=()=>{initFullTaxLayoutSystem();migrateCustomers();clearProductForm();clearCustomerForm();loadSettings();renderProducts();renderCustomers();refreshInvoiceSelects();loadPrintSettings();newInvoice();renderHistory();let today=new Date();autoDate.value=today.toISOString().slice(0,10);autoMonth.value=today.getMonth()+1;autoYearBE.value=today.getFullYear()+543;loadAutoInvoiceNumberSettingsUI();bindAutoInvoiceNumberPreviewEvents();toggleAutoInvoiceMode();renderTrainingInvoices();initializeBackupSystem()}
+</script>
+</body>
+</html>

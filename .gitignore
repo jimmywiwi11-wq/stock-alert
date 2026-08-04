@@ -1,0 +1,6 @@
+node_modules/
+.pnpm-store/
+.local-tools/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

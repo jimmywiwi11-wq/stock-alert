@@ -1,0 +1,6 @@
+{
+  "version": "7.73",
+  "label": "V7.73",
+  "releasedAt": "2026-08-03T00:00:00Z",
+  "message": "Keep home sales and cash-check buttons from swapping labels after PWA refreshes."
+}

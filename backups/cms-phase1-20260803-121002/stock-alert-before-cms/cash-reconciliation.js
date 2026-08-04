@@ -1,0 +1,713 @@
+/* Stock Alert V7.73 - Cash Reconciliation */
+(function(){
+  const APP_VERSION='V7.73';
+  const CASH_KEY='stockAlertDailyCashChecksV746';
+  const DRAFT_KEY='stockAlertDailyCashDraftsV746';
+  const CASH_COLL='stock_alert_beta1_cash_reconciliation';
+  const branches={
+    1:{name:'โชคอนันต์ สาขา 1',short:'สาขา 1',theme:'blue'},
+    2:{name:'โชคอนันต์ สาขา 2',short:'สาขา 2',theme:'green'}
+  };
+  let cashBranch=1,cashInfoMode='history',cashSalesMode='daily',salesBranch=1,salesScope='current',salesSaving=false,salesOpenedUpdatedAt=0,salesEditingOriginal=null;
+  let salesDateFilter=today(),salesMonthFilter=today().slice(0,7),salesYearFilter=today().slice(0,4);
+  let editingExpenseIndex=-1,editingAddIndex=-1,editingExchangeIndex=-1,cashSaving=false,cashUnsub=null;
+  let cashDirty=false,cashSuppressDirty=false,cashEditingRecord=null;
+  let cashConnectionState='initializing',cashNoticeVisibleUntil=0,cashConnectionStartedAt=Date.now();
+  let cashSyncStarting=false,cashRetrying=false,cashToastTimer=null,cashToastText='',cashListenerRun=0,cashActiveListeners=0,cashLastError=null,cashAuthReadyPromise=null;
+
+  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function read(key,def){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(def));}catch(e){return def;}}
+  function write(key,val){localStorage.setItem(key,JSON.stringify(val));}
+  function num(v){const n=Number(String(v??'').replace(/,/g,'').trim());return Number.isFinite(n)&&n>0?n:0;}
+  function money(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function intText(v){return Math.floor(num(v)).toLocaleString('th-TH');}
+  function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  function timeNow(ts=Date.now()){return new Date(ts).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});}
+  function dateText(v){const d=v?new Date(`${v}T00:00:00`):new Date();return d.toLocaleDateString('th-TH',{day:'2-digit',month:'long',year:'numeric'});}
+  function monthKey(v){return String(v||'').slice(0,7)||today().slice(0,7);}
+  function yearKey(v){return String(v||'').slice(0,4)||today().slice(0,4);}
+  function userName(){try{return (typeof nickname!=='undefined'&&nickname)||localStorage.getItem('stockAlertNickname')||localStorage.getItem('stockAlertUserNickname')||'ไม่ระบุ';}catch(e){return 'ไม่ระบุ';}}
+  function ready(){return typeof db!=='undefined'&&db&&cashConnectionState==='connected';}
+  function firebaseDbReady(){return typeof db!=='undefined'&&db&&typeof db.collection==='function';}
+  function isFileMode(){return location.protocol==='file:';}
+  function isLocalServer(){return location.hostname==='localhost'||location.hostname==='127.0.0.1';}
+  function runtimeMode(){return isFileMode()?'file':isLocalServer()?'localhost':'deployed';}
+  function isCashPageActive(){return !!document.querySelector('#cashMenuPage.active,#cashBranchPage.active,#cashInfoPage.active,#cashSalesMenuPage.active,#cashSalesEntryPage.active,#cashSalesSummaryPage.active');}
+  function debugCash(label,extra={}){
+    const auth=typeof firebase!=='undefined'&&firebase.auth?firebase.auth():null;
+    console.info('[CashReconciliation]',label,{mode:runtimeMode(),firebaseApps:typeof firebase!=='undefined'&&firebase.apps?firebase.apps.length:0,dbReady:firebaseDbReady(),authAvailable:!!auth,authReady:!auth||!!auth.currentUser,hasUser:!!auth?.currentUser,isAnonymous:!!auth?.currentUser?.isAnonymous,connection:cashConnectionState,activeListeners:cashActiveListeners,...extra});
+  }
+  function authInstance(){try{return typeof firebase!=='undefined'&&firebase.auth?firebase.auth():null;}catch(e){return null;}}
+  function toastCash(msg){
+    try{
+      const el=document.getElementById('toast');
+      if(!el){toast(msg);return;}
+      if(cashToastText===msg&&el.classList.contains('show'))return;
+      cashToastText=msg;
+      clearTimeout(cashToastTimer);
+      el.textContent=msg;
+      const close=document.createElement('button');
+      close.type='button';close.className='cashToastClose';close.textContent='×';
+      close.onclick=()=>{el.classList.remove('show');cashToastText='';};
+      el.appendChild(close);
+      el.classList.add('show');
+      cashToastTimer=setTimeout(()=>{el.classList.remove('show');cashToastText='';},4200);
+    }catch(e){try{toast(msg);}catch(_){alert(msg);}}
+  }
+  function clearCashToast(){
+    const el=document.getElementById('toast');
+    if(el&&cashToastText){el.classList.remove('show');cashToastText='';}
+    clearTimeout(cashToastTimer);
+  }
+  function docId(type,branch,date){return `${type}_${branch}_${date}`;}
+  function draftKey(branch,date){return `${branch}_${date}`;}
+  function currentDeviceBranch(){return Number(window.StockAlertDeviceBranch?.get?.()||window.currentDeviceBranch||1)||1;}
+  function legacyDenomsTotal(map){return Object.entries(map||{}).reduce((s,[d,c])=>s+num(d)*num(c),0);}
+  function cleanName(v){return String(v||'ค่าใช้จ่าย').trim().replace(/\s+/g,' ');}
+
+  function emptyRecord(branch=cashBranch,date=today()){
+    return {id:`cash_${branch}_${date}`,type:'record',branch:Number(branch),branchId:String(branch),date,
+      morningChange:'',eveningChange:'',eveningBank1000Count:'',
+      cashAdds:[],expenses:[],exchangeTransactions:[],sales:'',transfer:'',note:'',createdAt:Date.now(),updatedAt:Date.now(),savedAt:null,savedBy:userName()};
+  }
+  function normalizeExchangeItems(items){
+    const seen=new Set();
+    return (items||[]).map(x=>{
+      const id=x.id||`ex_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+      return {id,fromType:String(x.fromType||'').trim(),toType:String(x.toType||'').trim(),fromDetail:String(x.fromDetail||'').trim(),toDetail:String(x.toDetail||'').trim(),amount:num(x.amount),note:String(x.note||'').trim(),time:x.time||timeNow(x.createdAt||Date.now()),createdAt:x.createdAt||Date.now(),updatedAt:x.updatedAt||Date.now(),createdBy:x.createdBy||x.by||x.user||userName(),branchId:String(x.branchId||x.branch||cashBranch),date:x.date||today()};
+    }).filter(x=>x.amount>0&&x.fromType&&x.toType&&!seen.has(x.id)&&seen.add(x.id));
+  }
+  function normalizeItems(items,kind){
+    return (items||[]).map(x=>{
+      const base={id:x.id||`${kind}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,amount:num(x.amount)||num(x.denom)*num(x.count),time:x.time||timeNow(x.createdAt||Date.now()),createdAt:x.createdAt||Date.now(),updatedAt:x.updatedAt||Date.now(),by:x.by||x.user||userName()};
+      return kind==='expense'?{...base,name:cleanName(x.name||x.detail),note:x.note||''}:{...base,detail:(x.detail||x.note||'เติมเงินทอน').trim()};
+    });
+  }
+  function normalize(row){
+    const branch=Number(row?.branch||row?.branchId||1),date=row?.date||today(),base=emptyRecord(branch,date);
+    return {...base,...row,id:row?.id||`cash_${branch}_${date}`,type:row?.type||'record',branch,branchId:String(branch),date,
+      morningChange:row?.morningChange??legacyDenomsTotal(row?.morningDenoms),
+      eveningChange:row?.eveningChange??legacyDenomsTotal(row?.eveningDenoms),
+      eveningBank1000Count:num(row?.eveningBank1000Count),
+      cashAdds:normalizeItems(row?.cashAdds||row?.morningAdds||[],'add'),
+      expenses:normalizeItems(row?.expenses||[],'expense'),
+      exchangeTransactions:normalizeExchangeItems(row?.exchangeTransactions||row?.exchanges||[]).map(x=>({...x,branchId:String(branch),date})),
+      sales:row?.sales??row?.salesTotal??'',transfer:row?.transfer??row?.transferTotal??'',rowCount:normalizeRowCount(row),note:row?.note||'',savedBy:row?.savedBy||row?.by||userName(),
+      source:row?.source||'',salesActivityLog:Array.isArray(row?.salesActivityLog)?row.salesActivityLog:[],salesHidden:row?.salesHidden===true};
+  }
+  function normalizeRowCount(row){
+    if(!row||!Object.prototype.hasOwnProperty.call(row,'rowCount'))return null;
+    const text=String(row.rowCount??'').trim();
+    return text===''?null:text;
+  }
+  function hasRowCount(record){return normalizeRowCount(record)!==null;}
+  function rowCountNumber(record){const text=normalizeRowCount(record);if(text===null)return null;const compact=String(text).replace(/,/g,'').trim();if(!/^\d+(?:\.\d+)?$/.test(compact))return null;const n=Number(compact);return Number.isFinite(n)&&n>=0?n:null;}
+  function hasNumericRowCount(record){return rowCountNumber(record)!==null;}
+  function rowCountInputValue(record){const text=normalizeRowCount(record);return text===null?'':text;}
+  function rowCountText(record){const text=normalizeRowCount(record);return text===null?'ไม่ได้ระบุ':esc(text);}
+  function rowCountFromInput(id){const raw=String(document.getElementById(id)?.value??'').trim();return raw===''?null:raw;}
+  function rows(){return read(CASH_KEY,[]).map(normalize).filter(r=>r.type!=='draft');}
+  function drafts(){return read(DRAFT_KEY,{});}
+  function setRows(next){write(CASH_KEY,next.map(normalize).sort((a,b)=>String(b.date).localeCompare(String(a.date))||Number(b.updatedAt||0)-Number(a.updatedAt||0)).slice(0,1500));}
+  function getRecord(branch=cashBranch,date=today()){
+    const draft=drafts()[draftKey(branch,date)];
+    if(draft)return normalize({...draft,type:'draft'});
+    return normalize(rows().find(r=>Number(r.branch)===Number(branch)&&r.date===date)||emptyRecord(branch,date));
+  }
+  function stripMorningBank(row){const out={...row};delete out.morningBank1000Count;return out;}
+  function upsertLocal(record){record=stripMorningBank(normalize(record));const next=rows().filter(r=>!(Number(r.branch)===Number(record.branch)&&r.date===record.date));next.unshift({...record,type:'record'});setRows(next);return stripMorningBank(normalize({...record,type:'record'}));}
+  function setDraftLocal(record){const all=drafts();all[draftKey(record.branch,record.date)]=stripMorningBank(normalize({...record,type:'draft',updatedAt:Date.now()}));write(DRAFT_KEY,all);}
+  function clearDraftLocal(branch,date){const all=drafts();delete all[draftKey(branch,date)];write(DRAFT_KEY,all);}
+  async function cloudSet(record,type){if(!ready())throw new Error('firebase-not-ready');record=stripMorningBank(normalize({...record,type,branchId:String(record.branch),updatedAt:Date.now()}));await db.collection(CASH_COLL).doc(docId(type,record.branch,record.date)).set(record,{merge:true});return record;}
+  async function cloudDelete(type,branch,date){if(ready())await db.collection(CASH_COLL).doc(docId(type,branch,date)).delete();}
+  function setCashConnection(state,temporary=false){
+    cashConnectionState=state;
+    cashNoticeVisibleUntil=temporary?Date.now()+2600:0;
+    if(state==='connected')clearCashToast();
+    if(temporary)setTimeout(refreshCashActive,2700);
+  }
+  function stopCashSync(){
+    if(cashUnsub){try{cashUnsub();}catch(e){}cashUnsub=null;cashActiveListeners=Math.max(0,cashActiveListeners-1);window.StockAlertCashActiveListeners=cashActiveListeners;}
+  }
+  function waitForAuthReady(){
+    if(cashAuthReadyPromise)return cashAuthReadyPromise;
+    if(typeof window.stockAlertAuthReady==='function'){
+      cashAuthReadyPromise=window.stockAlertAuthReady().then(user=>({available:true,user})).catch(error=>({available:true,error}));
+      return cashAuthReadyPromise;
+    }
+    const auth=authInstance();
+    if(!auth){cashAuthReadyPromise=Promise.resolve({available:false});return cashAuthReadyPromise;}
+    if(auth.currentUser){cashAuthReadyPromise=Promise.resolve({available:true,user:auth.currentUser});return cashAuthReadyPromise;}
+    cashAuthReadyPromise=new Promise(resolve=>{
+      let done=false;
+      let unsub=()=>{};
+      const finish=user=>{if(done)return;done=true;try{unsub();}catch(e){}resolve({available:true,user});};
+      unsub=auth.onAuthStateChanged(user=>{
+        if(user)finish(user);
+        else if(auth.signInAnonymously)auth.signInAnonymously().then(cred=>finish(cred.user)).catch(error=>resolve({available:true,error}));
+        else finish(null);
+      },error=>resolve({available:true,error}));
+      setTimeout(()=>{if(done)return;done=true;try{unsub();}catch(e){}resolve({available:true,timeout:true});},3500);
+    });
+    return cashAuthReadyPromise;
+  }
+  async function startCashSync(force=false){
+    if(cashUnsub&&!force)return;
+    if(cashSyncStarting)return;
+    cashSyncStarting=true;
+    try{
+      if(force)stopCashSync();
+      cashConnectionStartedAt=Date.now();
+      if(isFileMode()){
+        setCashConnection('file');
+        debugCash('file-mode-skip-firebase');
+        return;
+      }
+      if(cashConnectionState==='file')setCashConnection('initializing');
+      if(!firebaseDbReady()){
+        setCashConnection(navigator.onLine===false?'offline-cache':'error');
+        debugCash('db-not-ready');
+        return;
+      }
+      setCashConnection(force?'reconnecting':'initializing');
+      const authState=await waitForAuthReady();
+      if(authState.error){
+        cashLastError=authState.error;
+        console.warn('[CashReconciliation] auth error',authState.error.code||authState.error.name,authState.error.message||authState.error);
+        cashAuthReadyPromise=null;
+        setCashConnection('error');
+        return;
+      }
+      const runId=++cashListenerRun;
+      debugCash('listener-start',{runId});
+      cashActiveListeners++;
+      window.StockAlertCashActiveListeners=cashActiveListeners;
+      cashUnsub=db.collection(CASH_COLL).onSnapshot({includeMetadataChanges:true},snap=>{
+        if(runId!==cashListenerRun)return;
+        cashRetrying=false;
+        cashLastError=null;
+        const meta=snap.metadata||{};
+        setCashConnection(meta.fromCache&&navigator.onLine===false?'offline-cache':'connected',!(meta.fromCache&&navigator.onLine===false));
+        debugCash('initial-snapshot-ok',{fromCache:!!meta.fromCache,hasPendingWrites:!!meta.hasPendingWrites,docs:snap.size,runId});
+        const remoteRows=[],remoteDrafts={};
+        snap.forEach(doc=>{const row=normalize({id:doc.id,...doc.data()});if(row.type==='draft')remoteDrafts[draftKey(row.branch,row.date)]=row;else remoteRows.push(row);});
+        if(remoteRows.length)setRows(remoteRows);
+        write(DRAFT_KEY,{...drafts(),...remoteDrafts});
+        refreshCashActive();
+      },err=>{
+        if(runId!==cashListenerRun)return;
+        cashLastError=err;
+        stopCashSync();
+        const code=err?.code||err?.name||'unknown';
+        console.warn('[CashReconciliation] Firestore listener error',code,err?.message||err);
+        setCashConnection(navigator.onLine===false?'offline-cache':'error');
+        refreshCashActive();
+      });
+    }finally{
+      cashSyncStarting=false;
+    }
+  }
+  function pollCashSync(){
+    if(cashUnsub||cashSyncStarting)return;
+    if(Date.now()-cashConnectionStartedAt>3200){
+      setCashConnection(navigator.onLine===false?'offline-cache':'error');
+      refreshCashActive();
+      return;
+    }
+    startCashSync();
+  }
+  function calc(record){
+    record=normalize(record);
+    const morning=num(record.morningChange),evening=num(record.eveningChange);
+    const addTotal=(record.cashAdds||[]).reduce((s,x)=>s+num(x.amount),0);
+    const expenseTotal=(record.expenses||[]).reduce((s,x)=>s+num(x.amount),0);
+    const sales=num(record.sales),transfer=num(record.transfer);
+    const expected=morning+addTotal+sales-transfer-expenseTotal,diff=evening-expected;
+    const status=Math.abs(diff)<0.005?'พอดี':diff>0?'เกิน':'ขาด';
+    return {morning,evening,addTotal,expenseTotal,sales,transfer,cashSales:sales-transfer,expected,diff,status};
+  }
+  function resultTone(status){return status==='พอดี'?'ok':status==='เกิน'?'over':'short';}
+  function resultText(c){return c.status==='พอดี'?'พอดี':`${c.status} ${money(Math.abs(c.diff))} บาท`;}
+  function validate(record,soft=false){const c=calc(record);if(c.transfer>c.sales){if(!soft)toastCash('ยอดโอนต้องไม่มากกว่ายอดขายรวม');return false;}return true;}
+  function icon(name){
+    const p={cash:'<path d="M4 7h16v10H4z"/><path d="M8 11h.01M16 13h.01"/><circle cx="12" cy="12" r="2"/>',chart:'<path d="M4 19h16"/><path d="M7 16v-5M12 16V7M17 16v-9"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/>',branch:'<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/>',exchange:'<path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/><path d="M6 12h12"/>'};
+    return `<svg viewBox="0 0 24 24" aria-hidden="true">${p[name]||p.cash}</svg>`;
+  }
+  function ensureModal(id){let m=document.getElementById(id);if(!m){m=document.createElement('div');m.id=id;m.className='modal';document.body.appendChild(m);}return m;}
+  function actionDisabled(){return cashSaving?'disabled':'';}
+  function connectionNotice(){
+    if(cashConnectionState==='connected'&&Date.now()>cashNoticeVisibleUntil)return '';
+    if(cashConnectionState==='connected')return '<div class="cashSync ok">เชื่อมต่อข้อมูลสำเร็จ</div>';
+    if(cashConnectionState==='file'&&isFileMode())return '<div class="cashSync wait">กำลังเปิดเวอร์ชันทดสอบในเครื่อง ควรทดสอบ Firebase ผ่าน localhost หรือ URL ที่ Deploy แล้ว</div>';
+    if(cashConnectionState==='file')return '';
+    if(cashConnectionState==='offline-cache')return '<div class="cashSync wait">กำลังใช้ข้อมูลที่บันทึกไว้ในเครื่อง รอซิงค์เมื่อออนไลน์ <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>';
+    if(cashConnectionState==='reconnecting')return '<div class="cashSync wait">กำลังเชื่อมต่ออีกครั้ง...</div>';
+    if(cashConnectionState==='error')return `<div class="cashSync error">เชื่อมต่อข้อมูลตรวจสอบเงินไม่สำเร็จ <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>`;
+    if(cashConnectionState==='unavailable')return '<div class="cashSync wait">ยังไม่ได้เชื่อมต่อ Firebase <button type="button" onclick="retryCashConnection()">ลองเชื่อมต่ออีกครั้ง</button></div>';
+    return '<div class="cashSync wait">กำลังเชื่อมต่อข้อมูล...</div>';
+  }
+  function cleanNumericInput(el,integerOnly=false){const pos=el.selectionStart;let v=String(el.value||'').replace(/[^\d.]/g,'');if(integerOnly)v=v.replace(/\..*/,'');const parts=v.split('.');if(parts.length>2)v=parts.shift()+'.'+parts.join('');v=v.replace(/^0+(?=\d)/,'');el.value=v;if(pos!=null)try{el.setSelectionRange(Math.min(pos,el.value.length),Math.min(pos,el.value.length));}catch(e){}}
+  function formatField(el,integerOnly=false){const v=integerOnly?Math.floor(num(el.value)):num(el.value);el.value=v?(integerOnly?intText(v):v.toLocaleString('th-TH',{maximumFractionDigits:2})):'';}
+  function zeroAsBlank(v){return num(v)>0?String(Math.floor(num(v))):'';}
+  function collectBranchForm(){
+    const date=document.getElementById('cashDateInputV749')?.value||today();
+    const base=cashEditingRecord&&cashEditingRecord.date===date&&Number(cashEditingRecord.branch)===Number(cashBranch)?cashEditingRecord:getRecord(cashBranch,date);
+    return normalize({...base,type:'record',branch:cashBranch,date,
+      morningChange:document.getElementById('cashMorningTotalV749')?.value||'',
+      eveningChange:document.getElementById('cashEveningTotalV749')?.value||'',
+      eveningBank1000Count:document.getElementById('cashEveningBank1000V749')?.value||0,
+      sales:document.getElementById('cashSalesV749')?.value||'',
+      transfer:document.getElementById('cashTransferV749')?.value||'',
+      note:(document.getElementById('cashNoteV749')?.value||'').trim(),updatedAt:Date.now(),savedBy:userName()});
+  }
+  function cashFormulaHtml(record){
+    const c=calc(record),tone=resultTone(c.status);
+    return `<div class="cashFormula"><div><span>ยอดขายรวม</span><b>${money(c.sales)} บาท</b></div><div><span>ยอดโอน</span><b>${money(c.transfer)} บาท</b></div><div><span>เงินทอนตอนเช้า</span><b>${money(c.morning)} บาท</b></div><div><span>เพิ่มเงินทอน</span><b>${money(c.addTotal)} บาท</b></div><div><span>ค่าใช้จ่าย</span><b>${money(c.expenseTotal)} บาท</b></div><hr><div><span>เงินสดที่ควรมี</span><b>${money(c.expected)} บาท</b></div><div><span>เงินทอนตอนเย็น</span><b>${money(c.evening)} บาท</b></div><div><span>แบงค์ 1,000 ตอนเย็น</span><b>${intText(record.eveningBank1000Count)} ใบ</b></div><hr><div class="result ${tone}"><span>ผลลัพธ์</span><b>${resultText(c)}</b></div><small>จำนวนแบงค์ 1,000 ตอนเย็นเป็นข้อมูลประกอบในรายงานเท่านั้น ไม่ถูกนำไปบวกซ้ำ</small></div>`;
+  }
+  function exchangeLabel(v,detail=''){return String(v||'')==='อื่น ๆ'&&detail?detail:String(v||'-');}
+  function exchangeText(x,arrow='เป็น'){return `${exchangeLabel(x.fromType,x.fromDetail)} ${arrow} ${exchangeLabel(x.toType,x.toDetail)}`;}
+  function exchangeTotal(record){return (record.exchangeTransactions||[]).reduce((s,x)=>s+num(x.amount),0);}
+  function exchangeOptions(selected=''){
+    const opts=['แบงค์ 1,000','แบงค์ 500','แบงค์ 100','แบงค์ 50','แบงค์ 20','เหรียญ','อื่น ๆ'];
+    return opts.map(o=>`<option value="${esc(o)}" ${String(selected)===o?'selected':''}>${esc(o)}</option>`).join('');
+  }
+  function hasCashCheck(record){
+    record=normalize(record);
+    return record.hasCashCheck===true||!!record.cashCheckRecordId||/^cash-check/.test(String(record.source||''))||num(record.morningChange)>0||num(record.eveningChange)>0||num(record.eveningBank1000Count)>0||(record.cashAdds||[]).length>0||(record.expenses||[]).length>0||(record.exchangeTransactions||[]).length>0;
+  }
+  function hasSalesData(record){record=normalize(record);return !record.salesHidden&&(/^sales-only/.test(String(record.source||''))||/^cash-check/.test(String(record.source||''))||String(record.sales).trim()!==''||String(record.transfer).trim()!==''||num(record.sales)>0||num(record.transfer)>0);}
+  function salesSourceLabel(record){
+    const source=String(record?.source||'');
+    if(source==='sales-only')return 'บันทึกยอดขาย';
+    if(source==='cash-check-updated')return 'ตรวจสอบเงิน (อัปเดตยอดขาย)';
+    if(source==='sales-only-updated-cash-check')return 'ตรวจสอบเงิน (แก้จากบันทึกยอดขาย)';
+    if(hasCashCheck(record)||source==='cash-check')return 'ตรวจสอบเงิน';
+    return 'บันทึกยอดขาย';
+  }
+  function salesLog(record,action,source){
+    const list=Array.isArray(record.salesActivityLog)?record.salesActivityLog.slice(-30):[];
+    list.push({action,source,by:userName(),at:Date.now(),sales:num(record.sales),transfer:num(record.transfer)});
+    return list;
+  }
+  function exchangeSummaryHtml(record){
+    const list=record.exchangeTransactions||[];
+    if(!list.length)return '<div class="cashExchangeSummary"><b>แลกเงิน:</b> ไม่มี</div>';
+    return `<div class="cashExchangeSummary"><b>แลกเงิน:</b><ul>${list.map(x=>`<li>${esc(x.time||'-')} ${esc(exchangeText(x))} จำนวน ${money(x.amount)} บาท</li>`).join('')}</ul></div>`;
+  }
+  function exchangePaperHtml(record){
+    const list=record.exchangeTransactions||[],total=exchangeTotal(record);
+    if(!list.length)return '<h3 class="cashExchangePaperTitle">แลกเงิน</h3><div class="cashPaperLine exchange mutedLine"><span>แลกเงิน: ไม่มี</span><b></b></div>';
+    return `<h3 class="cashExchangePaperTitle">แลกเงิน</h3>${list.map(x=>`<div class="cashPaperLine exchange"><span>${esc(x.time||'-')} ${esc(exchangeText(x,'→'))}</span><b>${money(x.amount)} บาท</b></div>`).join('')}<div class="cashPaperLine exchange total"><span>ยอดแลกเงินรวม</span><b>${money(total)} บาท</b></div>`;
+  }
+  function exchangeDayCard(record){
+    const list=record.exchangeTransactions||[],total=exchangeTotal(record);
+    const rows=list.length?list.map((x,i)=>`<div class="cashDayItem cashExchangeItem"><div class="cashDayMain"><span class="cashDayTime">${esc(x.time||'-')}</span><b>${esc(exchangeText(x))}</b><strong class="cashAmountExchange">${money(x.amount)} บาท</strong><small>${esc(x.note||'ไม่มีหมายเหตุ')} • ${esc(x.createdBy||'-')}</small></div><button class="cashMoreBtn exchange" onclick="openCashExchangeMenu(${i})">⋮</button></div>`).join(''):'<div class="empty compact">ยังไม่มีรายการแลกเงิน</div>';
+    return `<section class="cashDayCard exchange"><header><div><h4>รายการแลกเงินระหว่างวัน</h4><span>${list.length} รายการ</span></div><b>${money(total)} บาท</b></header><div class="cashDayList">${rows}</div></section>`;
+  }
+  function exportCardHtml(record){
+    record=normalize(record);const c=calc(record),tone=resultTone(c.status),mobile=window.innerWidth<720?'mobile':'desktop';
+    const row=(label,value,cls='')=>`<div class="cashPaperRow ${cls}"><span>${label}</span><b>${value}</b></div>`;
+    const addRows=record.cashAdds.length?record.cashAdds.map(x=>`<div class="cashPaperLine"><span>${esc(x.time||'-')} ${esc(x.detail||'เติมเงินทอน')}</span><b>${money(x.amount)} บาท</b></div>`).join(''):'<div class="cashPaperLine mutedLine"><span>เพิ่มเงินทอน: ไม่มี</span><b></b></div>';
+    const expenseRows=record.expenses.length?record.expenses.map(x=>`<div class="cashPaperLine expense"><span>${esc(x.time||'-')} ${esc(x.name||'-')}${x.note?` • ${esc(x.note)}`:''}</span><b>${money(x.amount)} บาท</b></div>`).join(''):'<div class="cashPaperLine mutedLine"><span>ค่าใช้จ่าย: ไม่มี</span><b></b></div>';
+    return `<div class="cashExportCard cashPaper ${mobile}" id="cashExportCard"><header><h2>${esc(branches[record.branch]?.name||'โชคอนันต์')}</h2><p>วันที่ ${dateText(record.date)} • ผู้บันทึก ${esc(record.savedBy||userName())} • ${timeNow(record.updatedAt||Date.now())}</p></header><section class="cashPaperTable">${row('ยอดขายรวม',`${money(c.sales)} บาท`,'sales')}${row('ยอดโอน',`${money(c.transfer)} บาท`,'transfer')}${row('ยอดขายเงินสด',`${money(c.cashSales)} บาท`)}${row('เงินทอนตอนเช้า',`${money(c.morning)} บาท`)}${row('เพิ่มเงินทอนรวม',`${money(c.addTotal)} บาท`)}${row('ค่าใช้จ่ายรวม',`${money(c.expenseTotal)} บาท`,'expense')}${row('เงินสดที่ควรมี',`${money(c.expected)} บาท`,'expected')}${row('เงินทอนตอนเย็น',`${money(c.evening)} บาท`)}${row('แบงค์ 1,000 ตอนเย็น',`${intText(record.eveningBank1000Count)} ใบ`)}</section><section class="cashPaperResult ${tone}"><span>ผลการตรวจสอบ</span><b>${resultText(c)}</b></section><section class="cashPaperDetails"><h3>เพิ่มเงินทอน</h3>${addRows}<h3>ค่าใช้จ่าย</h3>${expenseRows}</section><footer><div>หมายเหตุ: ${esc(record.note||'-')}</div><div>ผู้บันทึก: ${esc(record.savedBy||userName())}</div><div>บันทึกเวลา: ${timeNow(record.updatedAt||Date.now())}</div></footer></div>`;
+  }
+  function summaryPanelHtml(record){return `<div id="cashResultBox">${cashFormulaHtml(record)}${exchangeSummaryHtml(normalize(record))}<div class="cashExportPreview">${exportCardHtml(record).replace('</section><footer>',`${exchangePaperHtml(normalize(record))}</section><footer>`)}</div></div>`;}
+  function dayListsHtml(record){
+    const c=calc(record);
+    const addRows=record.cashAdds.length?record.cashAdds.map((x,i)=>`<div class="cashDayItem cashAddItem"><div class="cashDayMain"><span class="cashDayTime">${esc(x.time||'-')}</span><b class="cashAmountIn">เติมเงินทอน ${money(x.amount)} บาท</b><small>${esc(x.detail||'-')} • ${esc(x.by||'-')}</small></div><button class="cashMoreBtn" onclick="openCashAddMenu(${i})">⋮</button></div>`).join(''):'<div class="empty compact">ยังไม่มีรายการเพิ่มเงินทอน</div>';
+    const expenseRows=record.expenses.length?record.expenses.map((x,i)=>`<div class="cashDayItem cashExpenseItem"><div class="cashDayMain"><span class="cashDayTime">${esc(x.time||'-')}</span><b>${esc(x.name)}</b><strong class="cashAmountOut">${money(x.amount)} บาท</strong><small>${esc(x.note||'ไม่มีหมายเหตุ')} • ${esc(x.by||'-')}</small></div><button class="cashMoreBtn expense" onclick="openCashExpenseMenu(${i})">⋮</button></div>`).join(''):'<div class="empty compact">ยังไม่มีรายการค่าใช้จ่าย</div>';
+    return `<div class="cashDayCards"><section class="cashDayCard add"><header><div><h4>เงินทอนที่เพิ่มระหว่างวัน</h4><span>${record.cashAdds.length} รายการ</span></div><b>${money(c.addTotal)} บาท</b></header><div class="cashDayList">${addRows}</div></section><section class="cashDayCard expense"><header><div><h4>ค่าใช้จ่ายระหว่างวัน</h4><span>${record.expenses.length} รายการ</span></div><b>${money(c.expenseTotal)} บาท</b></header><div class="cashDayList">${expenseRows}</div></section>${exchangeDayCard(record)}</div>`;
+  }
+  function textReport(record){
+    record=normalize(record);const c=calc(record);
+    const lines=[branches[record.branch]?.name||'โชคอนันต์',`วันที่ ${dateText(record.date)}`,'',`ยอดขายรวม: ${money(c.sales)} บาท`,`ยอดโอน: ${money(c.transfer)} บาท`,`ยอดขายเงินสด: ${money(c.cashSales)} บาท`,`เงินทอนตอนเช้า: ${money(c.morning)} บาท`,`เพิ่มเงินทอนรวม: ${money(c.addTotal)} บาท`,`ค่าใช้จ่ายรวม: ${money(c.expenseTotal)} บาท`,`เงินสดที่ควรมี: ${money(c.expected)} บาท`,`เงินทอนตอนเย็น: ${money(c.evening)} บาท`,`แบงค์ 1,000 ตอนเย็น: ${intText(record.eveningBank1000Count)} ใบ`,'',`ผลลัพธ์: ${resultText(c)}`,'','เพิ่มเงินทอน:'];
+    if(record.cashAdds.length)record.cashAdds.forEach(x=>lines.push(`- ${x.time||'-'} ${x.detail||'เติมเงินทอน'} ${money(x.amount)} บาท`));else lines.push('- ไม่มี');
+    lines.push('','ค่าใช้จ่าย:');
+    if(record.expenses.length)record.expenses.forEach(x=>lines.push(`- ${x.time||'-'} ${x.name||'-'} ${money(x.amount)} บาท${x.note?` — ${x.note}`:''}`));else lines.push('- ไม่มี');
+    if(record.exchangeTransactions.length){lines.push('','แลกเงิน:');record.exchangeTransactions.forEach(x=>lines.push(`- ${x.time||'-'} ${exchangeText(x,'→')} จำนวน ${money(x.amount)} บาท${x.note?` — ${x.note}`:''}`));lines.push(`รวมยอดที่แลก: ${money(exchangeTotal(record))} บาท`);}else lines.push('','แลกเงิน: ไม่มี');
+    lines.push('',`หมายเหตุ: ${record.note||'-'}`,`ผู้บันทึก: ${record.savedBy||userName()}`,`เวลา: ${timeNow(record.updatedAt||Date.now())}`);
+    return lines.join('\n');
+  }
+  function ensurePages(){
+    const phone=document.querySelector('.phone')||document.body;
+    const ensure=(id,html)=>{let p=document.getElementById(id);if(!p){p=document.createElement('section');p.id=id;p.className='page';phone.appendChild(p);}if(p.dataset.cashV749!=='1'){p.innerHTML=html;p.dataset.cashV749='1';}return p;};
+    ensure('cashMenuPage',`<div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ตรวจสอบเงิน</h2><div class="smallTitle">บันทึกและตรวจสอบเงินประจำวัน</div></div></div><div class="cashMenuGridV749"><button class="cashMenuCardV749 blue" onclick="openCashBranch(1)"><span>${icon('branch')}</span><b>โชคอนันต์ สาขา 1</b></button><button class="cashMenuCardV749 green" onclick="openCashBranch(2)"><span>${icon('branch')}</span><b>โชคอนันต์ สาขา 2</b></button><button class="cashMenuCardV749 purple" onclick="go('cashInfoPage')"><span>${icon('info')}</span><b>ข้อมูล</b></button><button class="cashMenuCardV749 orange" onclick="go('cashSalesSummaryPage')"><span>${icon('chart')}</span><b>ยอดขายรวม</b></button></div>`);
+    ensure('cashBranchPage',`<div class="pageHeader cashBranchHeader"><button class="back" onclick="go('cashMenuPage')">‹</button><div><h2 id="cashBranchTitle" style="margin:0">ตรวจสอบเงิน</h2><div id="cashBranchSub" class="smallTitle">กรอกยอดประจำวัน</div></div></div><div id="cashBranchBox"></div>`);
+    ensure('cashInfoPage',`<div class="pageHeader"><button class="back" onclick="go('cashMenuPage')">‹</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ประวัติ รายจ่าย และสรุปขาด/เกิน</div></div></div><div class="cashModeTabs"><button onclick="renderCashInfoSection('history')">ประวัติ</button><button onclick="renderCashInfoSection('monthlyDiff')">ขาด/เกิน รายเดือน</button><button onclick="renderCashInfoSection('expenses')">รายจ่าย</button></div><div id="cashInfoBox"></div>`);
+    ensure('cashSalesMenuPage',`<div class="pageHeader"><button class="back" onclick="go('home')">‹</button><div><h2 style="margin:0">ยอดขาย</h2><div class="smallTitle">บันทึกและดูข้อมูลยอดขายของร้าน</div></div></div><div class="cashMenuGridV749 salesMenuGridV769"><button class="cashMenuCardV749 salesEntryCardV769" onclick="openSalesEntryCurrent()"><span>${icon('cash')}</span><b>ลงข้อมูลยอดขาย</b><small>บันทึกยอดขายรวมและยอดโอนประจำวัน</small></button><button class="cashMenuCardV749 salesReportCardV769" onclick="openSalesHistory()"><span>${icon('chart')}</span><b>ข้อมูลยอดขาย</b><small>ดูยอดขายรายวัน รายเดือน รายปี และข้อมูลรวมสองสาขา</small></button></div>`);
+    ensure('cashSalesEntryPage',`<div class="pageHeader salesOnlyHeader"><button class="back" onclick="go('cashSalesMenuPage')">‹</button><div><h2 id="salesOnlyTitle" style="margin:0">บันทึกยอดขาย</h2><div id="salesOnlySub" class="smallTitle">ยอดขายรวมและยอดโอนประจำวัน</div></div></div><div id="salesOnlyBox"></div>`);
+    ensure('cashSalesSummaryPage',`<div class="pageHeader"><button class="back" onclick="go('cashSalesMenuPage')">‹</button><div><h2 style="margin:0">ข้อมูลยอดขาย</h2><div class="smallTitle">รายวัน รายเดือน รายปี แยกสาขาและรวมสองสาขา</div></div></div><div class="cashModeTabs salesScopeTabs"><button onclick="setSalesScope('current')">สาขาปัจจุบัน</button><button onclick="setSalesScope('1')">สาขา 1</button><button onclick="setSalesScope('2')">สาขา 2</button><button onclick="setSalesScope('all')">รวมสองสาขา</button></div><div class="cashModeTabs cashBigTabs"><button onclick="renderCashSalesSection('daily')">รายวัน</button><button onclick="renderCashSalesSection('monthly')">รายเดือน</button><button onclick="renderCashSalesSection('yearly')">รายปี</button></div><div id="cashSalesSummaryBox"></div>`);
+  }
+  function ensureSummarySalesEntry(){
+    const card=[...document.querySelectorAll('#summaryPage .card')].find(el=>/ข้อมูลอื่น/.test(el.textContent||''))||document.querySelector('#summaryPage .card:last-of-type');
+    if(!card||card.querySelector('.salesDataEntryV768'))return;
+    card.insertAdjacentHTML('afterbegin','<button type="button" class="btn ok salesDataEntryV768" style="width:100%;margin-bottom:10px" onclick="openSalesHistory()">ข้อมูลยอดขาย</button>');
+  }
+  function ensureHomeButton(){
+    document.getElementById('cashCheckHomeButton')?.remove();
+    document.getElementById('cashSalesHomeButton')?.remove();
+    document.querySelectorAll('.cashTileV748,.cashHomeCardV749,.salesHomeCardV768').forEach(x=>x.remove());
+    const grid=document.getElementById('mainGrid');if(!grid)return;
+    const branch=currentDeviceBranch();
+    const theme=branch===2?'green':'blue';
+    const card=document.createElement('button');card.type='button';card.id='cashCheckHomeButton';card.dataset.homeAction='cash-check';card.className=`cashHomeCardV749 cashCheckHomeCardV749 ${theme}`;card.onclick=()=>openCashDeviceCurrent();
+    card.innerHTML=`<span class="cashHomeIconV749">${icon('cash')}</span><span><b>ตรวจสอบเงิน สาขา ${branch}</b><small>เปิดหน้ากรอกข้อมูลของสาขาปัจจุบันทันที</small></span>`;
+    grid.parentNode.insertBefore(card,grid.nextSibling);
+    const sales=document.createElement('button');sales.type='button';sales.id='cashSalesHomeButton';sales.dataset.homeAction='sales-entry';sales.className='cashHomeCardV749 salesHomeCardV768';sales.onclick=()=>openSalesMenu();
+    sales.innerHTML=`<span class="cashHomeIconV749">${icon('chart')}</span><span><b>บันทึกยอดขาย</b><small>บันทึกยอดขายรวมและยอดโอนประจำวัน</small></span>`;
+    grid.parentNode.insertBefore(sales,card);
+  }
+  function renderBranch(record=getRecord(cashBranch,today())){
+    cashSuppressDirty=true;record=normalize(record);cashEditingRecord=record;cashBranch=Number(record.branch)||1;
+    const c=calc(record),branch=branches[cashBranch],box=document.getElementById('cashBranchBox');if(!box)return;
+    document.getElementById('cashBranchTitle').textContent=branch.name;
+    document.getElementById('cashBranchSub').textContent=`${dateText(record.date)} • ${c.status}`;
+    const header=document.querySelector('#cashBranchPage .cashBranchHeader');
+    if(header){
+      header.querySelector('.cashDeviceBadgeV758')?.remove();
+      const badge=document.createElement('span');
+      badge.className=`cashDeviceBadgeV758 ${branch.theme==='green'?'deviceBranchTwo':'deviceBranchOne'}`;
+      badge.textContent=`กำลังบันทึกข้อมูลของสาขา ${cashBranch}`;
+      header.appendChild(badge);
+    }
+    box.innerHTML=`<div class="cashBranchPanelV749 ${branch.theme}">${connectionNotice()}<section class="cashInputCard cashMorningCard"><h3>ข้อมูลตอนเช้า</h3><label>วันที่</label><input class="input" id="cashDateInputV749" type="date" value="${esc(record.date)}" onchange="loadCashDate()"><label>เงินทอนตอนเช้า</label><input class="input cashMoneyInput" id="cashMorningTotalV749" inputmode="decimal" value="${esc(record.morningChange||'')}" placeholder="0"><div class="cashQuickActions"><button type="button" class="btn primary cashActionAdd" onclick="openCashAddPopup()">+ เพิ่มเงินทอน</button><button type="button" class="btn cashActionExpense" onclick="openCashExpensePopup()">+ เพิ่มค่าใช้จ่าย</button><button type="button" class="btn cashActionExchange" onclick="openCashExchangePopup()">${icon('exchange')} แลกเงิน</button></div>${dayListsHtml(record)}</section><section class="cashInputCard cashClosingCard"><h3>ข้อมูลตอนปิดร้าน</h3><p>ยอดขายรวมคือยอดรวมทั้งหมดของวัน ยอดโอนคือส่วนที่ลูกค้าจ่ายโอนและต้องหักออกจากเงินสด</p><label>ยอดขายรวม</label><input class="input cashMoneyInput" id="cashSalesV749" inputmode="decimal" value="${esc(record.sales||'')}" placeholder="0"><label>ยอดโอน</label><input class="input cashMoneyInput" id="cashTransferV749" inputmode="decimal" value="${esc(record.transfer||'')}" placeholder="0"><label>เงินทอนตอนเย็น</label><input class="input cashMoneyInput" id="cashEveningTotalV749" inputmode="decimal" value="${esc(record.eveningChange||'')}" placeholder="0"><label>จำนวนแบงค์ 1,000 ตอนเย็น (จำนวนใบ)</label><input class="input cashIntegerInput" id="cashEveningBank1000V749" inputmode="numeric" value="${esc(zeroAsBlank(record.eveningBank1000Count))}" placeholder="0"><small>กรอกเป็นจำนวนใบ เช่น 5 = 5 ใบ ไม่ใช่ 5,000 บาท ระบบจะไม่คำนวณยอดเงินจากช่องนี้</small><div class="cashValidation" id="cashValidationV749"></div></section><label>หมายเหตุ</label><textarea id="cashNoteV749" placeholder="ไม่บังคับ">${esc(record.note||'')}</textarea>${summaryPanelHtml(record)}<div class="cashActionsV749"><button class="btn gray" onclick="go('cashMenuPage')">ย้อนกลับ</button><button class="btn gray" onclick="editCashDraft()">แก้ไข</button><button class="btn primary" ${actionDisabled()} onclick="saveCashTemporary()">บันทึกชั่วคราว</button><button class="btn ok" ${actionDisabled()} onclick="saveCashRecord()">บันทึกข้อมูล</button><button class="btn gray" onclick="copyCashText()">ส่งออกข้อความ</button><button class="btn ok" onclick="exportCashImage()">ส่งออกภาพ</button><button class="btn danger" ${actionDisabled()} onclick="startNewCashDay()">เริ่มใหม่</button></div></div>`;
+    bindCashInputs();cashDirty=false;cashSuppressDirty=false;
+  }
+  function refreshSummary(){
+    const r=collectBranchForm(),box=document.getElementById('cashResultBox'),warn=document.getElementById('cashValidationV749');
+    if(box)box.outerHTML=summaryPanelHtml(r);
+    if(warn)warn.textContent=num(r.transfer)>num(r.sales)?'ยอดโอนต้องไม่มากกว่ายอดขายรวม':'';
+  }
+  function bindCashInputs(){
+    document.querySelectorAll('#cashBranchBox input,#cashBranchBox textarea').forEach(el=>{
+      el.addEventListener('input',()=>{if(el.classList.contains('cashMoneyInput'))cleanNumericInput(el,false);if(el.classList.contains('cashIntegerInput'))cleanNumericInput(el,true);if(!cashSuppressDirty)cashDirty=true;refreshSummary();});
+      el.addEventListener('blur',()=>{if(el.classList.contains('cashMoneyInput'))formatField(el,false);if(el.classList.contains('cashIntegerInput'))formatField(el,true);refreshSummary();});
+    });
+  }
+
+  window.openCashBranch=function(branch){cashBranch=Number(branch)||1;go('cashBranchPage');renderBranch(getRecord(cashBranch,today()));};
+  window.openCashDeviceCurrent=function(){const branch=Number(window.StockAlertDeviceBranch?.get?.()||1);openCashBranch(branch);};
+  window.retryCashConnection=async function(){
+    if(cashRetrying)return;
+    cashRetrying=true;
+    cashConnectionStartedAt=Date.now();
+    setCashConnection('connecting');
+    clearCashToast();
+    debugCash('manual-retry-start');
+    await startCashSync(true);
+    if(cashConnectionState!=='connected'&&cashLastError){
+      console.warn('[CashReconciliation] retry failed',cashLastError.code||cashLastError.name||'unknown',cashLastError.message||cashLastError);
+    }
+    cashRetrying=false;
+    refreshCashActive();
+  };
+  window.loadCashDate=function(){const date=document.getElementById('cashDateInputV749')?.value||today();if(cashDirty&&!confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากวันนี้ใช่หรือไม่?')){renderBranch(cashEditingRecord);return;}renderBranch(getRecord(cashBranch,date));};
+  window.openCashAddPopup=function(index=-1){
+    const r=collectBranchForm();editingAddIndex=Number(index);const x=editingAddIndex>=0?r.cashAdds[editingAddIndex]:{};
+    const m=ensureModal('cashAddModalV749');
+    m.innerHTML=`<div class="sheet"><h2>${editingAddIndex>=0?'แก้ไขเงินทอน':'เพิ่มเงินทอน'}</h2><p class="muted">เวลา ${esc(x?.time||timeNow())} • ผู้ทำรายการ ${esc(x?.by||userName())}</p><label>จำนวนเงินที่เพิ่ม</label><input class="input cashMoneyInput" id="cashAddAmountV749" inputmode="decimal" value="${esc(x?.amount||'')}" placeholder="0"><label>รายละเอียดหรือหมายเหตุ</label><input class="input" id="cashAddDetailV749" value="${esc(x?.detail||'')}" placeholder="เช่น เติมแบงค์ 20"><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveCashAdd()">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashAddModalV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.saveCashAdd=function(){
+    const amount=num(document.getElementById('cashAddAmountV749')?.value),detail=(document.getElementById('cashAddDetailV749')?.value||'').trim();
+    if(!amount)return toastCash('กรุณากรอกจำนวนเงินที่เพิ่ม');
+    const r=collectBranchForm(),old=editingAddIndex>=0?r.cashAdds[editingAddIndex]:null,row={id:old?.id||`add_${Date.now()}`,amount,detail:detail||'เติมเงินทอน',time:old?.time||timeNow(),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now(),by:old?.by||userName()};
+    if(editingAddIndex>=0)r.cashAdds[editingAddIndex]=row;else r.cashAdds.push(row);
+    cashDirty=true;closeModal('cashAddModalV749');renderBranch(r);
+  };
+  window.openCashAddMenu=function(index){
+    const m=ensureModal('cashAddMenuV749');
+    m.innerHTML=`<div class="sheet"><h2>จัดการเงินทอนที่เพิ่ม</h2><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('cashAddMenuV749');openCashAddPopup(${index})">แก้ไข</button><button class="btn danger" style="width:100%;margin-top:8px" onclick="removeCashAdd(${index})">ลบ</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashAddMenuV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.removeCashAdd=function(index){if(!confirm('ลบรายการเพิ่มเงินทอนนี้ใช่ไหม?'))return;const r=collectBranchForm();r.cashAdds=r.cashAdds.filter((_,i)=>i!==index);cashDirty=true;closeModal('cashAddMenuV749');renderBranch(r);};
+  window.toggleCashExchangeOther=function(){
+    const from=document.getElementById('cashExchangeFromV749')?.value==='อื่น ๆ',to=document.getElementById('cashExchangeToV749')?.value==='อื่น ๆ';
+    const fromBox=document.getElementById('cashExchangeFromOtherWrapV749'),toBox=document.getElementById('cashExchangeToOtherWrapV749');
+    if(fromBox)fromBox.style.display=from?'block':'none';
+    if(toBox)toBox.style.display=to?'block':'none';
+  };
+  window.openCashExchangePopup=function(index=-1){
+    const r=collectBranchForm();editingExchangeIndex=Number(index);const x=editingExchangeIndex>=0?r.exchangeTransactions[editingExchangeIndex]:{};
+    const m=ensureModal('cashExchangeModalV749');
+    m.innerHTML=`<div class="sheet"><h2>${editingExchangeIndex>=0?'แก้ไขแลกเงิน':'แลกเงิน'}</h2><p class="muted">เวลา ${esc(x?.time||timeNow())} • ผู้บันทึก ${esc(x?.createdBy||userName())}</p><label>แลกจาก</label><select class="input" id="cashExchangeFromV749" onchange="toggleCashExchangeOther()">${exchangeOptions(x?.fromType)}</select><div id="cashExchangeFromOtherWrapV749" style="display:none"><label>รายละเอียดแลกจาก</label><input class="input" id="cashExchangeFromOtherV749" value="${esc(x?.fromDetail||'')}" placeholder="ระบุชนิดเงิน"></div><label>แลกเป็น</label><select class="input" id="cashExchangeToV749" onchange="toggleCashExchangeOther()">${exchangeOptions(x?.toType)}</select><div id="cashExchangeToOtherWrapV749" style="display:none"><label>รายละเอียดแลกเป็น</label><input class="input" id="cashExchangeToOtherV749" value="${esc(x?.toDetail||'')}" placeholder="ระบุชนิดเงิน"></div><label>จำนวนเงินที่แลก</label><input class="input cashMoneyInput" id="cashExchangeAmountV749" inputmode="decimal" value="${esc(x?.amount||'')}" placeholder="0"><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="cashExchangeNoteV749" placeholder="เช่น แลกกับธนาคาร หรือ สำหรับเงินทอน">${esc(x?.note||'')}</textarea><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveCashExchange()">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashExchangeModalV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');toggleCashExchangeOther();
+    document.getElementById('cashExchangeAmountV749')?.addEventListener('input',e=>cleanNumericInput(e.target,false));
+    document.getElementById('cashExchangeAmountV749')?.addEventListener('blur',e=>formatField(e.target,false));
+  };
+  window.saveCashExchange=function(){
+    const fromType=(document.getElementById('cashExchangeFromV749')?.value||'').trim(),toType=(document.getElementById('cashExchangeToV749')?.value||'').trim(),fromDetail=(document.getElementById('cashExchangeFromOtherV749')?.value||'').trim(),toDetail=(document.getElementById('cashExchangeToOtherV749')?.value||'').trim(),amount=num(document.getElementById('cashExchangeAmountV749')?.value),note=(document.getElementById('cashExchangeNoteV749')?.value||'').trim();
+    if(!fromType||!toType||!amount)return toastCash('กรุณากรอกข้อมูลแลกเงินให้ครบ');
+    if(fromType==='อื่น ๆ'&&!fromDetail)return toastCash('กรุณาระบุรายละเอียดแลกจาก');
+    if(toType==='อื่น ๆ'&&!toDetail)return toastCash('กรุณาระบุรายละเอียดแลกเป็น');
+    const r=collectBranchForm(),old=editingExchangeIndex>=0?r.exchangeTransactions[editingExchangeIndex]:null,row={id:old?.id||`ex_${r.branch}_${r.date}_${Date.now()}`,fromType,toType,fromDetail,toDetail,amount,note,time:old?.time||timeNow(),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now(),createdBy:old?.createdBy||userName(),branchId:String(r.branch),date:r.date};
+    if(editingExchangeIndex>=0)r.exchangeTransactions[editingExchangeIndex]=row;else if(!r.exchangeTransactions.some(x=>String(x.id)===String(row.id)))r.exchangeTransactions.push(row);
+    cashDirty=true;closeModal('cashExchangeModalV749');renderBranch(r);
+  };
+  window.openCashExchangeMenu=function(index){
+    const m=ensureModal('cashExchangeMenuV749');
+    m.innerHTML=`<div class="sheet"><h2>จัดการรายการแลกเงิน</h2><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('cashExchangeMenuV749');openCashExchangePopup(${index})">แก้ไข</button><button class="btn danger" style="width:100%;margin-top:8px" onclick="deleteCashExchange(${index})">ลบ</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashExchangeMenuV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.deleteCashExchange=function(index){if(!confirm('ลบรายการแลกเงินนี้ใช่ไหม?'))return;const r=collectBranchForm();r.exchangeTransactions=r.exchangeTransactions.filter((_,i)=>i!==index);cashDirty=true;closeModal('cashExchangeMenuV749');renderBranch(r);};
+  window.openCashExpensePopup=function(index=-1){
+    const r=collectBranchForm();editingExpenseIndex=Number(index);const x=editingExpenseIndex>=0?r.expenses[editingExpenseIndex]:{};
+    const m=ensureModal('cashExpenseModalV749');
+    m.innerHTML=`<div class="sheet"><h2>${editingExpenseIndex>=0?'แก้ไขค่าใช้จ่าย':'เพิ่มค่าใช้จ่าย'}</h2><p class="muted">เวลา ${esc(x?.time||timeNow())} • ผู้ทำรายการ ${esc(x?.by||userName())}</p><label>ชื่อรายการ</label><input class="input" id="cashExpenseNameV749" value="${esc(x?.name||'')}" placeholder="เช่น ซื้อไม้กวาด"><label>จำนวนเงิน</label><input class="input cashMoneyInput" id="cashExpenseAmountV749" inputmode="decimal" value="${esc(x?.amount||'')}" placeholder="0"><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="cashExpenseNoteV749" placeholder="ไม่บังคับ">${esc(x?.note||'')}</textarea><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveCashExpense()">บันทึก</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashExpenseModalV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.saveCashExpense=function(){
+    const name=(document.getElementById('cashExpenseNameV749')?.value||'').trim(),amount=num(document.getElementById('cashExpenseAmountV749')?.value),note=(document.getElementById('cashExpenseNoteV749')?.value||'').trim();
+    if(!name||!amount)return toastCash('กรุณากรอกชื่อรายการและจำนวนเงิน');
+    const r=collectBranchForm(),old=editingExpenseIndex>=0?r.expenses[editingExpenseIndex]:null,row={id:old?.id||`exp_${Date.now()}`,name,amount,note,time:old?.time||timeNow(),createdAt:old?.createdAt||Date.now(),updatedAt:Date.now(),by:old?.by||userName()};
+    if(editingExpenseIndex>=0)r.expenses[editingExpenseIndex]=row;else r.expenses.push(row);
+    cashDirty=true;closeModal('cashExpenseModalV749');renderBranch(r);
+  };
+  window.openCashExpenseMenu=function(index){
+    const m=ensureModal('cashExpenseMenuV749');
+    m.innerHTML=`<div class="sheet"><h2>จัดการค่าใช้จ่าย</h2><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('cashExpenseMenuV749');openCashExpensePopup(${index})">แก้ไข</button><button class="btn danger" style="width:100%;margin-top:8px" onclick="deleteCashExpense(${index})">ลบ</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashExpenseMenuV749')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.deleteCashExpense=function(index){if(!confirm('ลบค่าใช้จ่ายรายการนี้ใช่ไหม?'))return;const r=collectBranchForm();r.expenses=r.expenses.filter((_,i)=>i!==index);cashDirty=true;closeModal('cashExpenseMenuV749');renderBranch(r);};
+  window.editCashDraft=function(){document.getElementById('cashSalesV749')?.focus();toastCash('แก้ไขข้อมูลได้แล้ว');};
+  window.saveCashTemporary=async function(){if(cashSaving)return;const r=collectBranchForm();if(!validate(r))return;if(!ready())return toastCash('กำลังเชื่อมต่อข้อมูล...');cashSaving=true;try{setDraftLocal(r);await cloudSet(r,'draft');cashDirty=false;toastCash('บันทึกชั่วคราวแล้ว');renderBranch(r);}catch(e){console.warn(e);toastCash('บันทึกไม่สำเร็จ กรุณาลองใหม่');}finally{cashSaving=false;refreshCashActive();}};
+  window.saveCashRecord=async function(){if(cashSaving)return null;const r=collectBranchForm();if(!validate(r))return null;if(!ready())return toastCash('กำลังเชื่อมต่อข้อมูล...');const old=getRecord(r.branch,r.date);if(String(old.source)==='sales-only'&&hasSalesData(old)&&!confirm('วันนี้มีข้อมูลยอดขายที่บันทึกไว้แล้ว ระบบจะอัปเดตยอดขายด้วยข้อมูลจากหน้าตรวจสอบเงิน'))return null;cashSaving=true;try{const source=String(old.source)==='sales-only'?'cash-check-updated':'cash-check',c=calc(r),diff=c.diff;const saved=upsertLocal({...r,type:'record',source,hasCashCheck:true,dateKey:r.date,branchId:String(r.branch),salesRecordId:docId('record',r.branch,r.date),reconciliationId:docId('record',r.branch,r.date),salesTotal:c.sales,transferTotal:c.transfer,cashSalesTotal:c.cashSales,openingCash:c.morning,addedCashTotal:c.addTotal,expenseTotal:c.expenseTotal,expectedCash:c.expected,actualCash:c.evening,difference:diff,shortageAmount:diff<0?Math.abs(diff):0,excessAmount:diff>0?diff:0,status:Math.abs(diff)<0.005?'balanced':diff>0?'excess':'shortage',savedAt:Date.now(),savedBy:userName(),updatedBy:userName(),salesActivityLog:salesLog({...r,source},'cash-check-save',source)});await cloudSet(saved,'record');clearDraftLocal(saved.branch,saved.date);await cloudDelete('draft',saved.branch,saved.date).catch(()=>{});cashDirty=false;toastCash('บันทึกข้อมูลแล้ว');renderBranch(saved);return saved;}catch(e){console.warn(e);toastCash('บันทึกไม่สำเร็จ กรุณาลองใหม่');return null;}finally{cashSaving=false;refreshCashActive();}};
+  window.startNewCashDay=function(){const r=collectBranchForm();if(!validate(r))return;const m=ensureModal('cashStartNewModalV749');m.innerHTML=`<div class="sheet"><h2>เริ่มใหม่</h2><p class="muted">ต้องการบันทึกข้อมูลวันนี้และเริ่มข้อมูลใหม่ใช่หรือไม่?</p><button class="btn danger" style="width:100%;margin-top:12px" onclick="confirmStartNewCashDay()">ยืนยันเริ่มใหม่</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashStartNewModalV749')">ยกเลิก</button></div>`;m.classList.add('show');};
+  window.confirmStartNewCashDay=async function(){const saved=await saveCashRecord();if(!saved)return;clearDraftLocal(saved.branch,saved.date);await cloudDelete('draft',saved.branch,saved.date).catch(()=>{});cashEditingRecord=emptyRecord(saved.branch,today());cashDirty=false;closeModal('cashStartNewModalV749');renderBranch(cashEditingRecord);toastCash('พร้อมเริ่มวันใหม่แล้ว');};
+  window.copyCashText=async function(){const r=collectBranchForm();if(!validate(r))return;const text=textReport(r);try{if(navigator.clipboard&&(window.isSecureContext||location.protocol==='https:'))await navigator.clipboard.writeText(text);else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');ta.remove();}toastCash('คัดลอกข้อความแล้ว');}catch(e){alert(text);}};
+  window.exportCashImage=async function(){const r=collectBranchForm();if(!validate(r))return;refreshSummary();const el=document.getElementById('cashExportCard');if(!el||typeof html2canvas!=='function')return toastCash('ส่งออกภาพไม่ได้');const canvas=await html2canvas(el,{backgroundColor:'#ffffff',scale:Math.max(2,window.devicePixelRatio||1),useCORS:true,logging:false});canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],`cash-${r.branch}-${r.date}.png`,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'ตรวจสอบเงิน',text:`${branches[r.branch].name} ${dateText(r.date)}`});return;}catch(e){}}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),800);toastCash('สร้างภาพแล้ว');},'image/png');};
+
+  function salesExportCardHtml(record){
+    record=normalize(record);const c=calc(record);
+    return `<div class="salesExportCardV771" id="salesExportCardV771"><header><h2>ร้านโชคอนันต์ ฮาร์ดแวร์</h2><p>${esc(branches[record.branch]?.name||'โชคอนันต์')}</p><p>วันที่ ${dateText(record.date)}</p></header><section><div><span>ยอดขายรวม</span><b>${money(c.sales)} บาท</b></div><div><span>ยอดโอน</span><b>${money(c.transfer)} บาท</b></div><div><span>ยอดเงินสด</span><b>${money(c.cashSales)} บาท</b></div><div><span>จำนวนแถว</span><b>${rowCountText(record)}</b></div></section><footer>หมายเหตุ: ${esc(record.note||'-')}</footer></div>`;
+  }
+  async function shareCanvasImage(canvas,fileName,title,text){
+    return new Promise(resolve=>canvas.toBlob(async blob=>{
+      if(!blob){toastCash('สร้างรูปภาพไม่สำเร็จ');resolve(false);return;}
+      const file=new File([blob],fileName,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title,text});resolve(true);return;}catch(e){}
+      }
+      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),800);toastCash('สร้างรูปภาพแล้ว');resolve(true);
+    },'image/png'));
+  }
+  window.exportSalesOnlyImage=async function(){
+    const r=collectSalesForm();if(!validateSalesOnly(r))return;
+    if(typeof html2canvas!=='function')return toastCash('ส่งออกภาพไม่ได้');
+    const host=document.createElement('div');host.className='salesExportHostV771';host.innerHTML=salesExportCardHtml(r);document.body.appendChild(host);
+    try{
+      const el=host.querySelector('#salesExportCardV771');
+      const canvas=await html2canvas(el,{backgroundColor:'#fff8c7',scale:Math.max(2,window.devicePixelRatio||1),useCORS:true,logging:false});
+      await shareCanvasImage(canvas,`sales-${r.branch}-${r.date}.png`,'ยอดขาย',`${branches[r.branch]?.name||'โชคอนันต์'} ${dateText(r.date)}`);
+    }catch(e){console.warn(e);toastCash('สร้างรูปภาพไม่สำเร็จ');}
+    finally{host.remove();}
+  };
+
+  function salesRecord(branch=salesBranch,date=today()){return getRecord(branch,date);}
+  function emptySalesRecord(branch=salesBranch,date=today()){return normalize({...emptyRecord(branch,date),source:'sales-only'});}
+  function salesCashValue(record){const c=calc(record);return c.sales-c.transfer;}
+  function collectSalesForm(){
+    const date=document.getElementById('salesOnlyDateV768')?.value||today();
+    const base=salesEditingOriginal&&Number(salesEditingOriginal.branch)===Number(salesBranch)&&salesEditingOriginal.date===date?salesEditingOriginal:salesRecord(salesBranch,date);
+    return normalize({...base,type:'record',branch:salesBranch,date,sales:document.getElementById('salesOnlyTotalV768')?.value||'',transfer:document.getElementById('salesOnlyTransferV768')?.value||'',rowCount:rowCountFromInput('salesOnlyRowCountV771'),note:(document.getElementById('salesOnlyNoteV768')?.value||'').trim(),updatedAt:Date.now(),updatedBy:userName(),savedBy:base.savedBy||userName()});
+  }
+  function validateSalesOnly(record){
+    if(!record.date)return toastCash('กรุณาเลือกวันที่'),false;
+    if(!record.branch)return toastCash('ไม่พบสาขาปัจจุบัน'),false;
+    const sales=num(record.sales),transfer=num(record.transfer);
+    if(transfer>sales)return toastCash('ยอดโอนไม่สามารถมากกว่ายอดขายรวมได้'),false;
+    return true;
+  }
+  function renderSalesEntry(record=salesRecord(salesBranch,today()),options={}){
+    record=normalize(record);salesBranch=Number(record.branch)||currentDeviceBranch();salesOpenedUpdatedAt=Number(record.updatedAt||0);salesEditingOriginal=record;
+    const branch=branches[salesBranch],box=document.getElementById('salesOnlyBox');if(!box)return;
+    document.getElementById('salesOnlyTitle').textContent=`บันทึกยอดขาย — ${branch.name}`;
+    document.getElementById('salesOnlySub').textContent=`${dateText(record.date)} • ${options.isNew?'รายการใหม่':salesSourceLabel(record)}`;
+    const header=document.querySelector('#cashSalesEntryPage .salesOnlyHeader');
+    if(header){header.classList.remove('deviceBranchOne','deviceBranchTwo');header.classList.add(salesBranch===2?'deviceBranchTwo':'deviceBranchOne');}
+    const notice=options.isNew?'':hasCashCheck(record)?'<div class="cashSync wait">วันนี้มีข้อมูลยอดขายจากการตรวจสอบเงินแล้ว</div>':hasSalesData(record)?'<div class="cashSync ok">วันนี้มีข้อมูลยอดขายที่บันทึกไว้แล้ว</div>':'';
+    box.innerHTML=`<div class="salesOnlyPanelV768 ${branch.theme}">${connectionNotice()}${notice}<section class="cashInputCard"><label>วันที่</label><input class="input" id="salesOnlyDateV768" type="date" value="${esc(record.date)}" autocomplete="off" onchange="loadSalesOnlyDate()"><label>ยอดขายรวม</label><small>ยอดขายทั้งหมดของวัน รวมทั้งเงินสดและยอดโอน</small><input class="input cashMoneyInput" id="salesOnlyTotalV768" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" name="sales-total-v771-${Date.now()}" value="${esc(record.sales||'')}" placeholder="0"><label>ยอดโอน</label><small>ส่วนหนึ่งของยอดขายรวมที่ลูกค้าชำระด้วยการโอน</small><input class="input cashMoneyInput" id="salesOnlyTransferV768" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false" name="sales-transfer-v771-${Date.now()}" value="${esc(record.transfer||'')}" placeholder="0"><label>จำนวนแถว</label><small>จำนวนแถวที่จดยอดขายในสมุดของวันนี้</small><input class="input" id="salesOnlyRowCountV771" type="text" inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="100" name="sales-row-count-v772-${Date.now()}" value="${esc(rowCountInputValue(record))}" placeholder="ระบุจำนวนแถว"><div class="cashFormula salesOnlyCalcV768"><div><span>ยอดเงินสด</span><b id="salesOnlyCashV768">${money(salesCashValue(record))} บาท</b></div></div><label>หมายเหตุ <span class="supplierUnknown">(ไม่บังคับ)</span></label><textarea id="salesOnlyNoteV768" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="ไม่บังคับ">${esc(record.note||'')}</textarea></section><div class="cashActionsV749 salesOnlyActionsV768"><button class="btn ok" id="salesOnlySaveBtnV768" ${salesSaving?'disabled':''} onclick="saveSalesOnlyRecord()">บันทึกยอดขาย</button><button class="btn primary" onclick="exportSalesOnlyImage()">ส่งออกเป็นรูปภาพ</button><button class="btn gray" onclick="go('cashSalesMenuPage')">ย้อนกลับ</button></div></div>`;
+    bindSalesOnlyInputs();
+  }
+  function refreshSalesOnlyCalc(){const r=collectSalesForm(),el=document.getElementById('salesOnlyCashV768');if(el)el.textContent=`${money(salesCashValue(r))} บาท`;}
+  function bindSalesOnlyInputs(){
+    document.querySelectorAll('#salesOnlyBox input,#salesOnlyBox textarea').forEach(el=>{
+      el.addEventListener('input',()=>{if(el.classList.contains('cashMoneyInput'))cleanNumericInput(el,false);if(el.classList.contains('cashIntegerInput'))cleanNumericInput(el,true);refreshSalesOnlyCalc();});
+      el.addEventListener('blur',()=>{if(el.classList.contains('cashMoneyInput'))formatField(el,false);if(el.classList.contains('cashIntegerInput'))formatField(el,true);refreshSalesOnlyCalc();});
+    });
+  }
+  async function cloudMergeSales(record,force=false){
+    if(!firebaseDbReady())throw new Error('firebase-not-ready');
+    const ref=db.collection(CASH_COLL).doc(docId('record',record.branch,record.date));
+    const updateSource=hasCashCheck(record)?'sales-only-updated-cash-check':'sales-only';
+    const payload={...record,type:'record',branch:Number(record.branch),branchId:String(record.branch),date:record.date,dateKey:record.date,sales:num(record.sales),transfer:num(record.transfer),salesTotal:num(record.sales),transferTotal:num(record.transfer),cashSalesTotal:num(record.sales)-num(record.transfer),rowCount:normalizeRowCount(record),source:updateSource,updatedAt:Date.now(),updatedBy:userName(),salesActivityLog:salesLog({...record,source:updateSource},'sales-only-save',updateSource)};
+    if(db.runTransaction&&navigator.onLine!==false){
+      return db.runTransaction(async tx=>{
+        const snap=await tx.get(ref),server=snap.exists?normalize({id:snap.id,...snap.data()}):null;
+        if(server&&!force&&salesOpenedUpdatedAt&&Number(server.updatedAt||0)>salesOpenedUpdatedAt&&String(server.sales)!==String(salesEditingOriginal?.sales||'')&&String(server.transfer)!==String(salesEditingOriginal?.transfer||''))throw new Error('SALES_CONFLICT');
+        tx.set(ref,{...server,...payload,createdAt:server?.createdAt||payload.createdAt||Date.now(),createdBy:server?.createdBy||payload.createdBy||userName(),hasCashCheck:hasCashCheck(server||payload),cashCheckRecordId:hasCashCheck(server||payload)?docId('record',record.branch,record.date):(server?.cashCheckRecordId||'')},{merge:true});
+        return normalize({...server,...payload});
+      });
+    }
+    await ref.set({...payload,hasCashCheck:hasCashCheck(record),cashCheckRecordId:hasCashCheck(record)?docId('record',record.branch,record.date):''},{merge:true});
+    return normalize(payload);
+  }
+  window.openSalesMenu=function(){salesBranch=currentDeviceBranch();go('cashSalesMenuPage');};
+  window.openSalesEntryCurrent=function(){salesBranch=currentDeviceBranch();go('cashSalesEntryPage');renderSalesEntry(emptySalesRecord(salesBranch,today()),{isNew:true});};
+  window.loadSalesOnlyDate=function(){const date=document.getElementById('salesOnlyDateV768')?.value||today();renderSalesEntry(emptySalesRecord(salesBranch,date),{isNew:true});};
+  window.saveSalesOnlyRecord=async function(force=false){
+    if(salesSaving)return;
+    const r=collectSalesForm();if(!validateSalesOnly(r))return;
+    if(hasCashCheck(r)&&!force&&!confirm('ข้อมูลวันนี้มาจากการตรวจสอบเงิน การแก้ยอดขายที่นี่จะอัปเดตยอดขายและยอดโอน แต่จะไม่ลบรายละเอียดการตรวจสอบเงิน'))return;
+    salesSaving=true;const btn=document.getElementById('salesOnlySaveBtnV768');if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
+    try{
+      const saved=await cloudMergeSales(r,force);
+      upsertLocal(saved);toastCash('บันทึกยอดขายเรียบร้อยแล้ว');renderSalesEntry(emptySalesRecord(saved.branch,saved.date),{isNew:true});refreshCashActive();
+    }catch(e){
+      if(e.message==='SALES_CONFLICT'&&confirm('ข้อมูลยอดขายวันนี้ถูกแก้ไขจากอีกเครื่อง กรุณาตรวจสอบข้อมูลล่าสุดก่อนบันทึก\n\nกด OK เพื่อโหลดข้อมูลล่าสุด หรือ Cancel เพื่อบันทึกทับหลังยืนยันอีกครั้ง')){renderSalesEntry(salesRecord(r.branch,r.date));}
+      else if(e.message==='SALES_CONFLICT'&&confirm('ต้องการบันทึกทับข้อมูลล่าสุดใช่ไหม?')){salesSaving=false;await saveSalesOnlyRecord(true);}
+      else{console.warn(e);toastCash('บันทึกไม่สำเร็จ กรุณาลองใหม่');}
+    }finally{salesSaving=false;if(btn){btn.disabled=false;btn.textContent='บันทึกยอดขาย';}}
+  };
+
+  function groupBy(list,fn){return list.reduce((map,row)=>{const k=fn(row);(map[k]=map[k]||[]).push(row);return map;},{});}
+  function total(list){return list.reduce((a,r)=>{const c=calc(r),checked=hasCashCheck(r),key=`${r.branch}_${r.date}`,rowNumber=rowCountNumber(r);a.sales+=c.sales;a.transfer+=c.transfer;a.cash+=c.sales-c.transfer;a.days.add(key);if(hasRowCount(r))a.rowTextDays.add(key);if(rowNumber!==null){a.rowCount+=rowNumber;a.rowDays.add(key);}if(checked){a.checkDays.add(key);a.expenses+=c.expenseTotal;a.added+=c.addTotal;a.expected+=c.expected;a.evening+=c.evening;if(c.diff>0){a.over+=c.diff;a.overDays.add(key);}else if(c.diff<0){a.short+=Math.abs(c.diff);a.shortDays.add(key);}else a.okDays.add(key);}return a;},{sales:0,transfer:0,cash:0,rowCount:0,expenses:0,added:0,expected:0,evening:0,over:0,short:0,days:new Set(),rowDays:new Set(),rowTextDays:new Set(),checkDays:new Set(),shortDays:new Set(),overDays:new Set(),okDays:new Set()});}
+  function netTone(net){return Math.abs(net)<0.005?'ok':net>0?'over':'short';}
+  function netText(net){return Math.abs(net)<0.005?'สุทธิพอดี':`${net>0?'เกินสุทธิ':'ขาดสุทธิ'} ${money(Math.abs(net))} บาท`;}
+  function cashStatusText(c){return Math.abs(c.diff)<0.005?'พอดี':c.diff>0?'เกิน':'ขาด';}
+  function cashResultText(c){return Math.abs(c.diff)<0.005?'พอดี':`${c.diff>0?'เกิน':'ขาด'} ${money(Math.abs(c.diff))} บาท`;}
+  function reconciliationSummaryHtml(list,mode='summary'){
+    const t=total(list),checks=t.checkDays.size,shortDays=t.shortDays.size,overDays=t.overDays.size,okDays=t.okDays.size,net=t.over-t.short;
+    const avgShort=shortDays?t.short/shortDays:0,avgOver=overDays?t.over/overDays:0,avgDiff=checks?net/checks:0;
+    const title=mode==='daily'?'ผลการตรวจสอบเงิน':'สรุปผลการตรวจสอบเงิน';
+    if(mode==='daily'&&!checks)return `<section class="cashInputCard salesReconcileCardV770"><h3>${title}</h3><div class="empty compact">วันนี้ไม่มีการตรวจสอบเงิน</div></section>`;
+    if(!checks)return `<section class="cashInputCard salesReconcileCardV770"><h3>${title}</h3><div class="empty compact">ยังไม่มีข้อมูลตรวจสอบเงินจริงในช่วงนี้</div></section>`;
+    return `<section class="cashInputCard salesReconcileCardV770"><h3>${title}</h3><div class="salesMetaGridV769 reconcileGridV770"><div><span>วันที่มีการตรวจสอบเงินจริง</span><b>${checks} วัน</b></div><div><span>วันที่ขาด</span><b>${shortDays} วัน</b></div><div><span>วันที่เกิน</span><b>${overDays} วัน</b></div><div><span>วันที่พอดี</span><b>${okDays} วัน</b></div><div><span>ยอดขาดรวม</span><b class="shortTextV770">${money(t.short)} บาท</b></div><div><span>ยอดเกินรวม</span><b class="overTextV770">${money(t.over)} บาท</b></div><div><span>ผลต่างสุทธิ</span><b class="${netTone(net)}TextV770">${netText(net)}</b></div><div><span>ค่าเฉลี่ยยอดขาด</span><b>${money(avgShort)} บาท</b></div><div><span>ค่าเฉลี่ยยอดเกิน</span><b>${money(avgOver)} บาท</b></div><div><span>ค่าเฉลี่ยผลต่างต่อวันที่ตรวจสอบ</span><b class="${netTone(avgDiff)}TextV770">${money(Math.abs(avgDiff))} บาท</b></div><div><span>ค่าใช้จ่ายรวม</span><b>${money(t.expenses)} บาท</b></div><div><span>เงินเพิ่มระหว่างวันรวม</span><b>${money(t.added)} บาท</b></div></div></section>`;
+  }
+  function reconciliationDetailHtml(list){
+    const checked=list.filter(hasCashCheck);
+    if(!checked.length)return reconciliationSummaryHtml(list,'daily');
+    return `<section class="cashInputCard salesReconcileCardV770"><h3>ผลการตรวจสอบเงิน</h3>${checked.map(r=>{const c=calc(r),tone=netTone(c.diff);return `<div class="cashFormula salesReconDetailV770"><div><span>สาขา</span><b>${esc(branches[r.branch]?.name||r.branch)}</b></div><div><span>ยอดขายรวม</span><b>${money(c.sales)} บาท</b></div><div><span>ยอดโอน</span><b>${money(c.transfer)} บาท</b></div><div><span>ยอดเงินสด</span><b>${money(c.cashSales)} บาท</b></div><div><span>เงินตั้งต้นตอนเช้า</span><b>${money(c.morning)} บาท</b></div><div><span>เงินเพิ่มระหว่างวัน</span><b>${money(c.addTotal)} บาท</b></div><div><span>ค่าใช้จ่ายรวม</span><b>${money(c.expenseTotal)} บาท</b></div><hr><div><span>เงินที่ควรมี</span><b>${money(c.expected)} บาท</b></div><div><span>เงินที่นับได้จริง</span><b>${money(c.evening)} บาท</b></div><div class="result ${tone}"><span>ผลต่าง</span><b>${cashResultText(c)}</b></div><div><span>ยอดขาด</span><b class="shortTextV770">${money(c.diff<0?Math.abs(c.diff):0)} บาท</b></div><div><span>ยอดเกิน</span><b class="overTextV770">${money(c.diff>0?c.diff:0)} บาท</b></div><div><span>สถานะ</span><b class="${tone}TextV770">${cashStatusText(c)}</b></div><hr><div><span>ผู้ตรวจสอบ</span><b>${esc(r.updatedBy||r.savedBy||'-')}</b></div><div><span>แก้ไขล่าสุด</span><b>${timeNow(r.updatedAt||r.savedAt||r.createdAt)}</b></div></div>`;}).join('')}</section>`;
+  }
+  function salesRows(){return rows().filter(hasSalesData).sort((a,b)=>String(b.date).localeCompare(String(a.date))||Number(b.updatedAt||0)-Number(a.updatedAt||0));}
+  function branchRowsForScope(list){
+    const scope=salesScope==='current'?String(currentDeviceBranch()):salesScope;
+    if(scope==='1'||scope==='2')return list.filter(r=>String(r.branch)===scope);
+    return list;
+  }
+  function scopeTitle(){const scope=salesScope==='current'?String(currentDeviceBranch()):salesScope;return scope==='1'?'สาขา 1':scope==='2'?'สาขา 2':'รวมสองสาขา';}
+  function salesDashboardHtml(list){
+    const t=total(list),has=t.days.size>0,value=v=>has?`${money(v)} บาท`:'ยังไม่มีข้อมูล';
+    return `<div class="salesDashboardV769"><section class="salesDashCardV769 total"><span>ยอดขายรวม</span><b>${value(t.sales)}</b></section><section class="salesDashCardV769 transfer"><span>ยอดโอน</span><b>${value(t.transfer)}</b></section><section class="salesDashCardV769 cash"><span>ยอดเงินสด</span><b>${value(t.cash)}</b></section></div>`;
+  }
+  function salesBranchBreakdownHtml(list){
+    const scope=salesScope==='current'?String(currentDeviceBranch()):salesScope;
+    if(scope!=='all')return '';
+    const b1=total(list.filter(r=>r.branch===1)),b2=total(list.filter(r=>r.branch===2)),all=total(list);
+    const row=(title,t)=>{const net=t.over-t.short,rowAvg=t.rowDays.size?t.rowCount/t.rowDays.size:0;return `<div class="salesBreakRowV769"><b>${title}</b><span>ยอดขายรวม ${t.days.size?money(t.sales)+' บาท':'ยังไม่มีข้อมูล'}</span><span>ยอดโอน ${t.days.size?money(t.transfer)+' บาท':'ยังไม่มีข้อมูล'}</span><span>ยอดเงินสด ${t.days.size?money(t.cash)+' บาท':'ยังไม่มีข้อมูล'}</span><span>จำนวนแถวรวม ${intText(t.rowCount)} แถว • วันที่มีข้อมูล ${t.rowDays.size} วัน • เฉลี่ย ${money(rowAvg)} แถว/วัน</span><span>ตรวจสอบเงินจริง ${t.checkDays.size} วัน • ขาด ${money(t.short)} บาท • เกิน ${money(t.over)} บาท • ${netText(net)}</span></div>`;};
+    return `<section class="salesBreakdownV769"><h3>รายละเอียดแยกสาขา</h3>${row('สาขา 1',b1)}${row('สาขา 2',b2)}${row('รวม',all)}</section>`;
+  }
+  function salesSummaryMetaHtml(list,mode){
+    const t=total(list),dayCount=t.days.size,avgDay=dayCount?t.sales/dayCount:0;
+    const rowAvg=t.rowDays.size?t.rowCount/t.rowDays.size:0;
+    if(mode==='yearly'){
+      const months=new Set(list.map(r=>monthKey(r.date))).size,avgMonth=months?t.sales/months:0;
+      return `<div class="salesMetaGridV769"><div><span>จำนวนวันที่มีข้อมูลยอดขาย</span><b>${dayCount} วัน</b></div><div><span>จำนวนวันที่มีการตรวจสอบเงินจริง</span><b>${t.checkDays.size} วัน</b></div><div><span>จำนวนแถวรวมทั้งปี</span><b>${intText(t.rowCount)} แถว</b></div><div><span>วันที่มีข้อมูลจำนวนแถว</span><b>${t.rowDays.size} วัน</b></div><div><span>เฉลี่ยจำนวนแถวต่อวัน</span><b>${money(rowAvg)} แถว</b></div><div><span>ค่าเฉลี่ยต่อเดือน</span><b>${money(avgMonth)} บาท</b></div><div><span>ค่าเฉลี่ยต่อวันที่มีข้อมูลยอดขาย</span><b>${money(avgDay)} บาท</b></div><div><span>หมายเหตุจำนวนแถว</span><b>ยอดรวมคำนวณเฉพาะรายการที่กรอกเป็นตัวเลขล้วน</b></div></div>`;
+    }
+    if(mode==='monthly')return `<div class="salesMetaGridV769"><div><span>จำนวนวันที่มีข้อมูลยอดขาย</span><b>${dayCount} วัน</b></div><div><span>จำนวนวันที่มีการตรวจสอบเงินจริง</span><b>${t.checkDays.size} วัน</b></div><div><span>จำนวนแถวรวมทั้งเดือน</span><b>${intText(t.rowCount)} แถว</b></div><div><span>วันที่มีข้อมูลจำนวนแถว</span><b>${t.rowDays.size} วัน</b></div><div><span>เฉลี่ยจำนวนแถวต่อวัน</span><b>${money(rowAvg)} แถว</b></div><div><span>ค่าเฉลี่ยต่อวันที่มีข้อมูลยอดขาย</span><b>${money(avgDay)} บาท</b></div><div><span>หมายเหตุจำนวนแถว</span><b>ยอดรวมคำนวณเฉพาะรายการที่กรอกเป็นตัวเลขล้วน</b></div></div>`;
+    return '';
+  }
+  function salesDailyHtml(list){
+    if(!list.length)return '<div class="empty">ยังไม่มีข้อมูลยอดขาย</div>';
+    return `<div class="salesDailyListV769">${list.map(r=>{const c=calc(r);return `<div class="cashHistoryRow salesHistoryRowV768 salesDayCardV769"><button onclick="openSalesDetail(${r.branch},'${esc(r.date)}')"><b>${dateText(r.date)} • ${esc(branches[r.branch]?.name||'')}</b><span class="salesAmountsV769"><strong>ยอดขายรวม ${money(c.sales)} บาท</strong><strong>ยอดโอน ${money(c.transfer)} บาท</strong><strong>ยอดเงินสด ${money(c.cashSales)} บาท</strong><strong>จำนวนแถว ${rowCountText(r)}</strong></span><span>ที่มา: ${salesSourceLabel(r)} • ผู้บันทึก ${esc(r.updatedBy||r.savedBy||'-')} • แก้ไขล่าสุด ${timeNow(r.updatedAt||r.savedAt||r.createdAt)}</span>${Number(c.sales)===0&&String(r.sales).trim()!==''?'<span class="salesZeroTagV768">บันทึกยอดขายเป็น 0 จริง</span>':''}</button><button class="cashMoreBtn" onclick="openSalesHistoryMenu(${r.branch},'${esc(r.date)}')">⋮</button></div>`;}).join('')}</div>`;
+  }
+  function salesMonthlyHtml(list){
+    const m=document.getElementById('cashMonthFilter')?.value||salesMonthFilter||today().slice(0,7);salesMonthFilter=m;
+    const monthRows=list.filter(r=>monthKey(r.date)===m),grouped=groupBy(monthRows,r=>r.date);
+    return `<input class="input salesPeriodInputV769" type="month" id="cashMonthFilter" value="${m}" onchange="setSalesMonthFilter(this.value)">${salesDashboardHtml(monthRows)}${salesSummaryMetaHtml(monthRows,'monthly')}${reconciliationSummaryHtml(monthRows,'monthly')}${salesBranchBreakdownHtml(monthRows)}<button class="btn gray" style="width:100%;margin:10px 0" onclick="copySalesMonthSummary()">คัดลอกสรุปรายเดือน</button>${Object.keys(grouped).sort().reverse().map(k=>`<div class="card salesGroupCardV769"><h3 style="margin:0 0 8px">${dateText(k)}</h3>${salesDailyHtml(grouped[k])}</div>`).join('')||'<div class="empty">เดือนนี้ยังไม่มีข้อมูล</div>'}`;
+  }
+  function salesYearlyHtml(list){
+    const y=document.getElementById('cashYearFilter')?.value||salesYearFilter||today().slice(0,4);salesYearFilter=y;
+    const yearRows=list.filter(r=>yearKey(r.date)===y),grouped=groupBy(yearRows,r=>monthKey(r.date));
+    return `<input class="input salesPeriodInputV769" type="number" id="cashYearFilter" value="${y}" min="2000" max="2100" onchange="setSalesYearFilter(this.value)">${salesDashboardHtml(yearRows)}${salesSummaryMetaHtml(yearRows,'yearly')}${reconciliationSummaryHtml(yearRows,'yearly')}${salesBranchBreakdownHtml(yearRows)}<div class="sectionTitle">สรุปแยกตามเดือน</div>${Object.keys(grouped).sort().map(k=>{const t=total(grouped[k]),net=t.over-t.short,rowAvg=t.rowDays.size?t.rowCount/t.rowDays.size:0;return `<div class="miniItem salesMonthRowV769"><div><b>${esc(k)}</b><div class="meta">จำนวนแถวรวม ${intText(t.rowCount)} แถว • วันที่มีข้อมูล ${t.rowDays.size} วัน • เฉลี่ย ${money(rowAvg)} แถว/วัน</div><div class="meta">ตรวจสอบ ${t.checkDays.size} วัน • ขาดรวม ${money(t.short)} บาท • เกินรวม ${money(t.over)} บาท • ${netText(net)}</div></div><span>${money(t.sales)} บาท</span></div>`;}).join('')||'<div class="empty">ปีนี้ยังไม่มีข้อมูล</div>'}`;
+  }
+  function salesDailySectionHtml(list){
+    const d=document.getElementById('cashDateFilter')?.value||salesDateFilter||today();salesDateFilter=d;
+    const dayRows=list.filter(r=>r.date===d);
+    return `<input class="input salesPeriodInputV769" type="date" id="cashDateFilter" value="${esc(d)}" onchange="setSalesDateFilter(this.value)">${salesDashboardHtml(dayRows)}${reconciliationDetailHtml(dayRows)}${salesBranchBreakdownHtml(dayRows)}${salesDailyHtml(dayRows)}`;
+  }
+  window.setSalesScope=function(scope){salesScope=scope;renderCashSalesSection(cashSalesMode);};
+  window.setSalesDateFilter=function(value){salesDateFilter=value||today();renderCashSalesSection('daily');};
+  window.setSalesMonthFilter=function(value){salesMonthFilter=value||today().slice(0,7);renderCashSalesSection('monthly');};
+  window.setSalesYearFilter=function(value){salesYearFilter=value||today().slice(0,4);renderCashSalesSection('yearly');};
+  window.renderCashSalesSection=function(mode='daily'){cashSalesMode=mode;const box=document.getElementById('cashSalesSummaryBox');if(!box)return;const all=branchRowsForScope(salesRows());document.querySelectorAll('#cashSalesSummaryPage .cashBigTabs button').forEach(b=>b.classList.toggle('active',(b.getAttribute('onclick')||'').includes(`'${mode}'`)));document.querySelectorAll('#cashSalesSummaryPage .salesScopeTabs button').forEach(b=>b.classList.toggle('active',(b.getAttribute('onclick')||'').includes(`'${salesScope}'`)));const head=`<div class="sectionTitle">มุมมอง: ${esc(scopeTitle())}</div>`;box.innerHTML=head+(mode==='monthly'?salesMonthlyHtml(all):mode==='yearly'?salesYearlyHtml(all):salesDailySectionHtml(all));};
+  window.renderCashSalesSummary=()=>renderCashSalesSection(cashSalesMode);
+  function historyHtml(){return rows().slice(0,200).map(r=>{const c=calc(r);return `<div class="cashHistoryRow"><button onclick="openSavedCash(${r.branch},'${esc(r.date)}')"><b>${dateText(r.date)} • ${esc(branches[r.branch]?.name)}</b><span>ยอดขายรวม ${money(c.sales)} • โอน ${money(c.transfer)} • ค่าใช้จ่าย ${money(c.expenseTotal)} • เงินสดควรมี ${money(c.expected)} • เงินเย็น ${money(c.evening)} • ${resultText(c)}</span></button><button class="cashMoreBtn" onclick="openCashHistoryMenu(${r.branch},'${esc(r.date)}')">⋮</button></div>`;}).join('')||'<div class="empty">ยังไม่มีประวัติ</div>';}
+  function monthlyDiffHtml(){const grouped=groupBy(rows(),r=>monthKey(r.date));return Object.keys(grouped).sort().reverse().map(k=>{const t=total(grouped[k]),net=t.over-t.short,tone=net===0?'ok':net>0?'over':'short';return `<div class="card"><h3 style="margin:0 0 8px">${esc(k)}</h3><div class="cashFormula"><div><span>เงินเกินรวม</span><b>${money(t.over)} บาท</b></div><div><span>เงินขาดรวม</span><b>${money(t.short)} บาท</b></div><div class="result ${tone}"><span>ผลสุทธิ</span><b>${net<0?'-':''}${money(Math.abs(net))} บาท</b></div></div></div>`;}).join('')||'<div class="empty">ยังไม่มีข้อมูล</div>';}
+  function expensesHtml(){const all=rows(),month=today().slice(0,7),daily=all.flatMap(r=>(r.expenses||[]).map(x=>({...x,branch:r.branch,date:r.date}))).sort((a,b)=>String(b.date).localeCompare(String(a.date)));const monthRows=all.filter(r=>monthKey(r.date)===month);const grouped={};monthRows.forEach(r=>(r.expenses||[]).forEach(x=>{const k=cleanName(x.name).toLowerCase();grouped[k]=grouped[k]||{name:x.name,count:0,total:0,b1:0,b2:0};grouped[k].count++;grouped[k].total+=num(x.amount);grouped[k][r.branch===1?'b1':'b2']+=num(x.amount);}));return `<div class="sectionTitle">รายจ่ายรายวัน</div>${daily.length?daily.map(x=>`<div class="miniItem"><div><b>${dateText(x.date)} • ${esc(branches[x.branch]?.short)} • ${esc(x.name)}</b><div class="meta">${esc(x.time||'-')} • ${esc(x.by||'-')}</div></div><span>${money(x.amount)} บาท</span></div>`).join(''):'<div class="empty">ยังไม่มีรายจ่าย</div>'}<div class="sectionTitle">รายจ่ายรายเดือน ${esc(month)}</div>${Object.values(grouped).map(x=>`<div class="miniItem"><div><b>${esc(x.name)}</b><div class="meta">${x.count} ครั้ง • สาขา1 ${money(x.b1)} • สาขา2 ${money(x.b2)}</div></div><span>${money(x.total)} บาท</span></div>`).join('')||'<div class="empty">เดือนนี้ยังไม่มีรายจ่าย</div>'}`;}
+  window.renderCashInfoSection=function(mode='history'){cashInfoMode=mode;const box=document.getElementById('cashInfoBox');if(!box)return;document.querySelectorAll('#cashInfoPage .cashModeTabs button').forEach(b=>b.classList.toggle('active',(b.getAttribute('onclick')||'').includes(`'${mode}'`)));box.innerHTML=mode==='history'?historyHtml():mode==='monthlyDiff'?monthlyDiffHtml():expensesHtml();};
+  window.renderCashHistory=()=>renderCashInfoSection(cashInfoMode);
+  window.openCashHistoryMenu=function(branch,date){const m=ensureModal('cashHistoryMenuV749');m.innerHTML=`<div class="sheet"><h2>${dateText(date)}</h2><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('cashHistoryMenuV749');openSavedCash(${branch},'${esc(date)}')">แก้ไข</button><button class="btn danger" style="width:100%;margin-top:8px" onclick="deleteCashHistory(${branch},'${esc(date)}')">ลบ</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('cashHistoryMenuV749')">ยกเลิก</button></div>`;m.classList.add('show');};
+  window.deleteCashHistory=async function(branch,date){if(!confirm('ลบประวัติรายการนี้ใช่ไหม?'))return;setRows(rows().filter(r=>!(Number(r.branch)===Number(branch)&&r.date===date)));clearDraftLocal(branch,date);try{await cloudDelete('record',branch,date);await cloudDelete('draft',branch,date);}catch(e){toastCash('ลบในเครื่องแล้ว แต่ซิงค์ Firebase ไม่สำเร็จ');}closeModal('cashHistoryMenuV749');renderCashInfoSection(cashInfoMode);};
+  window.openSavedCash=function(branch,date){cashBranch=Number(branch)||1;go('cashBranchPage');renderBranch(getRecord(cashBranch,date));};
+  window.openSalesHistory=function(){salesScope='current';salesBranch=currentDeviceBranch();go('cashSalesSummaryPage');renderCashSalesSection(cashSalesMode);};
+  window.openSalesEntryFor=function(branch,date){salesBranch=Number(branch)||currentDeviceBranch();go('cashSalesEntryPage');renderSalesEntry(salesRecord(salesBranch,date));};
+  window.openSalesDetail=function(branch,date){
+    const r=salesRecord(branch,date),c=calc(r),m=ensureModal('salesDetailModalV769');
+    m.innerHTML=`<div class="sheet"><h2>${dateText(date)}</h2><p class="muted">${esc(branches[r.branch]?.name||'')} • ${salesSourceLabel(r)}</p><div class="cashFormula salesDetailFormulaV769"><div><span>ยอดขายรวม</span><b>${money(c.sales)} บาท</b></div><div><span>ยอดโอน</span><b>${money(c.transfer)} บาท</b></div><div><span>ยอดเงินสด</span><b>${money(c.cashSales)} บาท</b></div><div><span>จำนวนแถว</span><b>${rowCountText(r)}</b></div><hr><div><span>ผู้บันทึก</span><b>${esc(r.updatedBy||r.savedBy||'-')}</b></div><div><span>แก้ไขล่าสุด</span><b>${timeNow(r.updatedAt||r.savedAt||r.createdAt)}</b></div><div><span>หมายเหตุ</span><b>${esc(r.note||'-')}</b></div></div><button class="btn primary" style="width:100%;margin-top:10px" onclick="closeModal('salesDetailModalV769');openSalesEntryFor(${r.branch},'${esc(r.date)}')">แก้ไข</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('salesDetailModalV769')">ปิด</button></div>`;
+    m.classList.add('show');
+  };
+  window.openSalesHistoryMenu=function(branch,date){
+    const r=salesRecord(branch,date),m=ensureModal('salesHistoryMenuV768');
+    const deleteText=hasCashCheck(r)?'ไปหน้าตรวจสอบเงิน':'ลบ';
+    m.innerHTML=`<div class="sheet"><h2>${dateText(date)}</h2><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('salesHistoryMenuV768');openSalesDetail(${branch},'${esc(date)}')">ดูรายละเอียด</button><button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal('salesHistoryMenuV768');openSalesEntryFor(${branch},'${esc(date)}')">แก้ไข</button><button class="${hasCashCheck(r)?'btn gray':'btn danger'}" style="width:100%;margin-top:8px" onclick="deleteSalesHistory(${branch},'${esc(date)}')">${deleteText}</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('salesHistoryMenuV768')">ยกเลิก</button></div>`;
+    m.classList.add('show');
+  };
+  window.deleteSalesHistory=async function(branch,date){
+    const r=salesRecord(branch,date);
+    if(hasCashCheck(r)){
+      closeModal('salesHistoryMenuV768');
+      const m=ensureModal('salesCashLinkedModalV769');
+      m.innerHTML=`<div class="sheet"><h2>รายการนี้เชื่อมกับข้อมูลตรวจสอบเงิน</h2><p class="muted">ไม่สามารถลบจากหน้าข้อมูลยอดขายโดยตรง เพื่อป้องกันการลบเงินทอน ค่าใช้จ่าย หรือผลขาด/เกินโดยไม่ตั้งใจ</p><button class="btn primary" style="width:100%;margin-top:12px" onclick="closeModal('salesCashLinkedModalV769');openSavedCash(${branch},'${esc(date)}')">ไปหน้าประวัติตรวจสอบเงิน</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('salesCashLinkedModalV769')">ยกเลิก</button></div>`;
+      m.classList.add('show');
+      return;
+    }
+    if(!confirm('ลบยอดขายของวันนี้ใช่ไหม?'))return;
+    setRows(rows().filter(x=>!(Number(x.branch)===Number(branch)&&x.date===date)));
+    try{await cloudDelete('record',branch,date);toastCash('ลบยอดขายแล้ว');}catch(e){toastCash('ลบในเครื่องแล้ว แต่ซิงค์ Firebase ไม่สำเร็จ');}
+    closeModal('salesHistoryMenuV768');renderCashSalesSection(cashSalesMode);
+  };
+  window.copySalesMonthSummary=async function(){
+    const m=document.getElementById('cashMonthFilter')?.value||today().slice(0,7),list=salesRows().filter(r=>monthKey(r.date)===m),b1=total(list.filter(r=>r.branch===1)),b2=total(list.filter(r=>r.branch===2)),all=total(list);
+    const text=`สรุปยอดขาย เดือน ${m}\n\nสาขา 1\nยอดขายรวม: ${b1.days.size?money(b1.sales)+' บาท':'ยังไม่มีข้อมูล'}\nยอดโอน: ${b1.days.size?money(b1.transfer)+' บาท':'ยังไม่มีข้อมูล'}\nยอดขายเงินสด: ${b1.days.size?money(b1.cash)+' บาท':'ยังไม่มีข้อมูล'}\n\nสาขา 2\nยอดขายรวม: ${b2.days.size?money(b2.sales)+' บาท':'ยังไม่มีข้อมูล'}\nยอดโอน: ${b2.days.size?money(b2.transfer)+' บาท':'ยังไม่มีข้อมูล'}\nยอดขายเงินสด: ${b2.days.size?money(b2.cash)+' บาท':'ยังไม่มีข้อมูล'}\n\nรวมสองสาขา\nยอดขายรวม: ${money(all.sales)} บาท\nยอดโอนรวม: ${money(all.transfer)} บาท\nยอดขายเงินสดรวม: ${money(all.cash)} บาท`;
+    try{await navigator.clipboard.writeText(text);toastCash('คัดลอกสรุปรายเดือนแล้ว');}catch(e){alert(text);}
+  };
+  function refreshCashActive(){ensureHomeButton();ensureSummarySalesEntry();if(document.getElementById('cashBranchPage')?.classList.contains('active'))renderBranch(collectBranchForm());if(document.getElementById('cashSalesEntryPage')?.classList.contains('active'))renderSalesEntry(collectSalesForm());if(document.getElementById('cashInfoPage')?.classList.contains('active'))renderCashInfoSection(cashInfoMode);if(document.getElementById('cashSalesSummaryPage')?.classList.contains('active'))renderCashSalesSection(cashSalesMode);}
+
+  const oldGo=window.go||go;
+  window.go=go=function(id){
+    ensurePages();ensureHomeButton();
+    if(cashDirty&&document.getElementById('cashBranchPage')?.classList.contains('active')&&id!=='cashBranchPage'&&!confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้ใช่หรือไม่?'))return;
+    if(id==='cashBranchPage'||id==='cashInfoPage'||id==='cashSalesMenuPage'||id==='cashSalesSummaryPage'||id==='cashSalesEntryPage')startCashSync();
+    else clearCashToast();
+    const r=oldGo.apply(this,arguments);
+    if(id==='cashBranchPage')renderBranch(getRecord(cashBranch,today()));
+    if(id==='cashSalesEntryPage')renderSalesEntry(salesRecord(salesBranch,today()));
+    if(id==='cashInfoPage')renderCashInfoSection(cashInfoMode);
+    if(id==='cashSalesSummaryPage')renderCashSalesSection(cashSalesMode);
+    if(id==='summaryPage')ensureSummarySalesEntry();
+    return r;
+  };
+  const oldRenderAll=window.renderAll||renderAll;
+  window.renderAll=renderAll=function(){const r=oldRenderAll.apply(this,arguments);ensurePages();ensureHomeButton();ensureSummarySalesEntry();return r;};
+  window.addEventListener('beforeunload',e=>{if(cashDirty){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('online',()=>setTimeout(()=>{if(isCashPageActive())startCashSync(true);refreshCashActive();},600));
+  window.addEventListener('offline',()=>{if(isCashPageActive()){setCashConnection('offline-cache');refreshCashActive();}});
+
+  const style=document.createElement('style');
+  style.textContent=`.cashHomeCardV749{width:100%;border:0;border-radius:22px;margin:14px 0 4px;padding:18px;display:flex;align-items:center;gap:14px;text-align:left;color:#fff;background:linear-gradient(135deg,#0f766e,#2563eb);box-shadow:0 14px 30px rgba(37,99,235,.24);font-family:inherit}.cashHomeCardV749 b{display:block;font-size:24px}.cashHomeCardV749 small{display:block;font-size:13px;font-weight:800;opacity:.92;margin-top:3px}.salesHomeCardV768{background:linear-gradient(135deg,#047857,#22c55e)!important;box-shadow:0 14px 30px rgba(5,150,105,.24)!important}.cashHomeIconV749{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:0 0 56px}.cashHomeCardV749 svg,.cashMenuCardV749 svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.cashMenuGridV749{display:grid;grid-template-columns:1fr;gap:14px;margin:12px 0 90px}.cashMenuCardV749{border:0;border-radius:22px;min-height:112px;padding:18px;color:#fff;text-align:left;display:flex;align-items:center;gap:14px;font:inherit;box-shadow:0 12px 26px rgba(15,23,42,.13)}.cashMenuCardV749 span{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.2);display:grid;place-items:center}.cashMenuCardV749 b{font-size:21px}.cashMenuCardV749.blue{background:linear-gradient(135deg,#0967f2,#38bdf8)}.cashMenuCardV749.green{background:linear-gradient(135deg,#0f9f6e,#7ddf95)}.cashMenuCardV749.purple{background:linear-gradient(135deg,#7c3aed,#c084fc)}.cashMenuCardV749.orange{background:linear-gradient(135deg,#f97316,#facc15);color:#382100}.cashBranchPanelV749,.salesOnlyPanelV768{padding-bottom:92px}.cashBranchPanelV749.blue,.salesOnlyPanelV768.blue{--cash:#0967f2}.cashBranchPanelV749.green,.salesOnlyPanelV768.green{--cash:#0f9f6e}.cashInputCard,.cashFormula,.cashExportCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:12px 0}.cashInputCard h3{margin:0 0 8px;color:var(--cash);font-size:18px}.cashInputCard p,.cashInputCard small{color:#64748b;font-weight:800}.cashQuickActions{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin:14px 0}.cashQuickActions .btn{min-height:54px;width:100%;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.cashQuickActions .btn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.cashActionAdd{background:linear-gradient(135deg,#0967f2,#38bdf8)!important}.cashActionExpense{background:linear-gradient(135deg,#f97316,#fb7185)!important;color:#fff!important}.cashActionExchange{background:linear-gradient(135deg,#0f766e,#7c3aed)!important;color:#fff!important}.cashWideBtn{width:100%;min-height:52px;margin:10px 0}.cashWideBtn.expense{background:#7c3aed}.cashDayCards{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 0}.cashDayCard{border-radius:18px;padding:12px;border:1px solid #dbeafe;background:#eff6ff}.cashDayCard.expense{border-color:#fed7aa;background:#fff7ed}.cashDayCard.exchange{border-color:#c4b5fd;background:#f5f3ff}.cashDayCard header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}.cashDayCard h4{margin:0;font-size:16px;color:#0b3b80}.cashDayCard.expense h4{color:#9a3412}.cashDayCard.exchange h4{color:#5b21b6}.cashDayCard header span{display:block;color:#64748b;font-size:12px;font-weight:900;margin-top:3px}.cashDayCard header>b{white-space:nowrap;color:#0967f2;font-size:17px}.cashDayCard.expense header>b{color:#c2410c}.cashDayCard.exchange header>b{color:#0f766e}.cashDayList{display:grid;gap:8px}.cashDayItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border-radius:14px;border:1px solid rgba(37,99,235,.18);padding:10px}.cashExpenseItem{border-color:rgba(249,115,22,.24)}.cashExchangeItem{border-color:rgba(124,58,237,.24)}.cashDayMain{min-width:0}.cashDayMain b,.cashDayMain strong,.cashDayMain small,.cashDayTime{display:block}.cashDayTime{font-size:12px;color:#64748b;font-weight:900}.cashAmountIn{color:#0967f2}.cashAmountOut{color:#c2410c;font-size:17px}.cashAmountExchange{color:#0f766e;font-size:17px}.cashMoreBtn.expense{background:#fff1e8;color:#c2410c}.cashMoreBtn.exchange{background:#ede9fe;color:#6d28d9}.cashLogList{display:grid;gap:8px;margin:8px 0 12px}.cashLogItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fbff;border:1px solid #e2eaf3;border-radius:16px;padding:9px}.cashLogItem>button:first-child{border:0;background:transparent;text-align:left;color:inherit;font:inherit}.cashLogItem b,.cashLogItem span{display:block}.cashLogItem span{font-size:12px;color:#64748b;font-weight:800;margin-top:2px}.cashMoreBtn{border:0;border-radius:12px;background:#eef5ff;color:#0967f2;font-size:22px;font-weight:950;width:40px;height:40px}.cashModeTabs{display:flex;gap:8px;overflow:auto;margin:4px 0 12px}.cashModeTabs button{border:1px solid #dbe5f0;background:#fff;color:#334155;border-radius:16px;padding:11px 13px;font-weight:900;white-space:nowrap}.cashModeTabs button.active{background:#0967f2;color:#fff;border-color:#0967f2}.cashBigTabs{display:grid;grid-template-columns:1fr;overflow:visible}.cashFormula div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-weight:900}.cashFormula hr{border:0;border-top:1px solid #dbe5f0;margin:7px 0}.cashFormula .result{font-size:20px}.cashFormula .ok b,.stat.ok .metric,.cashExportResult.ok{color:#16a34a}.cashFormula .short b,.stat.short .metric,.cashExportResult.short{color:#dc2626}.cashFormula .over b,.stat.over .metric,.cashExportResult.over{color:#0967f2}.cashSync{border-radius:14px;padding:10px 12px;margin:8px 0;font-weight:900}.cashSync.ok{background:#eafaf0;color:#15803d}.cashSync.wait{background:#fff7d6;color:#a16207}.cashSync.error{background:#fee2e2;color:#b91c1c}.cashToastClose{border:0;background:transparent;color:#fff;font-size:18px;font-weight:950;margin-left:10px;line-height:1;cursor:pointer}.cashValidation{color:#dc2626;font-weight:900;margin-top:8px}.cashActionsV749{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.cashActionsV749 .btn{min-height:46px}.salesOnlyActionsV768{grid-template-columns:1fr}.salesOnlyCalcV768{background:#ecfdf5;color:#065f46}.salesZeroTagV768{display:inline-block!important;background:#e0f2fe;color:#075985;border-radius:999px;padding:4px 8px;margin-top:5px}.cashExportPreview{overflow:auto}.cashExportCard{background:#fff;border-radius:20px;border:1px solid #dbe5f0;padding:18px;margin:12px auto;color:#0f172a;max-width:780px}.cashExportCard.mobile{max-width:430px}.cashExportCard header h2{margin:0;font-size:22px;color:#0b3b80}.cashExportHero{border-radius:16px;padding:14px;margin:10px 0}.cashExportHero span,.cashExportGrid span{display:block;font-weight:900;font-size:13px}.cashExportHero b{font-size:28px}.cashExportHero.sales{background:#dcfce7;color:#166534}.cashExportHero.transfer{background:#fef3c7;color:#92400e}.cashExportGrid{display:grid;grid-template-columns:1fr;gap:8px}.cashExportGrid div{background:#eaf3ff;border-radius:14px;padding:11px;color:#0b3b80;font-weight:900}.cashExportResult{font-size:28px;font-weight:950;text-align:center;margin:12px 0;padding:13px;border-radius:16px;background:#f8fbff}.cashExportCard h3{color:#0b3b80;margin:12px 0 6px}.cashExportCard p{margin:4px 0;font-weight:800}.cashExportCard footer{border-top:1px solid #dbe5f0;margin-top:12px;padding-top:10px;color:#64748b;font-weight:900}.cashPaper{box-sizing:border-box;width:min(100%,1080px);max-width:1080px;border:0!important;border-radius:0!important;padding:30px!important;margin:10px auto!important;background:#fff!important;color:#0f172a!important;box-shadow:0 1px 0 rgba(15,23,42,.06)}.cashPaper.mobile{max-width:430px;padding:18px!important}.cashPaper header{border-bottom:2px solid #dbe5f0;padding-bottom:10px;margin-bottom:8px}.cashPaper header h2{font-size:23px!important;margin:0 0 4px!important;color:#0b3b80!important}.cashPaper header p{margin:0!important;color:#64748b!important;font-weight:800!important;font-size:13px!important}.cashPaperTable{display:block;border:1px solid #dbe5f0;border-radius:10px;overflow:hidden}.cashPaperRow,.cashPaperLine,.cashPaperResult{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;min-height:34px;padding:7px 10px;border-bottom:1px solid #e8eef6;font-weight:900}.cashPaperRow:nth-child(even){background:#f8fbff}.cashPaperRow span,.cashPaperLine span{min-width:0;overflow-wrap:anywhere}.cashPaperRow b,.cashPaperLine b{white-space:nowrap;text-align:right}.cashPaperRow.sales span,.cashPaperRow.sales b{color:#15803d}.cashPaperRow.transfer span,.cashPaperRow.transfer b{color:#a16207}.cashPaperRow.expense span,.cashPaperRow.expense b,.cashPaperLine.expense b{color:#c2410c}.cashPaperLine.exchange span,.cashPaperLine.exchange b,.cashExchangePaperTitle{color:#0f766e!important}.cashPaperLine.exchange.total{background:#ecfdf5;border-radius:8px;border-bottom:0;margin-top:3px}.cashPaperRow.expected span,.cashPaperRow.expected b{color:#0b3b80}.cashPaperResult{border:0;border-radius:10px;margin:10px 0;font-size:18px}.cashPaperResult.ok{background:#dcfce7;color:#166534}.cashPaperResult.short{background:#fee2e2;color:#b91c1c}.cashPaperResult.over{background:#dbeafe;color:#1d4ed8}.cashPaperDetails h3{font-size:15px;color:#0b3b80;margin:10px 0 4px}.cashPaperLine{border:0;border-bottom:1px dashed #dbe5f0;min-height:30px;padding:5px 2px}.cashPaperLine.mutedLine{color:#64748b}.cashPaper footer{border-top:1px solid #dbe5f0;margin-top:10px;padding-top:8px;color:#64748b;font-weight:800;font-size:13px;display:grid;gap:3px}.cashHistoryRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;margin:8px 0}.cashHistoryRow>button:first-child{border:0;background:transparent;text-align:left;color:inherit}.cashHistoryRow b,.cashHistoryRow span{display:block}.cashHistoryRow span{font-size:12px;color:#64748b;font-weight:800;margin-top:3px}.salesHistoryRowV768 span+span{color:#475569}.summaryPageGrid{display:grid;grid-template-columns:1fr;gap:10px}.salesSummaryGridV768 .metric span{font-size:24px}.miniItem{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0}.compact{padding:10px}.sectionTitle{font-weight:950;margin:12px 0 8px;color:#0b3b80}@media(max-width:360px){.cashQuickActions{grid-template-columns:1fr}}@media(min-width:720px){.cashDayCards{grid-template-columns:repeat(3,minmax(0,1fr))}.cashMenuGridV749{grid-template-columns:1fr 1fr}.cashBigTabs{grid-template-columns:1fr 1fr}.cashActionsV749{grid-template-columns:repeat(4,1fr)}.salesOnlyActionsV768{grid-template-columns:repeat(3,1fr)}.cashExportGrid,.summaryPageGrid{grid-template-columns:repeat(2,1fr)}.cashExportCard.desktop .cashExportGrid{grid-template-columns:repeat(3,1fr)}}`;
+  style.textContent+=`.salesMenuGridV769 .cashMenuCardV749{min-height:132px}.salesMenuGridV769 .cashMenuCardV749 small{display:block;font-size:13px;font-weight:850;line-height:1.35;opacity:.93;margin-top:5px}.salesEntryCardV769{background:linear-gradient(135deg,#047857,#14b8a6)!important}.salesReportCardV769{background:linear-gradient(135deg,#2563eb,#7c3aed)!important}.salesDashboardV769{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0 12px}.salesDashCardV769{border-radius:16px;padding:14px;border:1px solid #dbe5f0;background:#fff;min-width:0}.salesDashCardV769 span{display:block;font-size:13px;font-weight:950;color:#475569;margin-bottom:5px}.salesDashCardV769 b{display:block;font-size:clamp(24px,7vw,34px);line-height:1.12;font-weight:950;white-space:nowrap;letter-spacing:0}.salesDashCardV769.total{background:#ecfdf5;border-color:#bbf7d0;color:#166534}.salesDashCardV769.transfer{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}.salesDashCardV769.cash{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.salesPeriodInputV769{margin:6px 0 12px}.salesMetaGridV769{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}.salesMetaGridV769 div,.salesBreakdownV769{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px}.salesMetaGridV769 span{display:block;color:#64748b;font-size:12px;font-weight:900}.salesMetaGridV769 b{display:block;font-size:18px;margin-top:3px}.shortTextV770{color:#dc2626!important}.overTextV770{color:#0967f2!important}.okTextV770{color:#16a34a!important}.salesBreakdownV769 h3{margin:0 0 8px;color:#0b3b80}.salesBreakRowV769{display:grid;gap:4px;border-top:1px solid #e8eef6;padding:9px 0}.salesBreakRowV769:first-of-type{border-top:0}.salesBreakRowV769 span{font-size:13px;font-weight:850;color:#475569}.salesDayCardV769 .salesAmountsV769{display:grid;gap:4px;margin:8px 0}.salesAmountsV769 strong{font-size:16px;color:#0f172a}.salesAmountsV769 strong:nth-child(2){color:#3730a3}.salesAmountsV769 strong:nth-child(3){color:#9a3412}.salesAmountsV769 strong:nth-child(4){color:#0f766e}.salesDetailFormulaV769 b{font-size:16px}.salesMonthRowV769>span{font-weight:950;color:#166534;white-space:nowrap}.salesExportHostV771{position:fixed;left:-9999px;top:0;width:430px;z-index:-1}.salesExportCardV771{box-sizing:border-box;width:430px;max-width:430px;background:#fff8c7;color:#0f172a;border:1px solid #f4d35e;border-radius:0;padding:28px;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:0}.salesExportCardV771 header{border-bottom:2px solid #e8c653;padding-bottom:12px;margin-bottom:12px;text-align:center}.salesExportCardV771 h2{margin:0 0 7px;font-size:25px;line-height:1.2;color:#713f12}.salesExportCardV771 p{margin:4px 0;font-size:15px;font-weight:900;color:#854d0e}.salesExportCardV771 section{display:grid;gap:8px}.salesExportCardV771 section div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:center;background:rgba(255,255,255,.58);border:1px solid rgba(202,138,4,.22);padding:10px;border-radius:8px;font-weight:950}.salesExportCardV771 span{min-width:0}.salesExportCardV771 b{text-align:right;white-space:normal;overflow-wrap:anywhere;font-size:18px}.salesExportCardV771 footer{border-top:1px solid #e8c653;margin-top:12px;padding-top:10px;font-weight:900;color:#713f12;overflow-wrap:anywhere}@media(min-width:560px){.salesDashboardV769{grid-template-columns:repeat(2,minmax(0,1fr))}.salesMetaGridV769{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(min-width:860px){.salesDashboardV769{grid-template-columns:repeat(3,minmax(0,1fr))}.salesMetaGridV769{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:380px){.salesDashCardV769{padding:12px}.salesDashCardV769 b{font-size:23px}.salesMonthRowV769{display:grid}.salesMonthRowV769>span{text-align:left}}`;
+  document.head.appendChild(style);
+  function labels(){document.title='Stock Alert V7.73';const sub=document.getElementById('updateStatusSub');if(sub)sub.textContent=APP_VERSION;const b=document.querySelector('#updateModalVersionBox b');if(b)b.textContent=APP_VERSION;}
+  ensurePages();ensureHomeButton();ensureSummarySalesEntry();labels();setTimeout(()=>{ensurePages();ensureHomeButton();ensureSummarySalesEntry();labels();if(isCashPageActive())pollCashSync();},500);setTimeout(()=>{if(isCashPageActive())pollCashSync();refreshCashActive();},3600);
+})();

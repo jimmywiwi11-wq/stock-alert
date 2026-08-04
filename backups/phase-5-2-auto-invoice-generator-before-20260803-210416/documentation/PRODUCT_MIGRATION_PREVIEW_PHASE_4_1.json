@@ -1,0 +1,296 @@
+{
+  "generatedAt": "2026-08-03T07:14:37.681Z",
+  "mode": "read-only-preview",
+  "sourceCounts": {
+    "stockAlertProducts": 4,
+    "stockAlertShortages": 2,
+    "taxInvoiceProducts": 6,
+    "total": 12
+  },
+  "conflictCounts": {
+    "sameCodeSameName": 1,
+    "sameCodeDifferentName": 1,
+    "sameNameDifferentCode": 1,
+    "fuzzyName": 14,
+    "spacingDifference": 1,
+    "caseDifference": 0,
+    "unitConflict": 0,
+    "salePriceConflict": 0,
+    "costPriceConflict": 1,
+    "stockAlertOnly": 4,
+    "taxInvoiceOnly": 4,
+    "missingCode": 4,
+    "missingUnit": 1,
+    "missingSalePrice": 4,
+    "missingCostPrice": 4,
+    "invalidRecord": 0
+  },
+  "rows": [
+    {
+      "source": "stock-alert-products",
+      "legacyId": "p1",
+      "proposedProductId": "pm_code_00123",
+      "existingProductCode": "00123",
+      "proposedProductCode": "00123",
+      "productName": "??? PVC 2 ????",
+      "unit": "????",
+      "costPrice": null,
+      "salePrice": 120,
+      "supplier": "SCG / ThaiPipe",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:00123",
+      "conflictStatus": "ok",
+      "proposedAction": "CREATE_NEW"
+    },
+    {
+      "source": "stock-alert-products",
+      "legacyId": "p2",
+      "proposedProductId": "pm_code_a200",
+      "existingProductCode": "A200",
+      "proposedProductCode": "A200",
+      "productName": "???????? TOA ????",
+      "unit": "???????",
+      "costPrice": 80,
+      "salePrice": 100,
+      "supplier": "TOA",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:A200",
+      "conflictStatus": "code-conflict",
+      "proposedAction": "REVIEW_CONFLICT"
+    },
+    {
+      "source": "stock-alert-products",
+      "legacyId": "p3",
+      "proposedProductId": "pm_name_unknown",
+      "existingProductCode": "",
+      "proposedProductCode": "",
+      "productName": "????????????",
+      "unit": "????",
+      "costPrice": 0,
+      "salePrice": 15,
+      "supplier": "SCG",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "name:????????????",
+      "conflictStatus": "missing-code",
+      "proposedAction": "NEED_CODE"
+    },
+    {
+      "source": "stock-alert-products",
+      "legacyId": "p4",
+      "proposedProductId": "pm_code_mix01",
+      "existingProductCode": "MIX01",
+      "proposedProductCode": "MIX01",
+      "productName": "?????????",
+      "unit": "???",
+      "costPrice": 70,
+      "salePrice": null,
+      "supplier": "Tools Co",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:MIX01",
+      "conflictStatus": "name-code-conflict",
+      "proposedAction": "REVIEW_CONFLICT"
+    },
+    {
+      "source": "stock-alert-shortages",
+      "legacyId": "s1",
+      "proposedProductId": "pm_name_pvc2",
+      "existingProductCode": "",
+      "proposedProductCode": "",
+      "productName": "??? PVC 2????",
+      "unit": "????",
+      "costPrice": null,
+      "salePrice": null,
+      "supplier": "SCG",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "name:???pvc2????",
+      "conflictStatus": "missing-code",
+      "proposedAction": "NEED_CODE"
+    },
+    {
+      "source": "stock-alert-shortages",
+      "legacyId": "s2",
+      "proposedProductId": "pm_name_pvc",
+      "existingProductCode": "",
+      "proposedProductCode": "",
+      "productName": "???????? PVC",
+      "unit": "",
+      "costPrice": null,
+      "salePrice": null,
+      "supplier": "SCG",
+      "eligibility": {
+        "eligible": false,
+        "reasons": [
+          "MISSING_UNIT"
+        ],
+        "missingFields": [
+          "unit"
+        ]
+      },
+      "duplicateGroup": "name:????????pvc",
+      "conflictStatus": "missing-code",
+      "proposedAction": "NEED_UNIT"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "00123",
+      "proposedProductId": "pm_code_00123",
+      "existingProductCode": "00123",
+      "proposedProductCode": "00123",
+      "productName": "??? PVC 2 ????",
+      "unit": "????",
+      "costPrice": 90,
+      "salePrice": 120,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:00123",
+      "conflictStatus": "ok",
+      "proposedAction": "KEEP"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "A200",
+      "proposedProductId": "pm_code_a200",
+      "existingProductCode": "A200",
+      "proposedProductCode": "A200",
+      "productName": "???????? TOA ??",
+      "unit": "???????",
+      "costPrice": 80,
+      "salePrice": 100,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:A200",
+      "conflictStatus": "code-conflict",
+      "proposedAction": "REVIEW_CONFLICT"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "B001",
+      "proposedProductId": "pm_code_b001",
+      "existingProductCode": "B001",
+      "proposedProductCode": "B001",
+      "productName": "????????????",
+      "unit": "????",
+      "costPrice": null,
+      "salePrice": 15,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:B001",
+      "conflictStatus": "ok",
+      "proposedAction": "KEEP"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "C999",
+      "proposedProductId": "pm_code_c999",
+      "existingProductCode": "C999",
+      "proposedProductCode": "C999",
+      "productName": "?????????",
+      "unit": "???",
+      "costPrice": 75,
+      "salePrice": 130,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:C999",
+      "conflictStatus": "name-code-conflict",
+      "proposedAction": "REVIEW_CONFLICT"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "G100",
+      "proposedProductId": "pm_code_g100",
+      "existingProductCode": "G100",
+      "proposedProductCode": "G100",
+      "productName": "???????? PVC 100 ????",
+      "unit": "??????",
+      "costPrice": 25,
+      "salePrice": 35,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "code:G100",
+      "conflictStatus": "ok",
+      "proposedAction": "KEEP"
+    },
+    {
+      "source": "tax-invoice-products",
+      "legacyId": "tax-invoice-products_6",
+      "proposedProductId": "pm_name_unknown",
+      "existingProductCode": "",
+      "proposedProductCode": "",
+      "productName": "??????",
+      "unit": "???",
+      "costPrice": 20,
+      "salePrice": null,
+      "supplier": "",
+      "eligibility": {
+        "eligible": true,
+        "reasons": [
+          "HAS_NAME_AND_UNIT"
+        ],
+        "missingFields": []
+      },
+      "duplicateGroup": "name:??????",
+      "conflictStatus": "missing-code",
+      "proposedAction": "NEED_CODE"
+    }
+  ]
+}

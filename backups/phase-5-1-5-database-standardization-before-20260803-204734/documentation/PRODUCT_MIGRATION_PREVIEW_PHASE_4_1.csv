@@ -1,0 +1,13 @@
+source,legacyId,proposedProductId,existingProductCode,proposedProductCode,productName,unit,costPrice,salePrice,supplier,eligible,missingFields,duplicateGroup,conflictStatus,proposedAction
+"stock-alert-products","p1","pm_code_00123","00123","00123","??? PVC 2 ????","????","","120","SCG / ThaiPipe","true","","code:00123","ok","CREATE_NEW"
+"stock-alert-products","p2","pm_code_a200","A200","A200","???????? TOA ????","???????","80","100","TOA","true","","code:A200","code-conflict","REVIEW_CONFLICT"
+"stock-alert-products","p3","pm_name_unknown","","","????????????","????","0","15","SCG","true","","name:????????????","missing-code","NEED_CODE"
+"stock-alert-products","p4","pm_code_mix01","MIX01","MIX01","?????????","???","70","","Tools Co","true","","code:MIX01","name-code-conflict","REVIEW_CONFLICT"
+"stock-alert-shortages","s1","pm_name_pvc2","","","??? PVC 2????","????","","","SCG","true","","name:???pvc2????","missing-code","NEED_CODE"
+"stock-alert-shortages","s2","pm_name_pvc","","","???????? PVC","","","","SCG","false","unit","name:????????pvc","missing-code","NEED_UNIT"
+"tax-invoice-products","00123","pm_code_00123","00123","00123","??? PVC 2 ????","????","90","120","","true","","code:00123","ok","KEEP"
+"tax-invoice-products","A200","pm_code_a200","A200","A200","???????? TOA ??","???????","80","100","","true","","code:A200","code-conflict","REVIEW_CONFLICT"
+"tax-invoice-products","B001","pm_code_b001","B001","B001","????????????","????","","15","","true","","code:B001","ok","KEEP"
+"tax-invoice-products","C999","pm_code_c999","C999","C999","?????????","???","75","130","","true","","code:C999","name-code-conflict","REVIEW_CONFLICT"
+"tax-invoice-products","G100","pm_code_g100","G100","G100","???????? PVC 100 ????","??????","25","35","","true","","code:G100","ok","KEEP"
+"tax-invoice-products","tax-invoice-products_6","pm_name_unknown","","","??????","???","20","","","true","","name:??????","missing-code","NEED_CODE"
