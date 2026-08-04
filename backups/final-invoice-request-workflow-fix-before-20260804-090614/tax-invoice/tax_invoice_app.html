@@ -1090,8 +1090,6 @@ function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAu
 window.stockAlertAuthReady=stockAlertAuthReady;
 </script>
 <script src="../../modules/customer-master/customer-master.js"></script>
-<script src="../../modules/invoice-generator/invoice-number-format.js"></script>
-<script src="../../modules/invoice-generator/invoice-number-service.js"></script>
 <script src="../../modules/invoice-generator/invoice-print-service.js"></script>
 <script src="../../modules/invoice-generator/invoice-history-adapter.js"></script>
 <script>
@@ -1903,21 +1901,15 @@ function saveInvoice(silent=false, keepFormAfterSave=false){
   if(idx>=0){a[idx]=inv}else{a.push(inv);advanceInvoiceCounterFromNo(inv.no);editInvoiceId=inv.id}
   store.set('invoices',a);
   lastSavedInvoiceRecords=[inv];
-  if(!silent&&window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function')ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices([inv],{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''}).then(rows=>{if(rows&&rows.length){lastSavedInvoiceRecords=rows;renderHistory();if(!keepFormAfterSave&&!silent)return;if(editInvoiceId===inv.id){let synced=rows[0];invNo.value=synced.no||invNo.value;invoiceItems=JSON.parse(JSON.stringify(synced.items||invoiceItems));renderInvoiceItems();renderInvoicePreview();}}}).catch(e=>console.warn('[TaxInvoice desktop history sync]',e));
   renderHistory();
   if(!silent)alert('บันทึกบิลแล้ว');
   if(!keepFormAfterSave){newInvoice();}
   else{invoiceItems=currentItems;renderInvoiceItems();renderInvoicePreview();}
   return true;
 }
-async function printAndSaveInvoice(){
+function printAndSaveInvoice(){
   let ok=saveInvoice(true,true);
-  if(ok){
-    if(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices==='function'&&lastSavedInvoiceRecords.length){
-      try{lastSavedInvoiceRecords=await ChokAnanInvoiceHistoryAdapter.syncDesktopManualInvoices(lastSavedInvoiceRecords,{by:'tax-invoice-desktop',uid:auth?.currentUser?.uid||''})}catch(e){console.warn('[TaxInvoice desktop print sync]',e)}
-    }
-    setTimeout(()=>{Array.isArray(ok)?printInvoiceRecordsClean(lastSavedInvoiceRecords.length?lastSavedInvoiceRecords:ok):printInvoiceRecordsClean(lastSavedInvoiceRecords)},120)
-  }
+  if(ok){setTimeout(()=>{Array.isArray(ok)?printInvoiceRecordsClean(ok):printInvoiceRecordsClean(lastSavedInvoiceRecords)},120)}
 }
 function applyInvoiceDefaults(){if(window.invType)invType.value='ใบกำกับภาษีเต็ม';if(window.vatMode)vatMode.value='excluded';if(window.paperSize)paperSize.value='9x11';toggleBuyerFields();applyPaperDefaults()}
 function newInvoice(){editInvoiceId=null;invNo.value=nextInvoiceNo();invDate.value=new Date().toISOString().slice(0,10);applyInvoiceDefaults();buyerName.value='';buyerTax.value='';buyerAddress.value='';clearSelectedInvoiceCustomer();if(window.customerSearchInvoice)customerSearchInvoice.value='';hideBuyerNameSuggestions();productSelectionClosed=true;if(window.productSearchInvoice){productSearchInvoice.value='';hideProductSuggestions();}if(document.activeElement?.classList?.contains('invoice-qty-input'))document.activeElement.blur();invoiceItems=[];renderInvoiceItems();updateInvoiceNumberSettingUI()}
