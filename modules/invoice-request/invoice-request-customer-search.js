@@ -81,7 +81,7 @@
 
   function listCustomers(){
     if (root.ChokAnanCustomerMaster && typeof root.ChokAnanCustomerMaster.getCustomerMaster === 'function') {
-      return root.ChokAnanCustomerMaster.getCustomerMaster({ includeLegacy: true }).map(normalizeCustomer).filter(item => item.customerName || item.customerCode);
+      return root.ChokAnanCustomerMaster.getCustomerMaster({ includeLegacy: false }).map(normalizeCustomer).filter(item => item.customerName || item.customerCode);
     }
     const store = root.CMSInvoiceRequestStore;
     const rows = store ? store.readJson('customers', []) : [];
@@ -89,8 +89,9 @@
   }
 
   function searchCustomers(query, limit){
+    if (!normalizeSearch(query)) return [];
     const rows = listCustomers().map(customer => ({ customer, score: score(customer, query) }))
-      .filter(row => !query || row.score < 99)
+      .filter(row => row.score < 99)
       .sort((a, b) => a.score - b.score || fullName(a.customer).localeCompare(fullName(b.customer), 'th'));
     return rows.slice(0, limit || 20).map(row => row.customer);
   }

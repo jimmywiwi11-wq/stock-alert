@@ -1,4 +1,4 @@
-const CACHE_NAME='stock-alert-v7_81-customer-master-sync';
+const CACHE_NAME='stock-alert-v7_82-mobile-tax-invoice-sync-ui';
 const APP_SHELL=['./','./index.html','./manifest.json','./icons/icon-32.png','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./app.js','./cash-reconciliation.js','./vendor/html2canvas.min.js','./modules/cms-integration/cms-integration.css','./modules/cms-integration/cms-product-adapter.js','./modules/cms-integration/cms-invoice-request-status.js','./modules/cms-integration/cms-integration.js','./modules/product-master/product-master.js','./modules/product-master/product-master-stock-alert.js','./modules/product-master/product-master-tax-bridge.js','./modules/customer-master/customer-master.js','./modules/invoice-request/invoice-request.css','./modules/invoice-request/invoice-request-store.js','./modules/invoice-request/invoice-request-validation.js','./modules/invoice-request/invoice-request-customer-search.js','./modules/invoice-request/invoice-request-product-search.js','./modules/invoice-request/invoice-request-summary.js','./modules/invoice-request/invoice-request-sync.js','./modules/invoice-generator/invoice-number-format.js','./modules/invoice-generator/invoice-chunk-service.js','./modules/invoice-generator/invoice-vat-service.js','./modules/invoice-generator/invoice-generation-validation.js','./modules/invoice-generator/invoice-history-adapter.js','./modules/invoice-generator/invoice-number-service.js','./modules/invoice-generator/invoice-generation-lock.js','./modules/invoice-generator/invoice-number-reservation.js','./modules/invoice-generator/invoice-generation-audit.js','./modules/invoice-generator/invoice-preview-service.js','./modules/invoice-generator/invoice-print-service.js','./modules/invoice-generator/invoice-status-service.js','./modules/invoice-generator/invoice-generator-store.js','./modules/invoice-generator/invoice-generator.js','./modules/invoice-request/invoice-request.js'];
 
 // Do NOT call skipWaiting here. This keeps future versions from replacing the current app
@@ -27,7 +27,7 @@ self.addEventListener('fetch', event => {
   if (url.pathname.endsWith('/version.json')) {
     event.respondWith(
       fetch(req, { cache: 'no-store' }).catch(() =>
-        new Response(JSON.stringify({ version:'7.81', label:'V7.81', offline:true }), {
+        new Response(JSON.stringify({ version:'7.82', label:'V7.82', offline:true }), {
           headers: { 'Content-Type':'application/json' }
         })
       )

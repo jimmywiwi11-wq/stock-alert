@@ -90,6 +90,35 @@
   color: #0967f2;
   font-style: normal;
   font-weight: 950;
+  font-size: 0;
+}
+.cmsInvoiceMenuButtonV42:nth-child(1) i { background: #dbeafe; color: #0967f2; }
+.cmsInvoiceMenuButtonV42:nth-child(2) i { background: #dcfce7; color: #15803d; }
+.cmsInvoiceMenuButtonV42:nth-child(3) i { background: #f3e8ff; color: #7e22ce; }
+.cmsInvoiceMenuButtonV42 i::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  display: block;
+  background: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+.cmsInvoiceMenuButtonV42:nth-child(1) i::before {
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 3h7l4 4v14H7zM14 3v5h5M10 12h6M10 16h6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 3h7l4 4v14H7zM14 3v5h5M10 12h6M10 16h6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.cmsInvoiceMenuButtonV42:nth-child(2) i::before {
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 12l2 2 4-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 12l2 2 4-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.cmsInvoiceMenuButtonV42:nth-child(3) i::before {
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 .cmsInvoiceMenuButtonV42 b,
 .cmsInvoiceMenuButtonV42 span { display: block; }
@@ -129,6 +158,16 @@
   font-weight: 850;
   color: #274060;
   overflow-wrap: anywhere;
+}
+.cmsInvoiceGridV42.three .cmsInvoiceReadOnlyV42 {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(13px, 1.8vw, 16px);
+  line-height: 1.28;
+  padding: 10px 8px;
 }
 .cmsInvoiceSuggestWrapV42 { position: relative; }
 .cmsInvoiceSuggestV42 {
@@ -227,14 +266,21 @@
 }
 .cmsInvoiceSummaryV42 {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
+  align-items: stretch;
 }
 .cmsInvoiceSummaryV42 div {
   background: #f8fbff;
   border: 1px solid var(--line, #e7edf5);
   border-radius: 14px;
   padding: 10px;
+  min-height: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 .cmsInvoiceSummaryV42 small,
 .cmsInvoiceSummaryV42 b { display: block; }
@@ -260,6 +306,177 @@
 .cmsInvoiceListRowV42 span { display: block; }
 .cmsInvoiceListMetaV42 { color: #64748b; font-size: 12px; font-weight: 850; line-height: 1.45; margin-top: 4px; }
 .cmsInvoiceSimilarV42 { margin: 8px 0; }
+.cmsInvoiceProductEntryRowV42 {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.6fr) minmax(84px, .7fr) minmax(76px, .65fr) minmax(100px, .8fr) minmax(82px, auto);
+  gap: 8px;
+  align-items: end;
+  margin-top: 10px;
+}
+.cmsInvoiceProductEntryRowV42 > div,
+.cmsInvoiceProductEntryRowV42 .name { min-width: 0; }
+.cmsInvoiceAddProductV42 {
+  min-height: 44px;
+  border: 0;
+  border-radius: 13px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-weight: 950;
+  background: #16a34a;
+  color: #fff;
+  white-space: nowrap;
+}
+.cmsInvoiceItemsV42.compact { gap: 8px; }
+.cmsInvoiceItemCompactV42 {
+  display: grid;
+  grid-template-columns: 32px minmax(170px, 1.5fr) minmax(74px, .55fr) minmax(72px, .55fr) minmax(92px, .7fr) minmax(104px, .8fr) 58px 48px;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid var(--line, #e7edf5);
+  border-radius: 12px;
+  padding: 8px;
+  background: #fff;
+}
+.cmsInvoiceItemCompactV42.invalid { border-color: #fecaca; background: #fff7f7; }
+.cmsInvoiceItemCompactV42 .no {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #eef5ff;
+  color: #0967f2;
+  font-weight: 950;
+}
+.cmsInvoiceItemCompactV42 input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid var(--line, #e7edf5);
+  border-radius: 10px;
+  padding: 9px 8px;
+  font-size: 15px;
+}
+.cmsInvoiceItemCompactV42 .qty,
+.cmsInvoiceItemCompactV42 .price,
+.cmsInvoiceItemCompactV42 .total {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cmsInvoiceItemCompactV42 .total {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  border-radius: 10px;
+  background: #f8fbff;
+  border: 1px solid var(--line, #e7edf5);
+  font-weight: 950;
+  white-space: nowrap;
+}
+.cmsInvoiceItemCompactV42 .edit,
+.cmsInvoiceItemCompactV42 .remove {
+  min-height: 36px;
+  border: 0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 950;
+  padding: 7px 8px;
+}
+.cmsInvoiceItemCompactV42 .edit { background: #eef3f8; color: #274060; }
+.cmsInvoiceItemCompactV42 .remove { background: #ffe5e8; color: #b91c1c; }
+.cmsInvoiceItemCompactV42 .meta,
+.cmsInvoiceItemCompactV42 .cmsInvoiceErrorV42 {
+  grid-column: 2 / -1;
+  min-width: 0;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 850;
+}
+.cmsInvoiceStatusTextV42.ready { color: #0967f2; }
+.cmsInvoiceStatusTextV42.printed { color: #15803d; }
+.cmsInvoicePreviewButtonV42 {
+  border: 0;
+  border-radius: 13px;
+  padding: 12px;
+  font-family: inherit;
+  font-weight: 950;
+  background: #dbeafe;
+  color: #0956c7;
+}
+.cmsInvoicePreviewOpenV42,
+.cmsInvoicePreviewOpenV42 body { overflow: hidden; }
+.cmsInvoicePreviewModalV42 {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #f3f7fb;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.cmsInvoicePreviewCloseV42 {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: 12px;
+  z-index: 10001;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: #10213d;
+  color: #fff;
+  font-weight: 950;
+  font-family: inherit;
+}
+.cmsInvoicePreviewScrollV42 {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: calc(env(safe-area-inset-top, 0px) + 62px) 12px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  overscroll-behavior: contain;
+}
+.cmsInvoicePreviewSheetV42 {
+  width: min(100%, 760px);
+  margin: 0 auto 14px;
+  background: #fff;
+  border: 1px solid #dbe6f3;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(15,23,42,.08);
+}
+.cmsInvoicePreviewHeadV42,
+.cmsInvoicePreviewBuyerV42,
+.cmsInvoicePreviewTotalsV42 {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cmsInvoicePreviewTitleV42 { margin: 10px 0; text-align: center; font-size: 21px; font-weight: 950; }
+.cmsInvoicePreviewBuyerV42 { border: 1px solid #e7edf5; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+.cmsInvoicePreviewTableV42 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 82px 92px 98px;
+  border: 1px solid #e7edf5;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+}
+.cmsInvoicePreviewTableV42 > div { padding: 8px; border-bottom: 1px solid #e7edf5; min-width: 0; overflow-wrap: anywhere; }
+.cmsInvoicePreviewTableV42 .head { background: #f8fbff; font-weight: 950; }
+.cmsInvoicePreviewTableV42 .num { text-align: right; white-space: nowrap; }
+.cmsInvoicePreviewTotalsV42 { justify-content: flex-end; margin-top: 10px; font-weight: 900; }
+.cmsInvoicePreviewTotalsV42 span,
+.cmsInvoicePreviewTotalsV42 b { min-width: 120px; text-align: right; }
+.cmsInvoicePreviewEmptyV42 {
+  width: min(100%, 520px);
+  margin: 80px auto;
+  padding: 18px;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  font-weight: 950;
+}
 
 @media (min-width: 720px) {
   body.cmsDesktopAllowedV3 .cmsInvoiceEntryV42 {
@@ -277,6 +494,25 @@
 
 @media (max-width: 719px) {
   .cmsInvoiceLineTotalV42 { grid-column: span 2; }
+  .cmsInvoiceSummaryV42 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cmsInvoiceSummaryV42 div:last-child { grid-column: 1 / -1; }
+  .cmsInvoiceProductEntryRowV42 { grid-template-columns: 1fr 1fr; }
+  .cmsInvoiceProductEntryRowV42 .name { grid-column: 1 / -1; }
+  .cmsInvoiceAddProductV42 { grid-column: 1 / -1; }
+  .cmsInvoiceItemCompactV42 {
+    grid-template-columns: 30px minmax(0, 1fr) 78px;
+    align-items: stretch;
+  }
+  .cmsInvoiceItemCompactV42 .product { grid-column: 2 / -1; }
+  .cmsInvoiceItemCompactV42 .qty,
+  .cmsInvoiceItemCompactV42 .unit,
+  .cmsInvoiceItemCompactV42 .price,
+  .cmsInvoiceItemCompactV42 .total,
+  .cmsInvoiceItemCompactV42 .edit,
+  .cmsInvoiceItemCompactV42 .remove { grid-column: auto; }
+  .cmsInvoiceItemCompactV42 .meta,
+  .cmsInvoiceItemCompactV42 .cmsInvoiceErrorV42 { grid-column: 1 / -1; }
+  .cmsInvoicePreviewTableV42 { grid-template-columns: minmax(0, 1fr) 64px 76px 82px; font-size: 12px; }
 }
 
 @media (max-width: 380px) {
@@ -285,6 +521,18 @@
   .cmsInvoiceGridV42.two,
   .cmsInvoiceGridV42.three,
   .cmsInvoiceItemFieldsV42,
-  .cmsInvoiceSummaryV42,
   .cmsInvoiceActionRowV42 { grid-template-columns: 1fr; }
+  .cmsInvoiceSummaryV42 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cmsInvoiceProductEntryRowV42 { grid-template-columns: 1fr; }
+  .cmsInvoiceItemCompactV42 { grid-template-columns: 28px minmax(0, 1fr); }
+  .cmsInvoiceItemCompactV42 .product,
+  .cmsInvoiceItemCompactV42 .qty,
+  .cmsInvoiceItemCompactV42 .unit,
+  .cmsInvoiceItemCompactV42 .price,
+  .cmsInvoiceItemCompactV42 .total,
+  .cmsInvoiceItemCompactV42 .edit,
+  .cmsInvoiceItemCompactV42 .remove,
+  .cmsInvoiceItemCompactV42 .meta,
+  .cmsInvoiceItemCompactV42 .cmsInvoiceErrorV42 { grid-column: 1 / -1; }
+  .cmsInvoicePreviewTableV42 { grid-template-columns: minmax(0, 1fr) 58px 70px 76px; }
 }

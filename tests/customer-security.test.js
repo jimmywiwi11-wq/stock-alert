@@ -8,7 +8,7 @@ const searchSource = fs.readFileSync(path.join(root, 'modules/invoice-request/in
 const desktopSource = fs.readFileSync(path.join(root, 'desktop/tax-invoice/tax_invoice_app.html'), 'utf8');
 const masterSource = fs.readFileSync(path.join(root, 'modules/customer-master/customer-master.js'), 'utf8');
 
-assert.ok(searchSource.includes('getCustomerMaster({ includeLegacy: true })'), 'employee Invoice Request should read Customer Master');
+assert.ok(searchSource.includes('getCustomerMaster({ includeLegacy: false })'), 'employee Invoice Request should read shared Customer Master as primary source');
 assert.strictEqual(requestSource.includes('upsertCustomerMaster'), false, 'employee Invoice Request must not write Customer Master');
 assert.ok(desktopSource.includes("upsertCustomerMaster(item,{createdFrom:'tax-invoice-desktop'"), 'Tax Invoice Desktop should write through Customer Master adapter');
 assert.ok(masterSource.includes('findDuplicateCustomer'), 'Customer Master should provide duplicate prevention');

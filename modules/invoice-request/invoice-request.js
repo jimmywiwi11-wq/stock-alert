@@ -17,7 +17,12 @@
     draftId: '',
     validation: null,
     confirmLocked: false,
-    idempotencyKey: ''
+    idempotencyKey: '',
+    selectedProduct: null,
+    customerSearchTimer: null,
+    productSearchTimer: null,
+    realtimeBound: false,
+    realtimeUnsubs: []
   };
 
   function esc(value){
@@ -186,7 +191,7 @@
   function renderProductPanel(){
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
       <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหาสินค้าเดิม</label><input class="cmsInvoiceInputV42" id="cmsProductSearchV42" placeholder="ค้นจากชื่อ รหัส หน่วย ราคา หรือคำใกล้เคียง" oninput="CMSInvoiceRequest.searchProduct(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
-      <div class="cmsInvoiceSubPanelV42"><h3 class="cmsInvoiceSectionTitleV42">เพิ่มสินค้าใหม่เข้า Product Master</h3>
+      <div class="cmsInvoiceSubPanelV42"><h3 class="cmsInvoiceSectionTitleV42">เพิ่มสินค้า</h3>
         <div id="cmsSimilarBoxV42"></div>
         <div class="cmsInvoiceGridV42 two">
           <div><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oninput="CMSInvoiceRequest.showSimilar(this.value)" placeholder="ชื่อสินค้าใหม่"></div>
@@ -634,6 +639,419 @@
     }
   }
 
+  const TAX_INVOICE_HISTORY_KEY = 'cms.invoiceRequest.taxInvoiceHistory';
+
+  function normalizeUiText(value){
+    return text(value).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '').trim();
+  }
+
+  function readMobileHistory(){
+    const rows = store.readJson(TAX_INVOICE_HISTORY_KEY, []);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function saveMobileHistory(row){
+    if (!row) return row;
+    const rows = readMobileHistory();
+    const key = row.invoiceId || row.historyId || row.id || row.invoiceNumber;
+    const next = [row, ...rows.filter(item => (item.invoiceId || item.historyId || item.id || item.invoiceNumber) !== key)].slice(0, 200);
+    localStorage.setItem(TAX_INVOICE_HISTORY_KEY, JSON.stringify(next));
+    return row;
+  }
+
+  function renderProductPanel(){
+    return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
+      <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหาสินค้าเดิม</label><input class="cmsInvoiceInputV42" id="cmsProductSearchV42" placeholder="ค้นจากชื่อ รหัส หน่วย หรือราคา" oninput="CMSInvoiceRequest.searchProduct(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div></div>
+      <div class="cmsInvoiceProductEntryRowV42">
+        <div class="name"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oninput="CMSInvoiceRequest.productNameChanged(this.value)" placeholder="เลือกจากรายการหรือพิมพ์สินค้าใหม่" autocomplete="off"></div>
+        <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="0"></div>
+        <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย"></div>
+        <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="0.00"></div>
+        <button class="cmsInvoiceAddProductV42" onclick="CMSInvoiceRequest.addNewProduct()">เพิ่ม</button>
+      </div>
+      <div id="cmsSimilarBoxV42"></div>
+    </div>`;
+  }
+
+  function renderItems(){
+    const rows = state.items.map((item, index) => {
+      const errors = itemErrors(index);
+      const line = summary.line(item, SETTINGS);
+      const badges = [];
+      if (item.isNewProduct) badges.push('สินค้าใหม่');
+      if (item.source === 'live-product-master') badges.push('Product Master');
+      return `<div class="cmsInvoiceItemCompactV42 ${Object.keys(errors).length ? 'invalid' : ''}" data-item-index="${index}">
+        <div class="no">${index + 1}</div>
+        <input class="product" value="${esc(item.productName)}" oninput="CMSInvoiceRequest.updateItem(${index}, 'productName', this.value)" placeholder="ชื่อสินค้า">
+        <input class="qty" value="${esc(item.quantity ?? '')}" inputmode="decimal" oninput="CMSInvoiceRequest.updateItem(${index}, 'quantity', this.value)" onkeydown="CMSInvoiceRequest.quantityKey(event)" placeholder="จำนวน" data-qty-index="${index}">
+        <input class="unit" value="${esc(item.unit)}" oninput="CMSInvoiceRequest.updateItem(${index}, 'unit', this.value)" placeholder="หน่วย">
+        <input class="price" value="${esc(item.salePrice ?? '')}" inputmode="decimal" oninput="CMSInvoiceRequest.updateItem(${index}, 'salePrice', this.value)" placeholder="ราคา">
+        <div class="total" data-line-total="${index}">${money(line.lineSubtotal)}</div>
+        <button class="edit" type="button" onclick="CMSInvoiceRequest.focusItem(${index})">แก้ไข</button>
+        <button class="remove" type="button" onclick="CMSInvoiceRequest.removeItem(${index})">ลบ</button>
+        <div class="meta">${esc(item.productCode || '-')} ${badges.map(w => `<span class="cmsInvoiceBadgeV42 ${item.isNewProduct ? 'test' : ''}">${esc(w)}</span>`).join('')}</div>
+        ${Object.values(errors).map(error => `<div class="cmsInvoiceErrorV42">${esc(error)}</div>`).join('')}
+      </div>`;
+    }).join('');
+    const total = totals();
+    return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">รายการที่เลือก</h3>
+      <div class="cmsInvoiceSummaryV42">
+        <div><small>จำนวนรายการ</small><b>${state.items.length}</b></div>
+        <div><small>คาดว่าแบ่ง</small><b>${total.expectedInvoiceCount} ใบ</b></div>
+        <div><small>ก่อน VAT</small><b>${money(total.subtotal)}</b></div>
+        <div><small>VAT 7%</small><b>${money(total.vatAmount)}</b></div>
+        <div><small>ยอดรวม</small><b>${money(total.grandTotal)}</b></div>
+      </div>
+      <div class="cmsInvoiceItemsV42 compact">${rows || '<div class="empty">ยังไม่มีรายการสินค้า</div>'}</div>
+    </div>`;
+  }
+
+  function refreshSummaryDom(){
+    const cards = document.querySelectorAll('.cmsInvoiceSummaryV42 b');
+    const total = totals();
+    if (cards[0]) cards[0].textContent = state.items.length;
+    if (cards[1]) cards[1].textContent = `${total.expectedInvoiceCount} ใบ`;
+    if (cards[2]) cards[2].textContent = money(total.subtotal);
+    if (cards[3]) cards[3].textContent = money(total.vatAmount);
+    if (cards[4]) cards[4].textContent = money(total.grandTotal);
+  }
+
+  function updateItem(index, field, value){
+    if (!state.items[index]) return;
+    state.items[index][field] = value;
+    state.validation = null;
+    const line = summary.line(state.items[index], SETTINGS);
+    const lineTotal = document.querySelector(`[data-line-total="${index}"]`);
+    if (lineTotal) lineTotal.textContent = money(line.lineSubtotal);
+    refreshSummaryDom();
+  }
+
+  function focusItem(index){
+    document.querySelector(`[data-item-index="${index}"] input`)?.focus();
+  }
+
+  function productNameChanged(value){
+    if (!state.selectedProduct || normalizeUiText(value) !== normalizeUiText(state.selectedProduct.productName)) {
+      state.selectedProduct = null;
+    }
+    showSimilar(value);
+  }
+
+  function fillProductEntry(product){
+    state.selectedProduct = product || null;
+    const name = document.getElementById('cmsNewProductNameV42');
+    const unit = document.getElementById('cmsNewProductUnitV42');
+    const price = document.getElementById('cmsNewProductPriceV42');
+    const qty = document.getElementById('cmsNewProductQtyV42');
+    if (name) name.value = product?.productName || '';
+    if (unit) unit.value = product?.unit || '';
+    if (price) price.value = product?.salePrice == null ? '' : product.salePrice;
+    if (qty) {
+      qty.value = '';
+      setTimeout(() => qty.focus(), 20);
+    }
+  }
+
+  function clearProductEntry(){
+    state.selectedProduct = null;
+    ['cmsProductSearchV42', 'cmsNewProductNameV42', 'cmsNewProductQtyV42', 'cmsNewProductUnitV42', 'cmsNewProductPriceV42'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const similar = document.getElementById('cmsSimilarBoxV42');
+    if (similar) similar.innerHTML = '';
+  }
+
+  function searchCustomer(query){
+    const box = document.getElementById('cmsCustomerSuggestV42');
+    if (!box) return;
+    clearTimeout(state.customerSearchTimer);
+    state.customerSearchTimer = setTimeout(() => {
+      const rows = customerSearch.searchCustomers(query, 20);
+      box.innerHTML = rows.length ? rows.map((customer, index) => `<button type="button" onmousedown="CMSInvoiceRequest.selectCustomer(${index})"><b>${esc(customerSearch.fullName(customer) || customer.customerName)}</b><small>${esc(customerSearch.shortMeta(customer))}</small></button>`).join('') : '<button type="button"><b>ไม่พบลูกค้า</b><small>ค้นจากฐาน Customer Master กลางเท่านั้น</small></button>';
+      box.dataset.rows = JSON.stringify(rows);
+      box.classList.toggle('show', !!normalizeUiText(query) || rows.length > 0);
+    }, 160);
+  }
+
+  function searchProduct(query){
+    const box = document.getElementById('cmsProductSuggestV42');
+    if (!box) return;
+    clearTimeout(state.productSearchTimer);
+    state.productSearchTimer = setTimeout(() => {
+      const rows = productSearch.searchProducts(query, 24);
+      box.innerHTML = rows.length ? rows.map((product, index) => {
+        return `<button type="button" onmousedown="CMSInvoiceRequest.addExistingProduct(${index})"><b>${esc(product.productName)}</b><small>${esc(product.productCode || '-')} | หน่วย ${esc(product.unit || '-')} | ราคาขาย ${product.salePrice == null ? '-' : money(product.salePrice)}</small></button>`;
+      }).join('') : '<button type="button"><b>ไม่พบสินค้าเดิม</b><small>พิมพ์ชื่อในแถวเพิ่มสินค้าเพื่อสร้าง Product Master ใหม่</small></button>';
+      box.dataset.rows = JSON.stringify(rows);
+      box.classList.toggle('show', !!normalizeUiText(query) || rows.length > 0);
+    }, 160);
+  }
+
+  function addExistingProduct(index){
+    const box = document.getElementById('cmsProductSuggestV42');
+    const rows = JSON.parse(box?.dataset.rows || '[]');
+    const product = rows[index];
+    if (!product) return;
+    if (box) box.classList.remove('show');
+    const search = document.getElementById('cmsProductSearchV42');
+    if (search) search.value = product.productName || '';
+    fillProductEntry(product);
+  }
+
+  async function addNewProduct(){
+    const name = document.getElementById('cmsNewProductNameV42')?.value || '';
+    const unit = document.getElementById('cmsNewProductUnitV42')?.value || '';
+    const salePrice = document.getElementById('cmsNewProductPriceV42')?.value || '';
+    const quantity = document.getElementById('cmsNewProductQtyV42')?.value || '';
+    const selected = state.selectedProduct && normalizeUiText(name) === normalizeUiText(state.selectedProduct.productName) ? state.selectedProduct : null;
+    const item = {
+      productId: selected?.productId || '',
+      productCode: selected?.productCode || '',
+      productName: selected?.productName || name,
+      unit: unit || selected?.unit || '',
+      salePrice: salePrice || selected?.salePrice || '',
+      quantity,
+      source: selected ? (selected.source || 'existing-product') : 'new-product',
+      isNewProduct: !selected
+    };
+    const result = validation.validateItem(item);
+    if (!result.valid) {
+      alert(Object.values(result.errors)[0]);
+      return;
+    }
+    let product = selected;
+    if (!product) {
+      const similar = productSearch.similarProducts(name, 1)[0];
+      if (similar && confirm(`พบสินค้าใกล้เคียง: ${similar.productName}\nใช่สินค้าเดียวกันหรือไม่?`)) {
+        product = similar;
+        item.productId = similar.productId;
+        item.productCode = similar.productCode;
+        item.productName = similar.productName;
+        item.unit = unit || similar.unit;
+        item.salePrice = salePrice || similar.salePrice;
+        item.source = similar.source || 'existing-product-fuzzy';
+        item.isNewProduct = false;
+      } else {
+        const actor = { uid: sender().requestedByUid, by: sender().requestedByNickname, nickname: sender().requestedByNickname, branch: sender().requestedBranch };
+        const payload = { productName: name, name, unit, salePrice, price: salePrice, createdFrom: 'invoice-request', costPrice: null };
+        product = window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProductAsync === 'function'
+          ? await window.ChokAnanProductMaster.createProductAsync(payload, actor)
+          : (window.ChokAnanProductMaster && typeof window.ChokAnanProductMaster.createProduct === 'function'
+            ? window.ChokAnanProductMaster.createProduct(payload, actor)
+            : null);
+        item.productId = product?.productId || product?.id || newId('product-missing-master');
+        item.productCode = product?.productCode || product?.code || '';
+        item.productName = product?.productName || name;
+        item.source = product ? 'live-product-master-new' : 'new-product-local-fallback';
+      }
+    }
+    state.items.push({
+      requestItemId: newId('req-item'),
+      ...item,
+      addedByUid: sender().requestedByUid,
+      addedBy: sender().requestedByNickname,
+      addedAt: nowIso()
+    });
+    state.validation = null;
+    clearProductEntry();
+    renderForm();
+  }
+
+  function productSearchKey(event){
+    if (event.key !== 'Enter' && event.key !== 'Tab') return;
+    const box = document.getElementById('cmsProductSuggestV42');
+    const rows = JSON.parse(box?.dataset.rows || '[]');
+    if (rows.length) {
+      event.preventDefault();
+      addExistingProduct(0);
+    }
+  }
+
+  function requestIsReady(row){
+    const status = text(row?.status);
+    return status === 'พร้อมพิมพ์' || status.includes('พร้อมพิมพ์') || row?.generationState === 'generated';
+  }
+
+  function requestIsPrinted(row){
+    const status = text(row?.status);
+    return status === 'พิมพ์แล้ว' || status === 'สั่งพิมพ์แล้ว' || status.includes('พิมพ์แล้ว') || status.includes('สั่งพิมพ์แล้ว');
+  }
+
+  function statusClass(row){
+    if (requestIsPrinted(row)) return 'printed';
+    if (requestIsReady(row)) return 'ready';
+    return '';
+  }
+
+  function statusText(row){
+    if (requestIsPrinted(row)) return text(row.status) || 'พิมพ์แล้ว';
+    if (requestIsReady(row)) return 'พร้อมพิมพ์';
+    return text(row?.status) || 'กำลังดำเนินการ';
+  }
+
+  function saveRequestSnapshotFromDoc(doc){
+    const row = { ...(doc.data ? doc.data() : doc), requestId: doc.id || doc.requestId };
+    store.saveProductionRequest(row);
+    return row;
+  }
+
+  function bindRealtime(){
+    if (state.realtimeBound || !sync.firestoreReady()) return;
+    const uid = sender().requestedByUid;
+    if (!uid || !window.db) return;
+    state.realtimeBound = true;
+    const rerender = () => {
+      const active = document.querySelector('#cmsInvoiceRequestStatusPageV42.active, #cmsInvoiceRequestHistoryPageV42.active');
+      if (!active) return;
+      if (active.id === 'cmsInvoiceRequestStatusPageV42') renderStatus();
+      if (active.id === 'cmsInvoiceRequestHistoryPageV42') renderHistory();
+    };
+    state.realtimeUnsubs.push(window.db.collection('invoiceRequests').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
+      snapshot.forEach(saveRequestSnapshotFromDoc);
+      rerender();
+    }, error => console.warn('[invoice-request] request listener failed', error)));
+    state.realtimeUnsubs.push(window.db.collection('taxInvoiceHistory').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
+      snapshot.forEach(doc => saveMobileHistory({ ...(doc.data() || {}), historyId: doc.id }));
+      rerender();
+    }, error => console.warn('[invoice-request] history listener failed', error)));
+  }
+
+  function renderStatus(){
+    ensurePages();
+    bindRealtime();
+    const rows = isTestMode() ? store.listRequests() : store.listProductionRequests();
+    document.getElementById('cmsInvoiceRequestStatusPageV42').innerHTML = [
+      header('สถานะใบกำกับภาษี', isTestMode() ? 'Test Mode' : 'อัปเดตจากฐานข้อมูลกลางแบบ realtime'),
+      '<div class="cmsInvoiceListV42">',
+      rows.length ? rows.map(row => statusRowHtml(row)).join('') : '<div class="empty">ยังไม่มีคำขอในเครื่องนี้</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function statusRowHtml(row){
+    const generated = Array.isArray(row.generatedInvoiceNumbers) && row.generatedInvoiceNumbers.length
+      ? `<br>เลขที่ใบกำกับ: ${row.generatedInvoiceNumbers.map(esc).join(', ')}`
+      : '';
+    const preview = requestIsReady(row) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
+      ? `<button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(row.requestId)}')">ดูตัวอย่างใบกำกับภาษี</button>`
+      : '';
+    const action = canGenerateInvoice(row)
+      ? `<button class="cmsInvoiceSecondaryV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.generateInvoice('${esc(row.requestId)}')">สร้างใบกำกับ</button>`
+      : '';
+    return `<div class="cmsInvoiceListRowV42"><b>${esc(row.requestNumber || row.requestId)}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerDisplayName || row.customerSnapshot?.customerName || '-')}<br>เวลา: ${esc(row.requestedAt || row.sender?.requestedAt || '-')}<br>รายการ: ${row.itemCount || 0} | คาดว่า ${row.expectedInvoiceCount || 0} ใบ | ยอด ${money(row.grandTotal || row.subtotalPreview)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${statusClass(row)}">${esc(statusText(row))}</strong>${generated}</span>${preview}${action}</div>`;
+  }
+
+  function renderHistory(){
+    ensurePages();
+    bindRealtime();
+    const rows = readMobileHistory();
+    document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
+      header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoiceHistory ฐานกลาง'),
+      '<div class="cmsInvoiceListV42">',
+      rows.length ? rows.map(row => `<div class="cmsInvoiceListRowV42"><b>${esc(row.invoiceNumber || row.no || row.historyId || '-')}</b><span class="cmsInvoiceListMetaV42">ลูกค้า: ${esc(row.customerSnapshot?.customerName || row.buyerName || '-')}<br>ยอดรวม: ${money(row.grandTotal || row.total)}<br>สถานะ: <strong class="cmsInvoiceStatusTextV42 ${row.printed ? 'printed' : 'ready'}">${row.printed ? 'พิมพ์แล้ว' : 'พร้อมพิมพ์'}</strong></span></div>`).join('') : '<div class="empty">ยังไม่มีประวัติใบกำกับภาษีจากฐานกลาง</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function openStatus(){ renderStatus(); showPage('cmsInvoiceRequestStatusPageV42'); }
+  function openHistory(){ renderHistory(); showPage('cmsInvoiceRequestHistoryPageV42'); }
+
+  async function fetchPreviewInvoices(row){
+    if (!row || !sync.firestoreReady() || !window.db) return [];
+    const ids = Array.isArray(row.generatedInvoiceIds) ? row.generatedInvoiceIds.filter(Boolean) : [];
+    if (ids.length) {
+      const snaps = await Promise.all(ids.map(id => window.db.collection('taxInvoices').doc(id).get()));
+      return snaps.filter(snap => snap.exists).map(snap => ({ ...(snap.data() || {}), invoiceId: snap.id }));
+    }
+    const uid = sender().requestedByUid;
+    const snap = await window.db.collection('taxInvoices').where('requestedByUid', '==', uid).where('sourceRequestId', '==', row.requestId).get();
+    return snap.docs.map(doc => ({ ...(doc.data() || {}), invoiceId: doc.id }));
+  }
+
+  function previewInvoiceHtml(invoice, index){
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    return `<article class="cmsInvoicePreviewSheetV42">
+      <div class="cmsInvoicePreviewHeadV42"><span>ใบที่ ${index + 1}</span><b>${esc(invoice.invoiceNumber || '-')}</b></div>
+      <div class="cmsInvoicePreviewTitleV42">ใบกำกับภาษี</div>
+      <div class="cmsInvoicePreviewBuyerV42"><b>${esc(invoice.customerName || '-')}</b><span>เลขผู้เสียภาษี: ${esc(invoice.customerTaxId || '-')}</span></div>
+      <div class="cmsInvoicePreviewTableV42">
+        <div class="head">สินค้า</div><div class="head num">จำนวน</div><div class="head num">ราคา</div><div class="head num">รวม</div>
+        ${items.map(item => `<div>${esc(item.productName || item.name || '-')}</div><div class="num">${esc(item.quantity || '')} ${esc(item.unit || '')}</div><div class="num">${money(item.salePrice || item.price)}</div><div class="num">${money(item.lineSubtotal || item.total)}</div>`).join('')}
+      </div>
+      <div class="cmsInvoicePreviewTotalsV42"><span>ก่อน VAT ${money(invoice.beforeVat)}</span><span>VAT ${money(invoice.vatAmount)}</span><b>ยอดรวม ${money(invoice.grandTotal)}</b></div>
+    </article>`;
+  }
+
+  async function openPreview(requestId){
+    const row = store.listProductionRequests().find(item => item.requestId === requestId);
+    if (!requestIsReady(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์');
+    try {
+      const invoices = await fetchPreviewInvoices(row);
+      const payload = window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.requestPreviewPayload === 'function'
+        ? window.ChokAnanInvoicePreviewService.requestPreviewPayload(row, invoices)
+        : { invoices };
+      const modal = document.getElementById('cmsInvoicePreviewModalV42') || document.createElement('div');
+      modal.id = 'cmsInvoicePreviewModalV42';
+      modal.className = 'cmsInvoicePreviewModalV42';
+      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map(previewInvoiceHtml).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
+      if (!modal.parentElement) document.body.appendChild(modal);
+      document.documentElement.classList.add('cmsInvoicePreviewOpenV42');
+    } catch (error) {
+      alert(`เปิด Preview ไม่สำเร็จ: ${error.message || error}`);
+    }
+  }
+
+  function closePreview(){
+    document.getElementById('cmsInvoicePreviewModalV42')?.remove();
+    document.documentElement.classList.remove('cmsInvoicePreviewOpenV42');
+  }
+
+  async function confirmRequest(){
+    state.note = document.getElementById('cmsInvoiceNoteV42')?.value || state.note;
+    state.validation = validation.validateRequest({ customer: state.customer, items: state.items });
+    if (!state.validation.valid) {
+      renderForm();
+      const first = state.validation.firstInvalidIndex >= 0 ? document.querySelector(`[data-item-index="${state.validation.firstInvalidIndex}"]`) : document.getElementById('cmsCustomerSearchV42');
+      first?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alert(state.validation.errors[0]?.message || 'กรุณาตรวจรายการสินค้าให้ครบ');
+      return;
+    }
+    if (state.confirmLocked) return;
+    const total = totals();
+    if (!confirm(`ยืนยันส่งคำขอออกใบกำกับภาษี?\nรายการ ${state.items.length} รายการ\nคาดว่า ${total.expectedInvoiceCount} ใบ\nก่อน VAT ${money(total.subtotal)}\nVAT ${money(total.vatAmount)}\nยอดรวม ${money(total.grandTotal)}`)) return;
+    state.confirmLocked = true;
+    try {
+      if (isTestMode()) {
+        const row = requestSnapshot({ requestId: testRequestId(), requestNumber: testRequestId(), createdAt: nowIso() });
+        store.saveRequest(row);
+        alert(`สร้าง Test Request แล้ว\n${row.requestNumber}\nสถานะ: กำลังดำเนินการ`);
+      } else {
+        const row = requestSnapshot({ idempotencyKey: ensureIdempotencyKey(), createdAt: nowIso() });
+        const result = await sync.submit(row);
+        const saved = result.request;
+        bindRealtime();
+        alert(`${result.offline ? 'บันทึกคำขอไว้รอซิงก์ Firebase แล้ว' : 'ส่งคำขอเข้าฐานกลางแล้ว'}\n${saved.requestNumber || saved.requestId}\nสถานะ: ${saved.status}`);
+      }
+      if (state.draftId) {
+        if (isTestMode()) store.deleteDraft(state.draftId);
+        else store.deleteProductionDraft(state.draftId);
+      }
+      state.items = [];
+      state.customer = null;
+      state.selectedProduct = null;
+      state.note = '';
+      state.draftId = '';
+      state.validation = null;
+      state.idempotencyKey = '';
+      openStatus();
+    } catch (error) {
+      alert(`ส่งคำขอไม่สำเร็จ: ${error.message || error}`);
+    } finally {
+      state.confirmLocked = false;
+    }
+  }
+
   function init(){
     ensurePages();
     ensureHomeButton();
@@ -657,9 +1075,11 @@
     searchProduct,
     productSearchKey,
     addExistingProduct,
+    productNameChanged,
     showSimilar,
     addNewProduct,
     updateItem,
+    focusItem,
     quantityKey,
     removeItem,
     setNote,
@@ -667,6 +1087,8 @@
     deleteDraft,
     confirmRequest,
     generateInvoice,
+    openPreview,
+    closePreview,
     expectedInvoiceCount: () => expectedInvoiceCount(),
     requestSnapshot,
     testState: state
