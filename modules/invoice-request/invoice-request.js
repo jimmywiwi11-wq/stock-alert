@@ -19,6 +19,7 @@
     confirmLocked: false,
     idempotencyKey: '',
     selectedProduct: null,
+    editingItemIndex: -1,
     customerSearchTimer: null,
     productSearchTimer: null,
     customerSearchToken: 0,
@@ -109,7 +110,7 @@
   function modeBanner(){
     return isTestMode()
       ? '<div class="cmsInvoiceBannerV42">Test Mode: เก็บเฉพาะข้อมูลทดสอบในเครื่องนี้ ไม่ส่ง Firestore จริง</div>'
-      : '<div class="cmsInvoiceBannerV42 production">Production Mode: ส่งคำขอจริงไปที่ invoiceRequests แต่ยังไม่สร้างใบกำกับภาษีจริงและยังไม่ออกเลข IV</div>';
+      : '<div class="cmsInvoiceBannerV42 production">Production Mode: สถานะและตัวอย่างใบกำกับภาษีซิงก์จากฐานข้อมูลกลางแบบ realtime</div>';
   }
 
   function showPage(id){
@@ -185,12 +186,214 @@
 
   function renderCustomerPanel(){
     const c = state.customer;
-    const selectedName = c ? (c.customerName || c.name || '-') : '-';
-    return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">ลูกค้า</h3>
+    const selectedName = c ? ([c.prefix, c.customerName || c.name].filter(Boolean).join(' ').trim() || '-') : '-';
+    return `<div class="cmsInvoicePanelV42">
+      <div class="cmsInvoiceCustomerTitleRowV42">
+        <h3 class="cmsInvoiceSectionTitleV42">ลูกค้า</h3>
+        <button type="button" class="cmsInvoiceAddCustomerV42" onclick="CMSInvoiceRequest.openAddCustomer()">เพิ่ม</button>
+      </div>
       <div class="cmsInvoiceSuggestWrapV42"><label>ค้นหา/เลือกลูกค้า</label><input class="cmsInvoiceInputV42" id="cmsCustomerSearchV42" placeholder="ค้นจากรหัส ชื่อ เลขภาษี หรือที่อยู่" oncompositionstart="CMSInvoiceRequest.beginComposition('customer')" oncompositionend="CMSInvoiceRequest.endComposition('customer', this.value)" oninput="CMSInvoiceRequest.searchCustomer(this.value)" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsCustomerSuggestV42"></div></div>
       <div class="cmsInvoiceSelectedCustomerV42" style="margin-top:10px"><label>ลูกค้าที่เลือก</label><div class="cmsInvoiceReadOnlyV42">${esc(selectedName)}</div></div>
     </div>`;
   }
+  function openAddCustomer(){
+    closeAddCustomer();
+    const modal = document.createElement('div');
+    modal.id = 'cmsInvoiceCustomerModalV42';
+    modal.className = 'cmsInvoiceCustomerModalV42';
+    modal.innerHTML = `<div class="cmsInvoiceCustomerDialogV42" role="dialog" aria-modal="true" aria-labelledby="cmsInvoiceCustomerDialogTitleV42">
+      <div class="cmsInvoiceCustomerDialogHeadV42">
+        <h3 id="cmsInvoiceCustomerDialogTitleV42">เพิ่มบริษัทลูกค้า</h3>
+        <button type="button" onclick="CMSInvoiceRequest.closeAddCustomer()" aria-label="ปิด">×</button>
+      </div>
+      <div class="cmsInvoiceCustomerDialogBodyV42">
+        <div class="cmsInvoiceCustomerGridV42">
+          <div>
+            <label>คำนำหน้า</label>
+            <select id="cmsNewCustomerPrefixV42" class="cmsInvoiceInputV42">
+              <option value="บริษัท">บริษัท</option>
+              <option value="ห้างหุ้นส่วนจำกัด">ห้างหุ้นส่วนจำกัด</option>
+              <option value="นาย">นาย</option>
+              <option value="นาง">นาง</option>
+              <option value="นางสาว">นางสาว</option>
+              <option value="คุณ">คุณ</option>
+              <option value="">ไม่ระบุ</option>
+            </select>
+          </div>
+          <div>
+            <label>ชื่อบริษัท/ชื่อลูกค้า</label>
+            <input id="cmsNewCustomerNameV42" class="cmsInvoiceInputV42" autocomplete="organization" placeholder="ชื่อบริษัท">
+          </div>
+          <div class="wide">
+            <label>ที่อยู่ 1</label>
+            <input id="cmsNewCustomerAddress1V42" class="cmsInvoiceInputV42" autocomplete="street-address" placeholder="บ้านเลขที่ หมู่ ถนน ตำบล">
+          </div>
+          <div class="wide">
+            <label>ที่อยู่ 2</label>
+            <input id="cmsNewCustomerAddress2V42" class="cmsInvoiceInputV42" placeholder="อำเภอ จังหวัด รหัสไปรษณีย์">
+          </div>
+          <div class="wide">
+            <label>เลขประจำตัวผู้เสียภาษี</label>
+            <input id="cmsNewCustomerTaxV42" class="cmsInvoiceInputV42" inputmode="numeric" maxlength="13" placeholder="13 หลัก">
+          </div>
+        </div>
+        <div id="cmsNewCustomerErrorV42" class="cmsInvoiceCustomerErrorV42"></div>
+      </div>
+      <div class="cmsInvoiceCustomerDialogFootV42">
+        <button type="button" class="cancel" onclick="CMSInvoiceRequest.closeAddCustomer()">ยกเลิก</button>
+        <button type="button" class="save" id="cmsSaveCustomerV42" onclick="CMSInvoiceRequest.saveNewCustomer()">บันทึก</button>
+      </div>
+    </div>`;
+    modal.addEventListener('click', event => {
+      if (event.target === modal) closeAddCustomer();
+    });
+    document.body.appendChild(modal);
+    document.documentElement.classList.add('cmsInvoiceCustomerModalOpenV42');
+    setTimeout(() => document.getElementById('cmsNewCustomerNameV42')?.focus(), 50);
+  }
+
+  function closeAddCustomer(){
+    document.getElementById('cmsInvoiceCustomerModalV42')?.remove();
+    document.documentElement.classList.remove('cmsInvoiceCustomerModalOpenV42');
+  }
+
+  function customerCodeNow(){
+    const date = new Date();
+    const part = [
+      String(date.getFullYear()).slice(-2),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+      String(date.getHours()).padStart(2, '0'),
+      String(date.getMinutes()).padStart(2, '0'),
+      String(date.getSeconds()).padStart(2, '0')
+    ].join('');
+    return `CM${part}${Math.random().toString(36).slice(2,5).toUpperCase()}`;
+  }
+
+  function newCustomerValue(id){
+    return String(document.getElementById(id)?.value || '').trim();
+  }
+
+  function setNewCustomerError(message){
+    const box = document.getElementById('cmsNewCustomerErrorV42');
+    if (box) box.textContent = message || '';
+  }
+
+  async function saveNewCustomer(){
+    const prefix = newCustomerValue('cmsNewCustomerPrefixV42');
+    const customerName = newCustomerValue('cmsNewCustomerNameV42');
+    const address1 = newCustomerValue('cmsNewCustomerAddress1V42');
+    const address2 = newCustomerValue('cmsNewCustomerAddress2V42');
+    const taxId = newCustomerValue('cmsNewCustomerTaxV42').replace(/\D/g, '');
+    const saveButton = document.getElementById('cmsSaveCustomerV42');
+
+    setNewCustomerError('');
+    if (!customerName) {
+      setNewCustomerError('กรุณากรอกชื่อบริษัทหรือชื่อลูกค้า');
+      document.getElementById('cmsNewCustomerNameV42')?.focus();
+      return;
+    }
+    if (!address1) {
+      setNewCustomerError('กรุณากรอกที่อยู่ 1');
+      document.getElementById('cmsNewCustomerAddress1V42')?.focus();
+      return;
+    }
+    if (!address2) {
+      setNewCustomerError('กรุณากรอกที่อยู่ 2');
+      document.getElementById('cmsNewCustomerAddress2V42')?.focus();
+      return;
+    }
+    if (taxId && taxId.length !== 13) {
+      setNewCustomerError('เลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก');
+      document.getElementById('cmsNewCustomerTaxV42')?.focus();
+      return;
+    }
+    if (!window.db || typeof window.db.collection !== 'function') {
+      setNewCustomerError('ยังไม่เชื่อมต่อฐานข้อมูลกลาง กรุณาเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง');
+      return;
+    }
+
+    const existing = customerSearch.searchCustomers(taxId || customerName, 50);
+    const duplicate = existing.find(customer => {
+      const existingTax = String(customer.taxId || customer.customerTaxId || '').replace(/\D/g, '');
+      const existingName = normalizeUiText(customer.customerName || customer.name || '');
+      return (taxId && existingTax === taxId) || (existingName && existingName === normalizeUiText(customerName));
+    });
+    if (duplicate) {
+      state.customer = duplicate;
+      closeAddCustomer();
+      renderForm();
+      alert('ลูกค้านี้มีอยู่แล้ว ระบบเลือกข้อมูลเดิมให้ทันที');
+      return;
+    }
+
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = 'กำลังบันทึก...';
+    }
+
+    try {
+      const customerCode = customerCodeNow();
+      const fullName = [prefix, customerName].filter(Boolean).join(' ').trim();
+      const address = [address1, address2].filter(Boolean).join(' ').trim();
+      const now = nowIso();
+      const customer = {
+        id: customerCode,
+        customerId: customerCode,
+        code: customerCode,
+        customerCode,
+        prefix,
+        customerPrefix: prefix,
+        name: customerName,
+        customerName,
+        companyName: customerName,
+        fullName,
+        address1,
+        address2,
+        address,
+        customerAddress: address,
+        customerAddress1: address1,
+        customerAddress2: address2,
+        taxId,
+        customerTaxId: taxId,
+        phone: '',
+        headOffice: '',
+        branchNumber: '',
+        createdAt: now,
+        updatedAt: now,
+        createdBy: sender().requestedByNickname,
+        createdByUid: sender().requestedByUid,
+        createdFrom: 'employee-invoice-request',
+        source: 'customer-master'
+      };
+
+      await window.db.collection('customers').doc(customerCode).set(customer, { merge: true });
+
+      state.customer = customer;
+      try {
+        const localKey = 'chokananCustomerMasterRecentV1';
+        const recent = JSON.parse(localStorage.getItem(localKey) || '[]');
+        localStorage.setItem(localKey, JSON.stringify([customer, ...recent.filter(row => row.customerCode !== customerCode)].slice(0, 100)));
+      } catch (error) {}
+
+      try {
+        window.dispatchEvent(new CustomEvent('chokanan-customer-master-updated', {
+          detail: { customer, source: 'employee-invoice-request' }
+        }));
+      } catch (error) {}
+
+      closeAddCustomer();
+      renderForm();
+      alert(`บันทึกลูกค้าใหม่แล้ว\n${fullName}\nระบบเลือกบริษัทนี้ให้เรียบร้อย`);
+    } catch (error) {
+      setNewCustomerError(`บันทึกลูกค้าไม่สำเร็จ: ${error.message || error}`);
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = 'บันทึก';
+      }
+    }
+  }
+
 
   function renderProductPanel(){
     return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
@@ -394,6 +597,157 @@
 
   function openLanding(){ renderLanding(); showPage('cmsInvoiceRequestPageV42'); }
   function openForm(){ loadLatestDraft(); renderForm(); showPage('cmsInvoiceRequestFormPageV42'); }
+  function closeStatusMore(){
+    document.getElementById('cmsInvoiceStatusMoreMenuV42')?.classList.remove('show');
+  }
+
+  function toggleStatusMore(event){
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('cmsInvoiceStatusMoreMenuV42');
+    if (!menu) return;
+    const show = !menu.classList.contains('show');
+    closeStatusMore();
+    if (show) menu.classList.add('show');
+  }
+
+  function closeLocalClearDialog(){
+    document.getElementById('cmsInvoiceLocalClearModalV42')?.remove();
+    document.documentElement.classList.remove('cmsInvoiceLocalClearOpenV42');
+  }
+
+  function currentStatusPairsForClear(){
+    const pairs = mobileStatusInvoiceRows();
+    if (pairs.length) return pairs;
+    return (isTestMode() ? store.listRequests() : store.listProductionRequests())
+      .filter(requestVisibleInCurrentStatus)
+      .filter(request => !requestIsLocallyHidden(request, true))
+      .map(request => ({ invoice: {}, request }));
+  }
+
+  function clearPairLabel(pair, index){
+    const invoice = pair.invoice || {};
+    const request = pair.request || {};
+    const requestNumber = invoice.requestNumber || invoice.sourceRequestNumber || request.requestNumber || `รายการ ${index + 1}`;
+    const invoiceNumber = invoice.invoiceNumber || invoice.no || '';
+    const customer = invoiceCustomerName(invoice, request);
+    const status = invoice.invoiceNumber || invoice.no ? invoiceStatusText(invoice) : statusText(request);
+    return `${requestNumber}${invoiceNumber ? ` • ${invoiceNumber}` : ''} • ${customer} • ${status}`;
+  }
+
+  function openClearStatusDialog(){
+    closeStatusMore();
+    closeLocalClearDialog();
+    const pairs = currentStatusPairsForClear();
+    if (!pairs.length) {
+      alert('ไม่มีข้อมูลในหน้าสถานะให้ล้าง');
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'cmsInvoiceLocalClearModalV42';
+    modal.className = 'cmsInvoiceLocalClearModalV42';
+    modal.innerHTML = `<div class="cmsInvoiceLocalClearDialogV42">
+      <div class="cmsInvoiceLocalClearHeadV42"><h3>ล้างสถานะในมือถือ</h3><button type="button" onclick="CMSInvoiceRequest.closeLocalClearDialog()">×</button></div>
+      <div class="cmsInvoiceLocalClearBodyV42">
+        <p>ข้อมูลจะถูกซ่อนเฉพาะในแอปมือถือเครื่องนี้ ไม่กระทบโปรแกรมออกใบกำกับภาษีหรือ Firestore ส่วนกลาง</p>
+        <label class="cmsInvoiceClearChoiceV42"><input type="radio" name="cmsClearModeV42" value="all" checked onchange="CMSInvoiceRequest.clearStatusModeChanged()"> ล้างทั้งหมด</label>
+        <label class="cmsInvoiceClearChoiceV42"><input type="radio" name="cmsClearModeV42" value="selected" onchange="CMSInvoiceRequest.clearStatusModeChanged()"> เลือกบางรายการ</label>
+        <div id="cmsInvoiceClearSelectionV42" class="cmsInvoiceClearSelectionV42" hidden>
+          <label class="cmsInvoiceClearSelectAllV42"><input type="checkbox" id="cmsInvoiceClearSelectAllV42" onchange="CMSInvoiceRequest.toggleClearSelectAll(this.checked)"> เลือกทั้งหมด</label>
+          ${pairs.map((pair, index) => `<label><input type="checkbox" class="cmsInvoiceClearRowV42" value="${index}"> <span>${esc(clearPairLabel(pair, index))}</span></label>`).join('')}
+        </div>
+      </div>
+      <div class="cmsInvoiceLocalClearFootV42"><button type="button" class="cancel" onclick="CMSInvoiceRequest.closeLocalClearDialog()">ยกเลิก</button><button type="button" class="danger" onclick="CMSInvoiceRequest.confirmClearStatus()">ล้างสถานะ</button></div>
+    </div>`;
+    modal._clearPairs = pairs;
+    document.body.appendChild(modal);
+    document.documentElement.classList.add('cmsInvoiceLocalClearOpenV42');
+  }
+
+  function clearStatusModeChanged(){
+    const mode = document.querySelector('input[name="cmsClearModeV42"]:checked')?.value || 'all';
+    const selection = document.getElementById('cmsInvoiceClearSelectionV42');
+    if (selection) selection.hidden = mode !== 'selected';
+  }
+
+  function toggleClearSelectAll(checked){
+    document.querySelectorAll('.cmsInvoiceClearRowV42').forEach(input => { input.checked = !!checked; });
+  }
+
+  function confirmClearStatus(){
+    const modal = document.getElementById('cmsInvoiceLocalClearModalV42');
+    const pairs = modal?._clearPairs || [];
+    const mode = document.querySelector('input[name="cmsClearModeV42"]:checked')?.value || 'all';
+    const selected = mode === 'all'
+      ? pairs
+      : [...document.querySelectorAll('.cmsInvoiceClearRowV42:checked')].map(input => pairs[Number(input.value)]).filter(Boolean);
+
+    if (!selected.length) {
+      alert('กรุณาเลือกรายการที่ต้องการล้าง');
+      return;
+    }
+
+    const message = `ยืนยันล้างสถานะ ${selected.length} รายการ?\n\nล้างเฉพาะหน้าสถานะบนมือถือเครื่องนี้\nไม่ลบข้อมูลจากโปรแกรมออกใบกำกับภาษี`;
+    if (!confirm(message)) return;
+
+    hideLocalPairs(selected, MOBILE_STATUS_HIDDEN_KEY);
+    closeLocalClearDialog();
+    renderStatus();
+  }
+
+  function openClearAllDialog(){
+    closeStatusMore();
+    closeLocalClearDialog();
+    const modal = document.createElement('div');
+    modal.id = 'cmsInvoiceLocalClearModalV42';
+    modal.className = 'cmsInvoiceLocalClearModalV42';
+    modal.innerHTML = `<div class="cmsInvoiceLocalClearDialogV42 danger">
+      <div class="cmsInvoiceLocalClearHeadV42"><h3>ล้างสถานะและประวัติทั้งหมด</h3><button type="button" onclick="CMSInvoiceRequest.closeLocalClearDialog()">×</button></div>
+      <div class="cmsInvoiceLocalClearBodyV42">
+        <div class="cmsInvoiceClearWarningV42">การล้างนี้มีผลเฉพาะแอปมือถือเครื่องนี้เท่านั้น โปรแกรมออกใบกำกับภาษีและข้อมูลส่วนกลางยังอยู่ครบ</div>
+        <p><b>ขั้นที่ 1:</b> ทำเครื่องหมายยืนยันว่าคุณเข้าใจ</p>
+        <label class="cmsInvoiceClearChoiceV42"><input type="checkbox" id="cmsInvoiceClearUnderstandV42" onchange="CMSInvoiceRequest.clearAllValidationChanged()"> ฉันเข้าใจว่าจะล้างหน้าสถานะและประวัติบนมือถือ</label>
+        <p><b>ขั้นที่ 2:</b> พิมพ์คำว่า <strong>ลบทั้งหมด</strong></p>
+        <input class="cmsInvoiceInputV42" id="cmsInvoiceClearPhraseV42" autocomplete="off" placeholder="พิมพ์ ลบทั้งหมด" oninput="CMSInvoiceRequest.clearAllValidationChanged()">
+        <p><b>ขั้นที่ 3:</b> กดปุ่มสีแดงด้านล่างเพื่อยืนยันครั้งสุดท้าย</p>
+      </div>
+      <div class="cmsInvoiceLocalClearFootV42"><button type="button" class="cancel" onclick="CMSInvoiceRequest.closeLocalClearDialog()">ยกเลิก</button><button type="button" class="danger" id="cmsInvoiceClearAllFinalV42" onclick="CMSInvoiceRequest.confirmClearAll()" disabled>ลบทั้งหมด</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+    document.documentElement.classList.add('cmsInvoiceLocalClearOpenV42');
+  }
+
+  function clearAllValidationChanged(){
+    const understood = !!document.getElementById('cmsInvoiceClearUnderstandV42')?.checked;
+    const phrase = String(document.getElementById('cmsInvoiceClearPhraseV42')?.value || '').trim();
+    const button = document.getElementById('cmsInvoiceClearAllFinalV42');
+    if (button) button.disabled = !(understood && phrase === 'ลบทั้งหมด');
+  }
+
+  function confirmClearAll(){
+    const understood = !!document.getElementById('cmsInvoiceClearUnderstandV42')?.checked;
+    const phrase = String(document.getElementById('cmsInvoiceClearPhraseV42')?.value || '').trim();
+    if (!understood || phrase !== 'ลบทั้งหมด') return;
+
+    if (!confirm('ยืนยันครั้งสุดท้าย?\n\nสถานะและประวัติใบกำกับภาษีในมือถือเครื่องนี้จะหายทั้งหมด\nข้อมูลในโปรแกรมออกใบกำกับภาษีจะไม่ถูกลบ')) return;
+
+    const requests = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
+    const allPairs = readMobileHistory().map(invoice => ({ invoice, request: requests.get(invoiceRequestKey(invoice)) || {} }));
+    hideLocalPairs(allPairs, MOBILE_ALL_HIDDEN_KEY);
+
+    // Also hide request-only cards that do not yet have a taxInvoices record.
+    const allHidden = localAllHiddenSet();
+    for (const request of (isTestMode() ? store.listRequests() : store.listProductionRequests())) {
+      requestLocalKeys(request).forEach(key => allHidden.add(key));
+    }
+    writeLocalHiddenSet(MOBILE_ALL_HIDDEN_KEY, allHidden);
+
+    localStorage.removeItem(TAX_INVOICE_HISTORY_KEY);
+    closeLocalClearDialog();
+    renderStatus();
+    alert('ล้างสถานะและประวัติในมือถือเครื่องนี้แล้ว\nข้อมูลในโปรแกรมออกใบกำกับภาษียังอยู่ครบ');
+  }
+
   function openStatus(){ renderStatus(); showPage('cmsInvoiceRequestStatusPageV42'); }
   function openHistory(){ renderHistory(); showPage('cmsInvoiceRequestHistoryPageV42'); }
   function backHome(){ if (typeof window.go === 'function') window.go('home'); else showPage('home'); }
@@ -552,6 +906,8 @@
 
   function removeItem(index){
     state.items.splice(index, 1);
+    if (state.editingItemIndex === index) state.editingItemIndex = -1;
+    else if (state.editingItemIndex > index) state.editingItemIndex -= 1;
     state.validation = null;
     renderForm();
   }
@@ -654,6 +1010,9 @@
   }
 
   const TAX_INVOICE_HISTORY_KEY = 'cms.invoiceRequest.taxInvoiceHistory';
+  const MOBILE_STATUS_HIDDEN_KEY = 'cmsInvoiceMobileStatusHiddenV1';
+  const MOBILE_ALL_HIDDEN_KEY = 'cmsInvoiceMobileAllHiddenV1';
+
 
   function normalizeUiText(value){
     return text(value).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '').trim();
@@ -704,18 +1063,107 @@
   function normalizedStatus(row){
     const status = text(row?.status).toLowerCase();
     const printStatus = text(row?.printStatus).toLowerCase();
-    const hasNativeImport = row?.importedToNativeHistory === true && (
-      (Array.isArray(row?.nativeInvoiceIds) && row.nativeInvoiceIds.length > 0) ||
-      (Array.isArray(row?.generatedInvoiceIds) && row.generatedInvoiceIds.length > 0)
-    );
-    if (row?.printed === true || status === 'printed' || status === 'print_confirmed' || printStatus === 'printed' || printStatus === 'reprinted') return 'printed';
+    const generationState = text(row?.generationState).toLowerCase();
+
+    // Firestore status is the source of truth. A request may already have a real
+    // taxInvoices document even when legacy generatedInvoiceIds arrays are empty.
+    if (
+      row?.printed === true ||
+      status === 'printed' ||
+      status === 'print_confirmed' ||
+      printStatus === 'printed' ||
+      printStatus === 'reprinted' ||
+      status.includes('พิมพ์แล้ว') ||
+      status.includes('สั่งพิมพ์แล้ว')
+    ) return 'printed';
+
     if (status === 'partially_printed' || printStatus === 'partially_printed') return 'partially_printed';
-    if ((status === 'ready_to_print' || status === 'ready' || printStatus === 'ready_to_print' || row?.generationState === 'generated' || row?.generationState === 'completed' || row?.generationState === 'native-imported') && hasNativeImport) return 'ready_to_print';
-    if (status === 'ready_to_print' || printStatus === 'ready_to_print' || row?.generationState === 'generated' || row?.generationState === 'completed') return 'processing';
-    if (status === 'processing' || status === 'not-started' || row?.generationState === 'not-started') return 'processing';
-    if (status.includes('พิมพ์แล้ว') || status.includes('สั่งพิมพ์แล้ว')) return 'printed';
-    if (status.includes('พร้อมพิมพ์')) return 'ready_to_print';
+
+    if (
+      status === 'ready_to_print' ||
+      status === 'ready' ||
+      printStatus === 'ready_to_print' ||
+      generationState === 'generated' ||
+      generationState === 'completed' ||
+      generationState === 'native-imported' ||
+      status.includes('พร้อมพิมพ์')
+    ) return 'ready_to_print';
+
+    if (
+      status === 'processing' ||
+      status === 'not-started' ||
+      generationState === 'not-started'
+    ) return 'processing';
+
     return status || 'processing';
+  }
+
+  function readLocalHiddenSet(storageKey){
+    try {
+      const values = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      return new Set(Array.isArray(values) ? values.map(String) : []);
+    } catch (error) {
+      return new Set();
+    }
+  }
+
+  function writeLocalHiddenSet(storageKey, set){
+    localStorage.setItem(storageKey, JSON.stringify([...set]));
+  }
+
+  function localStatusHiddenSet(){
+    return readLocalHiddenSet(MOBILE_STATUS_HIDDEN_KEY);
+  }
+
+  function localAllHiddenSet(){
+    return readLocalHiddenSet(MOBILE_ALL_HIDDEN_KEY);
+  }
+
+  function localRecordKeys(invoice, request){
+    const keys = new Set();
+    const add = value => {
+      const textValue = String(value || '').trim();
+      if (textValue) keys.add(textValue);
+    };
+    add(invoiceRecordKey(invoice));
+    add(invoice?.invoiceId);
+    add(invoice?.historyId);
+    add(invoice?.id);
+    add(invoice?.invoiceNumber);
+    add(invoice?.no);
+    add(invoice?.No);
+    add(invoice?.sourceRequestId);
+    add(invoice?.requestId);
+    add(invoice?.requestNumber);
+    add(invoice?.sourceRequestNumber);
+    add(request?.requestId);
+    add(request?.id);
+    add(request?.requestNumber);
+    return [...keys];
+  }
+
+  function localPairIsHidden(invoice, request, includeStatusHidden){
+    const allHidden = localAllHiddenSet();
+    const statusHidden = includeStatusHidden ? localStatusHiddenSet() : new Set();
+    return localRecordKeys(invoice, request).some(key => allHidden.has(key) || statusHidden.has(key));
+  }
+
+  function hideLocalPairs(pairs, storageKey){
+    const hidden = readLocalHiddenSet(storageKey);
+    for (const pair of pairs || []) {
+      localRecordKeys(pair.invoice || {}, pair.request || {}).forEach(key => hidden.add(key));
+    }
+    writeLocalHiddenSet(storageKey, hidden);
+  }
+
+  function requestLocalKeys(request){
+    return localRecordKeys({}, request || {});
+  }
+
+  function requestIsLocallyHidden(request, includeStatusHidden){
+    const allHidden = localAllHiddenSet();
+    const statusHidden = includeStatusHidden ? localStatusHiddenSet() : new Set();
+    return requestLocalKeys(request).some(key => allHidden.has(key) || statusHidden.has(key));
   }
 
   function readMobileHistory(){
@@ -733,14 +1181,16 @@
   }
 
   function renderProductPanel(){
-    return `<div class="cmsInvoicePanelV42"><h3 class="cmsInvoiceSectionTitleV42">สินค้า</h3>
+    const editing = Number.isInteger(state.editingItemIndex) && state.editingItemIndex >= 0;
+    return `<div class="cmsInvoicePanelV42" id="cmsInvoiceProductEditorV42"><h3 class="cmsInvoiceSectionTitleV42">${editing ? `แก้ไขรายการที่ ${state.editingItemIndex + 1}` : 'สินค้า'}</h3>
       <div class="cmsInvoiceProductEntryRowV42">
         <div class="name cmsInvoiceSuggestWrapV42"><label>ชื่อสินค้า</label><input class="cmsInvoiceInputV42" id="cmsNewProductNameV42" oncompositionstart="CMSInvoiceRequest.beginComposition('productName')" oncompositionend="CMSInvoiceRequest.endComposition('productName', this.value)" oninput="CMSInvoiceRequest.productNameChanged(this.value)" onkeydown="CMSInvoiceRequest.productSearchKey(event)" placeholder="พิมพ์ชื่อสินค้า แล้วเลือกจากรายการ หรือพิมพ์สินค้าใหม่" autocomplete="off"><div class="cmsInvoiceSuggestV42" id="cmsProductSuggestV42"></div><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductNameErrorV42">${esc(state.productEntryErrors.productName || '')}</div></div>
         <div><label>จำนวน</label><input class="cmsInvoiceInputV42" id="cmsNewProductQtyV42" inputmode="decimal" placeholder="0" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductQtyErrorV42">${esc(state.productEntryErrors.quantity || '')}</div></div>
         <div><label>หน่วย</label><input class="cmsInvoiceInputV42" id="cmsNewProductUnitV42" placeholder="หน่วย" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductUnitErrorV42">${esc(state.productEntryErrors.unit || '')}</div></div>
         <div><label>ราคาขาย</label><input class="cmsInvoiceInputV42" id="cmsNewProductPriceV42" inputmode="decimal" placeholder="0.00" onfocus="CMSInvoiceRequest.hideProductSuggestions()"><div class="cmsInvoiceFieldErrorV42" id="cmsNewProductPriceErrorV42">${esc(state.productEntryErrors.salePrice || '')}</div></div>
-        <button class="cmsInvoiceAddProductV42" onclick="CMSInvoiceRequest.addNewProduct()">เพิ่ม</button>
+        <button class="cmsInvoiceAddProductV42 ${editing ? 'editing' : ''}" onclick="CMSInvoiceRequest.addNewProduct()">${editing ? 'บันทึกแก้ไข' : 'เพิ่ม'}</button>
       </div>
+      ${editing ? '<button type="button" class="cmsInvoiceCancelEditV42" onclick="CMSInvoiceRequest.cancelEditItem()">ยกเลิกแก้ไข</button>' : ''}
       <div id="cmsSimilarBoxV42"></div>
     </div>`;
   }
@@ -748,26 +1198,19 @@
   function renderItems(){
     const rows = state.items.map((item, index) => {
       const errors = itemErrors(index);
-      const line = summary.line(item, SETTINGS);
-      const badges = [];
-      if (item.isNewProduct) badges.push('สินค้าใหม่');
-      if (item.source === 'live-product-master') badges.push('Product Master');
-      return `<div class="cmsInvoiceItemCompactV42 ${Object.keys(errors).length ? 'invalid' : ''}" data-item-index="${index}">
+      return `<div class="cmsInvoiceItemSlimV42 ${Object.keys(errors).length ? 'invalid' : ''}" data-item-index="${index}">
         <div class="no">${index + 1}</div>
-        <input class="product" value="${esc(item.productName)}" oninput="CMSInvoiceRequest.updateItem(${index}, 'productName', this.value)" placeholder="ชื่อสินค้า">
-        <input class="qty" value="${esc(item.quantity ?? '')}" inputmode="decimal" oninput="CMSInvoiceRequest.updateItem(${index}, 'quantity', this.value)" onkeydown="CMSInvoiceRequest.quantityKey(event)" placeholder="จำนวน" data-qty-index="${index}">
-        <input class="unit" value="${esc(item.unit)}" oninput="CMSInvoiceRequest.updateItem(${index}, 'unit', this.value)" placeholder="หน่วย">
-        <input class="price" value="${esc(item.salePrice ?? '')}" inputmode="decimal" oninput="CMSInvoiceRequest.updateItem(${index}, 'salePrice', this.value)" placeholder="ราคา">
-        <div class="total" data-line-total="${index}">${money(line.lineSubtotal)}</div>
+        <div class="product" title="${esc(item.productName)}">${esc(item.productName)}</div>
+        <div class="qty">${esc(item.quantity ?? '')}</div>
+        <div class="unit">${esc(item.unit || '-')}</div>
+        <div class="price">${money(item.salePrice ?? 0)}</div>
         <div class="cmsInvoiceItemMenuWrapV42">
-          <button class="menu" type="button" onclick="CMSInvoiceRequest.toggleItemMenu(${index}, event)" aria-label="เมนูรายการ">...</button>
+          <button class="menu" type="button" onclick="CMSInvoiceRequest.toggleItemMenu(${index}, event)" aria-label="เมนูรายการ">⋯</button>
           <div class="cmsInvoiceItemMenuV42" id="cmsInvoiceItemMenuV42-${index}">
-            <button type="button" onclick="CMSInvoiceRequest.focusItem(${index});CMSInvoiceRequest.closeItemMenus()">แก้ไข</button>
+            <button type="button" onclick="CMSInvoiceRequest.editItem(${index});CMSInvoiceRequest.closeItemMenus()">แก้ไข</button>
             <button type="button" class="danger" onclick="CMSInvoiceRequest.removeItem(${index})">ลบ</button>
-            <button type="button" onclick="CMSInvoiceRequest.closeItemMenus()">X ปิด</button>
           </div>
         </div>
-        <div class="meta">${esc(item.productCode || '-')} ${badges.map(w => `<span class="cmsInvoiceBadgeV42 ${item.isNewProduct ? 'test' : ''}">${esc(w)}</span>`).join('')}</div>
         ${Object.values(errors).map(error => `<div class="cmsInvoiceErrorV42">${esc(error)}</div>`).join('')}
       </div>`;
     }).join('');
@@ -780,10 +1223,9 @@
         <div><small>VAT 7%</small><b>${money(total.vatAmount)}</b></div>
         <div><small>ยอดรวม</small><b>${money(total.grandTotal)}</b></div>
       </div>
-      <div class="cmsInvoiceItemsV42 compact">${rows || '<div class="empty">ยังไม่มีรายการสินค้า</div>'}</div>
+      <div class="cmsInvoiceItemsV42 slim">${rows || '<div class="empty">ยังไม่มีรายการสินค้า</div>'}</div>
     </div>`;
   }
-
   function refreshSummaryDom(){
     const cards = document.querySelectorAll('.cmsInvoiceSummaryV42 b');
     const total = totals();
@@ -804,8 +1246,40 @@
     refreshSummaryDom();
   }
 
+  function editItem(index){
+    const item = state.items[index];
+    if (!item) return;
+    state.editingItemIndex = index;
+    state.selectedProduct = {
+      productId: item.productId || '',
+      productCode: item.productCode || '',
+      productName: item.productName || '',
+      unit: item.unit || '',
+      salePrice: item.salePrice ?? '',
+      source: item.source || ''
+    };
+    state.productEntryErrors = {};
+    renderForm();
+    const name = document.getElementById('cmsNewProductNameV42');
+    const qty = document.getElementById('cmsNewProductQtyV42');
+    const unit = document.getElementById('cmsNewProductUnitV42');
+    const price = document.getElementById('cmsNewProductPriceV42');
+    if (name) name.value = item.productName || '';
+    if (qty) qty.value = item.quantity ?? '';
+    if (unit) unit.value = item.unit || '';
+    if (price) price.value = item.salePrice ?? '';
+    document.getElementById('cmsInvoiceProductEditorV42')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => qty?.focus(), 250);
+  }
+
+  function cancelEditItem(){
+    state.editingItemIndex = -1;
+    clearProductEntry();
+    renderForm();
+  }
+
   function focusItem(index){
-    document.querySelector(`[data-item-index="${index}"] input`)?.focus();
+    editItem(index);
   }
 
   function closeItemMenus(){
@@ -1005,13 +1479,28 @@
         try { window.dispatchEvent(new CustomEvent('chokanan-product-master-updated', { detail: { product, source: 'employee-invoice-request' } })); } catch (error) {}
       }
     }
-    state.items.push({
-      requestItemId: newId('req-item'),
-      ...item,
-      addedByUid: sender().requestedByUid,
-      addedBy: sender().requestedByNickname,
-      addedAt: nowIso()
-    });
+    const editingIndex = Number.isInteger(state.editingItemIndex) ? state.editingItemIndex : -1;
+    if (editingIndex >= 0 && state.items[editingIndex]) {
+      const original = state.items[editingIndex];
+      state.items[editingIndex] = {
+        ...original,
+        ...item,
+        requestItemId: original.requestItemId || newId('req-item'),
+        addedByUid: original.addedByUid || sender().requestedByUid,
+        addedBy: original.addedBy || sender().requestedByNickname,
+        addedAt: original.addedAt || nowIso(),
+        updatedAt: nowIso()
+      };
+    } else {
+      state.items.push({
+        requestItemId: newId('req-item'),
+        ...item,
+        addedByUid: sender().requestedByUid,
+        addedBy: sender().requestedByNickname,
+        addedAt: nowIso()
+      });
+    }
+    state.editingItemIndex = -1;
     state.validation = null;
     clearProductEntry();
     renderForm();
@@ -1113,8 +1602,15 @@
   }
 
   function requestCanPreview(row){
+    if (!row) return false;
     const status = normalizedStatus(row);
-    return status === 'ready_to_print' || status === 'printed' || status === 'partially_printed';
+    const rawStatus = text(row.status).toLowerCase();
+    const rawPrintStatus = text(row.printStatus).toLowerCase();
+    return status === 'ready_to_print'
+      || status === 'printed'
+      || status === 'partially_printed'
+      || rawStatus === 'ready_to_print'
+      || rawPrintStatus === 'ready_to_print';
   }
 
   function invoiceRecordKey(row){
@@ -1158,20 +1654,128 @@
     return String(request?.requestedAt || request?.createdAt || request?.updatedAt || '');
   }
 
+  function statusDuplicateText(value){
+    return String(value == null ? '' : value)
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[().,\-_/\\]/g, '');
+  }
+
+  function statusDuplicateItems(row){
+    const items = Array.isArray(row?.items) ? row.items : (Array.isArray(row?.itemsSnapshot) ? row.itemsSnapshot : []);
+    return items.map(item => [
+      statusDuplicateText(item.productCode || item.code || ''),
+      statusDuplicateText(item.productName || item.name || ''),
+      Number(item.quantity ?? item.qty ?? 0),
+      Number(item.salePrice ?? item.price ?? 0),
+      statusDuplicateText(item.unit || '')
+    ].join(':')).sort().join('|');
+  }
+
+  function statusDuplicateKey(invoice, request){
+    const requestNumber = String(
+      invoice?.requestNumber ||
+      invoice?.sourceRequestNumber ||
+      request?.requestNumber ||
+      ''
+    ).trim();
+
+    const requestId = String(
+      invoice?.sourceRequestId ||
+      invoice?.requestId ||
+      request?.requestId ||
+      request?.id ||
+      ''
+    ).trim();
+
+    const customerTax = String(
+      invoice?.buyerTax ||
+      invoice?.customerSnapshot?.taxId ||
+      invoice?.customerSnapshot?.customerTaxId ||
+      request?.customerSnapshot?.taxId ||
+      request?.customerSnapshot?.customerTaxId ||
+      ''
+    ).replace(/\D/g, '');
+
+    const customerName = statusDuplicateText(
+      invoice?.buyerName ||
+      invoice?.customerSnapshot?.customerName ||
+      invoice?.customerSnapshot?.companyName ||
+      request?.customerDisplayName ||
+      request?.customerSnapshot?.customerName ||
+      request?.customerSnapshot?.companyName ||
+      ''
+    );
+
+    const total = Number(invoice?.grandTotal ?? invoice?.total ?? request?.grandTotal ?? request?.subtotalPreview ?? 0);
+    const itemCount = Number(invoiceItemCount(invoice) || request?.itemCount || 0);
+    const date = previewDateKey(invoice?.invoiceDate || invoice?.date || invoice?.createdAt || request?.requestedAt || '');
+    const items = statusDuplicateItems(invoice);
+
+    // The request number/id identifies the business action, while the remaining
+    // fields prevent legitimate multi-invoice splits from being collapsed.
+    const requestPart = requestNumber || requestId || 'NO_REQUEST';
+    return [
+      requestPart,
+      customerTax,
+      customerName,
+      Number.isFinite(total) ? total.toFixed(2) : '0.00',
+      itemCount,
+      date,
+      items
+    ].join('||');
+  }
+
+  function statusRecordPriority(pair){
+    const status = normalizedStatus(pair.invoice);
+    const statusRank = status === 'printed' ? 30 : status === 'partially_printed' ? 20 : status === 'ready_to_print' ? 10 : 0;
+    const linkedRank = (pair.invoice?.sourceRequestId || pair.invoice?.requestId) ? 5 : 0;
+    const itemRank = Array.isArray(pair.invoice?.items) ? Math.min(pair.invoice.items.length, 9) : 0;
+    const timestamp = Date.parse(
+      printedTimestamp(pair.invoice) ||
+      pair.invoice?.updatedAt ||
+      pair.invoice?.createdAt ||
+      pair.invoice?.invoiceDate ||
+      ''
+    ) || 0;
+    return { statusRank, linkedRank, itemRank, timestamp };
+  }
+
+  function preferStatusRecord(current, candidate){
+    if (!current) return candidate;
+    const a = statusRecordPriority(current);
+    const b = statusRecordPriority(candidate);
+    if (b.statusRank !== a.statusRank) return b.statusRank > a.statusRank ? candidate : current;
+    if (b.linkedRank !== a.linkedRank) return b.linkedRank > a.linkedRank ? candidate : current;
+    if (b.itemRank !== a.itemRank) return b.itemRank > a.itemRank ? candidate : current;
+    return b.timestamp >= a.timestamp ? candidate : current;
+  }
+
+  function dedupeStatusPairs(pairs){
+    const unique = new Map();
+    for (const pair of pairs || []) {
+      const key = statusDuplicateKey(pair.invoice, pair.request);
+      unique.set(key, preferStatusRecord(unique.get(key), pair));
+    }
+    return [...unique.values()];
+  }
+
   function mobileStatusInvoiceRows(){
     const requests = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
-    return readMobileHistory()
+    const pairs = readMobileHistory()
       .filter(row => {
         const status = normalizedStatus(row);
         if (status === 'printed') return thaiDateKey(printedTimestamp(row)) === currentThaiDateKey();
         return status === 'ready_to_print' || status === 'partially_printed';
       })
       .map(row => ({ invoice: row, request: requests.get(invoiceRequestKey(row)) || {} }))
-      .sort((a, b) =>
-        requestSortStamp(b.request).localeCompare(requestSortStamp(a.request)) ||
-        invoiceIndex(a.invoice) - invoiceIndex(b.invoice) ||
-        String(a.invoice.invoiceNumber || a.invoice.no || '').localeCompare(String(b.invoice.invoiceNumber || b.invoice.no || ''))
-      );
+      .filter(pair => !localPairIsHidden(pair.invoice, pair.request, true));
+
+    return dedupeStatusPairs(pairs).sort((a, b) =>
+      requestSortStamp(b.request).localeCompare(requestSortStamp(a.request)) ||
+      invoiceIndex(a.invoice) - invoiceIndex(b.invoice) ||
+      String(a.invoice.invoiceNumber || a.invoice.no || '').localeCompare(String(b.invoice.invoiceNumber || b.invoice.no || ''))
+    );
   }
 
   function statusClass(row){
@@ -1211,10 +1815,46 @@
       snapshot.forEach(saveRequestSnapshotFromDoc);
       rerender();
     }, error => console.warn('[invoice-request] request listener failed', error)));
-    state.realtimeUnsubs.push(window.db.collection('taxInvoices').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
+    state.realtimeUnsubs.push(window.db.collection('taxInvoices').onSnapshot(snapshot => {
+      const requestIds = new Set((isTestMode() ? store.listRequests() : store.listProductionRequests())
+        .map(row => String(row.requestId || row.id || '').trim()).filter(Boolean));
       const rows = [];
-      snapshot.forEach(doc => rows.push({ ...(doc.data() || {}), historyId: doc.id }));
+      snapshot.forEach(doc => {
+        const data = { ...(doc.data() || {}), invoiceId: (doc.data() || {}).invoiceId || doc.id, historyId: doc.id };
+        const ownerUid = String(data.requestedByUid || data.ownerUid || '').trim();
+        const sourceRequestId = String(data.sourceRequestId || data.requestId || '').trim();
+        if ((ownerUid && ownerUid === uid) || (sourceRequestId && requestIds.has(sourceRequestId))) rows.push(data);
+      });
       localStorage.setItem(TAX_INVOICE_HISTORY_KEY, JSON.stringify(rows));
+      // Repair legacy request snapshots whose generatedInvoiceIds were never written back by the desktop app.
+      // A matching taxInvoices document is the source of truth that generation is complete.
+      const requestUpdates = new Map();
+      rows.forEach(invoice => {
+        const requestId = String(invoice.sourceRequestId || invoice.requestId || '').trim();
+        if (!requestId) return;
+        const current = requestUpdates.get(requestId) || { ids: [], numbers: [] };
+        const invoiceId = String(invoice.invoiceId || invoice.historyId || invoice.id || '').trim();
+        const invoiceNumber = String(invoice.invoiceNumber || invoice.no || '').trim();
+        if (invoiceId && !current.ids.includes(invoiceId)) current.ids.push(invoiceId);
+        if (invoiceNumber && !current.numbers.includes(invoiceNumber)) current.numbers.push(invoiceNumber);
+        requestUpdates.set(requestId, current);
+      });
+      const productionRows = store.listProductionRequests();
+      requestUpdates.forEach((value, requestId) => {
+        const request = productionRows.find(item => String(item.requestId || item.id || '').trim() === requestId);
+        if (!request) return;
+        store.saveProductionRequest({
+          ...request,
+          requestId,
+          generationState: 'completed',
+          importedToNativeHistory: true,
+          generatedInvoiceIds: value.ids,
+          nativeInvoiceIds: value.ids,
+          generatedInvoiceNumbers: value.numbers,
+          status: request.status === 'printed' ? 'printed' : 'ready_to_print',
+          printStatus: request.printStatus === 'printed' ? 'printed' : 'ready_to_print'
+        });
+      });
       rerender();
     }, error => console.warn('[invoice-request] taxInvoices listener failed', error)));
   }
@@ -1235,7 +1875,11 @@
     const generated = Array.isArray(row.generatedInvoiceNumbers) && row.generatedInvoiceNumbers.length
       ? `<br>เลขที่ใบกำกับ: ${row.generatedInvoiceNumbers.map(esc).join(', ')}`
       : '';
-    const preview = requestCanPreview(row) && Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length
+    const hasGeneratedInvoice = (Array.isArray(row.generatedInvoiceIds) && row.generatedInvoiceIds.length)
+      || (Array.isArray(row.generatedInvoiceNumbers) && row.generatedInvoiceNumbers.length)
+      || generatedInvoiceCount(row) > 0
+      || row.importedToNativeHistory === true;
+    const preview = requestCanPreview(row)
       ? `<button class="cmsInvoicePreviewButtonV42" style="width:100%;margin-top:10px" onclick="CMSInvoiceRequest.openPreview('${esc(row.requestId)}')">ดูตัวอย่างใบกำกับภาษี</button>`
       : '';
     const action = canGenerateInvoice(row)
@@ -1256,9 +1900,12 @@
     ensurePages();
     bindRealtime();
     const invoiceRows = mobileStatusInvoiceRows();
-    const rows = invoiceRows.length ? [] : (isTestMode() ? store.listRequests() : store.listProductionRequests()).filter(requestVisibleInCurrentStatus);
+    const rows = invoiceRows.length ? [] : (isTestMode() ? store.listRequests() : store.listProductionRequests())
+      .filter(requestVisibleInCurrentStatus)
+      .filter(request => !requestIsLocallyHidden(request, true));
     document.getElementById('cmsInvoiceRequestStatusPageV42').innerHTML = [
       header('สถานะใบกำกับภาษี', isTestMode() ? 'Test Mode' : 'อัปเดตจาก taxInvoices แบบ realtime'),
+      '<div class="cmsInvoicePageMoreWrapV42"><button type="button" class="cmsInvoicePageMoreV42" onclick="CMSInvoiceRequest.toggleStatusMore(event)" aria-label="เมนูเพิ่มเติม">⋮</button><div class="cmsInvoicePageMoreMenuV42" id="cmsInvoiceStatusMoreMenuV42"><button type="button" onclick="CMSInvoiceRequest.openClearStatusDialog()">ล้างสถานะ</button><button type="button" class="danger" onclick="CMSInvoiceRequest.openClearAllDialog()">ล้างประวัติทั้งหมด</button></div></div>',
       '<div class="cmsInvoiceListV42">',
       invoiceRows.length ? invoiceRows.map(pair => statusInvoiceRowHtml(pair.invoice, pair.request)).join('') : (rows.length ? rows.map(row => statusRowHtml(row)).join('') : '<div class="empty">ยังไม่มีใบกำกับภาษีในสถานะปัจจุบัน</div>'),
       '</div>'
@@ -1268,7 +1915,14 @@
   function renderHistory(){
     ensurePages();
     bindRealtime();
-    const rows = readMobileHistory().filter(isFullyPrinted).sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
+    const requestMap = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
+    const rows = dedupeStatusPairs(
+      readMobileHistory()
+        .filter(isFullyPrinted)
+        .map(invoice => ({ invoice, request: requestMap.get(invoiceRequestKey(invoice)) || {} }))
+        .filter(pair => !localPairIsHidden(pair.invoice, pair.request, false))
+    ).map(pair => pair.invoice)
+      .sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
       header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
       '<div class="cmsInvoiceListV42">',
@@ -1280,7 +1934,14 @@
   function renderHistory(){
     ensurePages();
     bindRealtime();
-    const rows = readMobileHistory().filter(isFullyPrinted).sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
+    const requestMap = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
+    const rows = dedupeStatusPairs(
+      readMobileHistory()
+        .filter(isFullyPrinted)
+        .map(invoice => ({ invoice, request: requestMap.get(invoiceRequestKey(invoice)) || {} }))
+        .filter(pair => !localPairIsHidden(pair.invoice, pair.request, false))
+    ).map(pair => pair.invoice)
+      .sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
       header('ประวัติใบกำกับภาษี', 'อ่านจาก taxInvoices ฐานกลาง'),
       '<div class="cmsInvoiceListV42">',
@@ -1295,16 +1956,324 @@
   function openStatus(){ renderStatus(); showPage('cmsInvoiceRequestStatusPageV42'); }
   function openHistory(){ renderHistory(); showPage('cmsInvoiceRequestHistoryPageV42'); }
 
+  function previewComparableText(value){
+    return String(value == null ? '' : value)
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[().,\-_/\\]/g, '');
+  }
+
+  function previewRequestNumber(row){
+    return String(row?.requestNumber || row?.sourceRequestNumber || '').trim();
+  }
+
+  function previewCustomerTax(row){
+    return String(
+      row?.buyerTax ||
+      row?.customerSnapshot?.taxId ||
+      row?.customerSnapshot?.customerTaxId ||
+      row?.customer?.taxId ||
+      row?.customer?.customerTaxId ||
+      ''
+    ).replace(/\D/g, '');
+  }
+
+  function previewCustomerName(row){
+    return previewComparableText(
+      row?.buyerName ||
+      row?.customerDisplayName ||
+      row?.customerSnapshot?.customerName ||
+      row?.customerSnapshot?.companyName ||
+      row?.customer?.customerName ||
+      row?.customer?.companyName ||
+      ''
+    );
+  }
+
+  function previewGrandTotal(row){
+    const value = Number(row?.grandTotal ?? row?.total ?? row?.subtotalPreview ?? 0);
+    return Number.isFinite(value) ? Math.round(value * 100) / 100 : 0;
+  }
+
+  function previewDateKey(value){
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const direct = raw.match(/^\d{4}-\d{2}-\d{2}/);
+    if (direct) return direct[0];
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date);
+  }
+
+  function invoiceMatchesPreviewRequest(invoice, row){
+    const requestId = String(row?.requestId || row?.id || '').trim();
+    const requestNumber = previewRequestNumber(row);
+    const sourceId = String(invoice?.sourceRequestId || invoice?.requestId || invoice?.employeeRequestId || '').trim();
+    const sourceNumber = String(invoice?.sourceRequestNumber || invoice?.requestNumber || '').trim();
+
+    if (requestId && sourceId === requestId) return true;
+    if (requestNumber && sourceNumber === requestNumber) return true;
+
+    const requestTax = previewCustomerTax(row);
+    const invoiceTax = previewCustomerTax(invoice);
+    const requestName = previewCustomerName(row);
+    const invoiceName = previewCustomerName(invoice);
+    const requestTotal = previewGrandTotal(row);
+    const invoiceTotal = previewGrandTotal(invoice);
+    const requestDate = previewDateKey(row?.requestedAt || row?.createdAt || row?.updatedAt);
+    const invoiceDate = previewDateKey(invoice?.invoiceDate || invoice?.date || invoice?.createdAt || invoice?.updatedAt);
+
+    let score = 0;
+    if (requestTax && invoiceTax && requestTax === invoiceTax) score += 5;
+    if (requestName && invoiceName && (requestName === invoiceName || requestName.includes(invoiceName) || invoiceName.includes(requestName))) score += 3;
+    if (requestTotal > 0 && invoiceTotal > 0 && Math.abs(requestTotal - invoiceTotal) < 0.01) score += 4;
+    if (requestDate && invoiceDate && requestDate === invoiceDate) score += 2;
+
+    // Customer identity + total is strong enough to identify the generated bill.
+    return score >= 7;
+  }
+
+  function requestSnapshotPreviewInvoice(row){
+    const items = Array.isArray(row?.items) ? row.items : [];
+    const customer = row?.customerSnapshot || row?.customer || {};
+    const invoiceNumber = Array.isArray(row?.generatedInvoiceNumbers) && row.generatedInvoiceNumbers[0]
+      ? row.generatedInvoiceNumbers[0]
+      : (row?.invoiceNumber || row?.no || '');
+    return {
+      invoiceId: `request-preview-${row?.requestId || row?.id || Date.now()}`,
+      sourceRequestId: row?.requestId || row?.id || '',
+      sourceRequestNumber: row?.requestNumber || '',
+      requestId: row?.requestId || row?.id || '',
+      requestNumber: row?.requestNumber || '',
+      invoiceNumber,
+      no: invoiceNumber,
+      invoiceDate: previewDateKey(row?.updatedAt || row?.requestedAt || new Date().toISOString()),
+      date: previewDateKey(row?.updatedAt || row?.requestedAt || new Date().toISOString()),
+      invoiceType: row?.invoiceSettings?.invoiceType === 'full-tax-invoice' ? 'ใบกำกับภาษีเต็ม' : (row?.invoiceType || 'ใบกำกับภาษีเต็ม'),
+      type: row?.invoiceSettings?.invoiceType === 'full-tax-invoice' ? 'ใบกำกับภาษีเต็ม' : (row?.invoiceType || 'ใบกำกับภาษีเต็ม'),
+      paperSize: row?.invoiceSettings?.paperSize || row?.paperSize || '9x11',
+      vatMode: row?.invoiceSettings?.vatMode || row?.vatMode || 'excluded',
+      buyerName: row?.customerDisplayName || [customer.prefix, customer.customerName || customer.companyName].filter(Boolean).join(' ').trim(),
+      buyerTax: customer.taxId || customer.customerTaxId || '',
+      buyerAddress: customer.address || customer.customerAddress || [customer.address1, customer.address2].filter(Boolean).join(' '),
+      buyerAddress1: customer.address1 || '',
+      buyerAddress2: customer.address2 || '',
+      customerSnapshot: customer,
+      items: items.map(item => ({
+        ...item,
+        name: item.name || item.productName || '',
+        productName: item.productName || item.name || '',
+        qty: item.qty ?? item.quantity ?? 0,
+        quantity: item.quantity ?? item.qty ?? 0,
+        price: item.price ?? item.salePrice ?? 0,
+        salePrice: item.salePrice ?? item.price ?? 0
+      })),
+      subtotal: Number(row?.subtotal ?? row?.subtotalPreview ?? 0),
+      beforeVat: Number(row?.subtotal ?? row?.subtotalPreview ?? 0),
+      vatAmount: Number(row?.vatAmount ?? 0),
+      grandTotal: Number(row?.grandTotal ?? 0),
+      total: Number(row?.grandTotal ?? 0),
+      printStatus: row?.printStatus || row?.status || 'ready_to_print',
+      status: row?.status || 'ready_to_print',
+      previewSource: 'request-snapshot-fallback'
+    };
+  }
+
+  function previewInvoiceMatchScore(invoice, row){
+    if (!invoice || !row) return -1;
+
+    const requestId = String(row.requestId || row.id || '').trim();
+    const requestNumber = previewRequestNumber(row);
+    const invoiceSourceId = String(invoice.sourceRequestId || invoice.requestId || invoice.employeeRequestId || '').trim();
+    const invoiceSourceNumber = String(invoice.sourceRequestNumber || invoice.requestNumber || '').trim();
+
+    const wantedIds = [
+      ...(Array.isArray(row.generatedInvoiceIds) ? row.generatedInvoiceIds : []),
+      ...(Array.isArray(row.nativeInvoiceIds) ? row.nativeInvoiceIds : []),
+      ...(Array.isArray(row.invoiceIds) ? row.invoiceIds : [])
+    ].map(String).map(v => v.trim()).filter(Boolean);
+
+    const wantedNumbers = [
+      ...(Array.isArray(row.generatedInvoiceNumbers) ? row.generatedInvoiceNumbers : []),
+      ...(Array.isArray(row.invoiceNumbers) ? row.invoiceNumbers : [])
+    ].map(String).map(v => v.trim().toUpperCase()).filter(Boolean);
+
+    const invoiceId = String(invoiceRecordKey(invoice) || invoice.invoiceId || invoice.id || '').trim();
+    const invoiceNo = String(invoice.invoiceNumber || invoice.no || invoice.No || '').trim().toUpperCase();
+
+    if (requestId && invoiceSourceId === requestId) return 1000;
+    if (requestNumber && invoiceSourceNumber === requestNumber) return 900;
+    if (wantedIds.includes(invoiceId)) return 800;
+    if (wantedNumbers.includes(invoiceNo)) return 700;
+    if (invoiceMatchesPreviewRequest(invoice, row)) return 100;
+    return -1;
+  }
+
+  function selectBestPreviewInvoices(rows, row){
+    const expected = Math.max(
+      1,
+      Number(row?.expectedInvoiceCount || row?.invoiceCount || 1) || 1
+    );
+
+    const ranked = mergePreviewInvoiceRows(rows)
+      .map(invoice => ({ invoice, score: previewInvoiceMatchScore(invoice, row) }))
+      .filter(item => item.score >= 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        const aTime = Date.parse(a.invoice.updatedAt || a.invoice.createdAt || a.invoice.invoiceDate || '') || 0;
+        const bTime = Date.parse(b.invoice.updatedAt || b.invoice.createdAt || b.invoice.invoiceDate || '') || 0;
+        return bTime - aTime;
+      });
+
+    if (!ranked.length) return [];
+
+    // When an exact request-linked invoice exists, never mix in fuzzy legacy matches.
+    const bestScore = ranked[0].score;
+    const minimumAcceptedScore = bestScore >= 800 ? 700 : bestScore;
+    return ranked
+      .filter(item => item.score >= minimumAcceptedScore)
+      .slice(0, expected)
+      .map(item => item.invoice);
+  }
+
   async function fetchPreviewInvoices(row){
-    if (!row || !sync.firestoreReady() || !window.db) return [];
-    const ids = Array.isArray(row.generatedInvoiceIds) ? row.generatedInvoiceIds.filter(Boolean) : [];
-    if (ids.length) {
-      const snaps = await Promise.all(ids.map(id => window.db.collection('taxInvoices').doc(id).get()));
-      return snaps.filter(snap => snap.exists).map(snap => ({ ...(snap.data() || {}), invoiceId: snap.id }));
+    if (!row) return [];
+
+    const requestId = String(row.requestId || row.id || row.sourceRequestId || '').trim();
+    const requestNumber = previewRequestNumber(row);
+    const invoiceIds = [
+      ...(Array.isArray(row.generatedInvoiceIds) ? row.generatedInvoiceIds : []),
+      ...(Array.isArray(row.nativeInvoiceIds) ? row.nativeInvoiceIds : []),
+      ...(Array.isArray(row.invoiceIds) ? row.invoiceIds : [])
+    ].map(String).map(value => value.trim()).filter(Boolean);
+    const invoiceNumbers = [
+      ...(Array.isArray(row.generatedInvoiceNumbers) ? row.generatedInvoiceNumbers : []),
+      ...(Array.isArray(row.invoiceNumbers) ? row.invoiceNumbers : [])
+    ].map(String).map(value => value.trim()).filter(Boolean);
+
+    const embedded = [];
+    for (const value of [row.generatedInvoices, row.invoices, row.invoiceSnapshots, row.nativeInvoices]) {
+      if (Array.isArray(value)) embedded.push(...value.filter(item => item && typeof item === 'object'));
     }
-    const uid = sender().requestedByUid;
-    const snap = await window.db.collection('taxInvoices').where('requestedByUid', '==', uid).where('sourceRequestId', '==', row.requestId).get();
-    return snap.docs.map(doc => ({ ...(doc.data() || {}), invoiceId: doc.id }));
+
+    // Fast path: use the realtime cache already downloaded by the listener.
+    const cached = readMobileHistory().filter(invoice => {
+      const no = String(invoice.invoiceNumber || invoice.no || '').trim();
+      const id = String(invoiceRecordKey(invoice) || '').trim();
+      return invoiceMatchesPreviewRequest(invoice, row) || invoiceIds.includes(id) || invoiceNumbers.includes(no);
+    });
+    const fastRows = selectBestPreviewInvoices([...embedded, ...cached], row);
+    if (fastRows.length) return fastRows;
+
+    if (!sync.firestoreReady() || !window.db) {
+      return [requestSnapshotPreviewInvoice(row)];
+    }
+
+    const remote = [];
+    const addQuery = snap => {
+      if (snap && Array.isArray(snap.docs)) {
+        snap.docs.forEach(doc => remote.push({ ...(doc.data() || {}), invoiceId: (doc.data() || {}).invoiceId || doc.id, historyId: doc.id }));
+      }
+    };
+    const addDoc = snap => {
+      if (snap && snap.exists) remote.push({ ...(snap.data() || {}), invoiceId: (snap.data() || {}).invoiceId || snap.id, historyId: snap.id });
+    };
+
+    const jobs = [];
+    invoiceIds.slice(0, 20).forEach(id => {
+      jobs.push(window.db.collection('taxInvoices').doc(id).get().then(addDoc).catch(() => {}));
+    });
+    if (requestId) {
+      jobs.push(window.db.collection('taxInvoices').where('sourceRequestId', '==', requestId).get().then(addQuery).catch(() => {}));
+      jobs.push(window.db.collection('taxInvoices').where('requestId', '==', requestId).get().then(addQuery).catch(() => {}));
+    }
+    if (requestNumber) {
+      jobs.push(window.db.collection('taxInvoices').where('sourceRequestNumber', '==', requestNumber).get().then(addQuery).catch(() => {}));
+      jobs.push(window.db.collection('taxInvoices').where('requestNumber', '==', requestNumber).get().then(addQuery).catch(() => {}));
+    }
+    invoiceNumbers.slice(0, 10).forEach(number => {
+      jobs.push(window.db.collection('taxInvoices').where('invoiceNumber', '==', number).get().then(addQuery).catch(() => {}));
+      jobs.push(window.db.collection('taxInvoices').where('no', '==', number).get().then(addQuery).catch(() => {}));
+    });
+
+    await Promise.all(jobs);
+    let matched = selectBestPreviewInvoices(remote.filter(invoice =>
+      invoiceMatchesPreviewRequest(invoice, row)
+      || invoiceIds.includes(invoiceRecordKey(invoice))
+      || invoiceNumbers.includes(String(invoice.invoiceNumber || invoice.no || '').trim())
+    ), row);
+    if (matched.length) return matched;
+
+    // One final collection read for legacy documents that omitted request-link fields.
+    try {
+      const allSnap = await window.db.collection('taxInvoices').get();
+      const legacyMatches = [];
+      (allSnap.docs || []).forEach(doc => {
+        const data = { ...(doc.data() || {}), invoiceId: (doc.data() || {}).invoiceId || doc.id, historyId: doc.id };
+        if (invoiceMatchesPreviewRequest(data, row)) legacyMatches.push(data);
+      });
+      matched = selectBestPreviewInvoices(legacyMatches, row);
+      if (matched.length) return matched;
+    } catch (error) {
+      console.warn('[invoice-request] preview legacy matching failed', error);
+    }
+
+    // Never show a dead modal when the request already says the bill is ready.
+    // The request contains customer/items/totals and can render a faithful preview
+    // while the next realtime sync repairs the direct taxInvoices link.
+    return [requestSnapshotPreviewInvoice(row)];
+  }
+
+  function mergePreviewInvoiceRows(rows){
+    const merged = new Map();
+
+    for (const invoice of (rows || [])) {
+      if (!invoice || typeof invoice !== 'object') continue;
+
+      const invoiceNo = String(invoice.invoiceNumber || invoice.no || invoice.No || '').trim().toUpperCase();
+      const requestId = String(invoice.sourceRequestId || invoice.requestId || invoice.employeeRequestId || '').trim();
+      const recordId = String(invoiceRecordKey(invoice) || invoice.invoiceId || invoice.id || '').trim();
+
+      // One real invoice may be present under Firestore document id, invoiceId,
+      // realtime cache and request snapshot. Prefer invoice number as the stable key.
+      const key = invoiceNo
+        ? `NO:${invoiceNo}`
+        : requestId
+          ? `REQ:${requestId}:${previewGrandTotal(invoice)}`
+          : `ID:${recordId}`;
+
+      if (!key || key === 'ID:') continue;
+
+      const previous = merged.get(key);
+      if (!previous) {
+        merged.set(key, invoice);
+        continue;
+      }
+
+      const previousScore =
+        (Array.isArray(previous.items) ? previous.items.length : 0) * 10 +
+        (previous.invoiceNumber || previous.no ? 5 : 0) +
+        (previous.sourceRequestId || previous.requestId ? 3 : 0) +
+        (previous.previewSource === 'request-snapshot-fallback' ? -20 : 0);
+
+      const currentScore =
+        (Array.isArray(invoice.items) ? invoice.items.length : 0) * 10 +
+        (invoice.invoiceNumber || invoice.no ? 5 : 0) +
+        (invoice.sourceRequestId || invoice.requestId ? 3 : 0) +
+        (invoice.previewSource === 'request-snapshot-fallback' ? -20 : 0);
+
+      if (currentScore > previousScore) merged.set(key, { ...previous, ...invoice });
+      else merged.set(key, { ...invoice, ...previous });
+    }
+
+    const result = [...merged.values()].sort((a,b)=>invoiceIndex(a)-invoiceIndex(b));
+    result.forEach(saveMobileHistory);
+    return result;
   }
 
   function previewAddressParts(invoice, customer){
@@ -1333,8 +2302,8 @@
     const grandTotal = +invoice.grandTotal || +invoice.total || beforeVat + vatAmount;
     const creditDays = invoice.creditDays ?? invoice.paymentCreditDays ?? customer.creditDays ?? 0;
     const totalText = typeof window.thaiBahtText === 'function' ? window.thaiBahtText(grandTotal) : thaiBahtTextLocal(grandTotal);
-    const pageLabel = totalCount > 1 ? `<div class="cmsInvoicePreviewPageLabelV42">ใบที่ ${index + 1}</div>` : '';
-    return `<article class="cmsInvoicePreviewSheetV42">
+    const pageLabel = `<div class="cmsInvoicePreviewPageHeadV42"><div class="cmsInvoicePreviewPageLabelV42">${totalCount > 1 ? `ใบที่ ${index + 1}` : `เลขที่ ${esc(invoiceNo)}`}</div><button class="cmsInvoiceExportOneV42" onclick="CMSInvoiceRequest.exportPreviewOne(${index})">ส่งออกรูปนี้</button></div>`;
+    return `<article class="cmsInvoicePreviewSheetV42" data-preview-index="${index}" data-invoice-no="${esc(invoiceNo)}">
       ${pageLabel}
       <section class="cmsInvoicePreviewPaperV42" aria-label="ตัวอย่างใบกำกับภาษี ${esc(invoiceNo)}">
         <div class="cmsInvoicePreviewShopV42">
@@ -1374,29 +2343,10 @@
     </article>`;
   }
 
-  async function openPreview(requestId){
-    const row = store.listProductionRequests().find(item => item.requestId === requestId);
-    if (!requestCanPreview(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
-    try {
-      const invoices = await fetchPreviewInvoices(row);
-      const payload = window.ChokAnanInvoicePreviewService && typeof window.ChokAnanInvoicePreviewService.requestPreviewPayload === 'function'
-        ? window.ChokAnanInvoicePreviewService.requestPreviewPayload(row, invoices)
-        : { invoices };
-      const modal = document.getElementById('cmsInvoicePreviewModalV42') || document.createElement('div');
-      modal.id = 'cmsInvoicePreviewModalV42';
-      modal.className = 'cmsInvoicePreviewModalV42';
-      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map((invoice, index) => previewInvoiceHtml(invoice, index, payload.invoices.length)).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
-      if (!modal.parentElement) document.body.appendChild(modal);
-      document.documentElement.classList.add('cmsInvoicePreviewOpenV42');
-    } catch (error) {
-      alert(`เปิด Preview ไม่สำเร็จ: ${error.message || error}`);
-    }
-  }
-
   async function openPreview(requestId, mode='request'){
     const row = mode === 'invoice'
       ? readMobileHistory().find(item => invoiceRecordKey(item) === String(requestId))
-      : store.listProductionRequests().find(item => item.requestId === requestId);
+      : store.listProductionRequests().find(item => String(item.requestId || item.id || '').trim() === String(requestId).trim());
     if (!row) return alert('ไม่พบข้อมูลใบกำกับภาษี');
     if (mode !== 'invoice' && !requestCanPreview(row)) return alert('เปิด Preview ได้เฉพาะสถานะพร้อมพิมพ์หรือพิมพ์แล้ว');
     try {
@@ -1408,11 +2358,113 @@
       const modal = document.getElementById('cmsInvoicePreviewModalV42') || document.createElement('div');
       modal.id = 'cmsInvoicePreviewModalV42';
       modal.className = 'cmsInvoicePreviewModalV42';
-      modal.innerHTML = `<button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map((invoice, index) => previewInvoiceHtml(invoice, index, payload.invoices.length)).join('') : '<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลใบกำกับสำหรับ Preview</div>'}</div>`;
+      modal.innerHTML = `<div class="cmsInvoicePreviewTopActionsV42"><button class="cmsInvoiceExportAllV42" onclick="CMSInvoiceRequest.exportPreviewAll()">ส่งออกทั้งชุด</button><button class="cmsInvoicePreviewCloseV42" onclick="CMSInvoiceRequest.closePreview()" aria-label="ปิด">X</button></div><div class="cmsInvoicePreviewScrollV42">${payload.invoices.length ? payload.invoices.map((invoice, index) => previewInvoiceHtml(invoice, index, payload.invoices.length)).join('') : `<div class="cmsInvoicePreviewEmptyV42">ยังไม่พบข้อมูลบิลจริงในฐานกลางสำหรับ ${esc(previewRequest.requestNumber || previewRequest.requestId || 'คำขอนี้')}</div>`}</div>`;
       if (!modal.parentElement) document.body.appendChild(modal);
       document.documentElement.classList.add('cmsInvoicePreviewOpenV42');
     } catch (error) {
       alert(`เปิด Preview ไม่สำเร็จ: ${error.message || error}`);
+    }
+  }
+
+  function previewFileName(sheet, index){
+    const raw = String(sheet?.dataset?.invoiceNo || `invoice-${index + 1}`);
+    return raw.replace(/[\/:*?"<>|]+/g, '-').trim() || `invoice-${index + 1}`;
+  }
+
+  async function capturePreviewPaper(paper){
+    if (!paper) throw new Error('ไม่พบตัวอย่างใบกำกับภาษี');
+    if (typeof window.captureExportPaper === 'function') return window.captureExportPaper(paper);
+    if (window.html2canvas) {
+      const canvas = await window.html2canvas(paper, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('สร้างรูปภาพไม่สำเร็จ')), 'image/png'));
+    }
+    throw new Error('ระบบสร้างรูปภาพยังไม่พร้อม กรุณารีโหลดแอป');
+  }
+
+  let previewShareBusy = false;
+
+  async function downloadPreviewFiles(files){
+    for (const file of files) {
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2500);
+      await new Promise(resolve => setTimeout(resolve, 350));
+    }
+  }
+
+  async function saveOrSharePreviewFiles(files){
+    if (!files.length) return;
+
+    // file:// and desktop browsers are unreliable with Web Share files.
+    // Download PNG directly there. On a real mobile HTTPS/PWA session, use Share.
+    const canUseShare = location.protocol !== 'file:'
+      && !previewShareBusy
+      && navigator.share
+      && navigator.canShare
+      && navigator.canShare({ files });
+
+    if (canUseShare) {
+      previewShareBusy = true;
+      try {
+        await navigator.share({ files, title: 'ใบกำกับภาษี' });
+        return;
+      } catch (error) {
+        // User cancellation is not an export failure.
+        if (error && error.name === 'AbortError') return;
+
+        // InvalidStateError means another share sheet is still open.
+        // Fall back to download instead of showing a dead-end alert.
+        console.warn('[invoice-request] share failed, using download fallback', error);
+      } finally {
+        previewShareBusy = false;
+      }
+    }
+
+    await downloadPreviewFiles(files);
+  }
+
+  async function exportPreviewOne(index){
+    const sheet = document.querySelector(`.cmsInvoicePreviewSheetV42[data-preview-index="${index}"]`);
+    const button = sheet?.querySelector('.cmsInvoiceExportOneV42');
+    if (button?.disabled || previewShareBusy) return;
+    try {
+      if (button) { button.disabled = true; button.textContent = 'กำลังสร้าง...'; }
+      const paper = sheet?.querySelector('.cmsInvoicePreviewPaperV42');
+      const blob = await capturePreviewPaper(paper);
+      const file = new File([blob], `${previewFileName(sheet, index)}.png`, { type: 'image/png' });
+      await saveOrSharePreviewFiles([file]);
+    } catch (error) {
+      alert(`ส่งออกรูปภาพไม่สำเร็จ: ${error.message || error}`);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = 'ส่งออกรูปนี้'; }
+    }
+  }
+
+  async function exportPreviewAll(){
+    const sheets = [...document.querySelectorAll('.cmsInvoicePreviewSheetV42')];
+    if (!sheets.length) return alert('ยังไม่มีตัวอย่างใบกำกับภาษีให้ส่งออก');
+    const button = document.querySelector('.cmsInvoiceExportAllV42');
+    if (button?.disabled || previewShareBusy) return;
+    try {
+      if (button) { button.disabled = true; button.textContent = `กำลังสร้าง 0/${sheets.length}`; }
+      const files = [];
+      for (let index = 0; index < sheets.length; index++) {
+        if (button) button.textContent = `กำลังสร้าง ${index + 1}/${sheets.length}`;
+        const blob = await capturePreviewPaper(sheets[index].querySelector('.cmsInvoicePreviewPaperV42'));
+        files.push(new File([blob], `${previewFileName(sheets[index], index)}.png`, { type: 'image/png' }));
+      }
+      await saveOrSharePreviewFiles(files);
+      if (button) { button.disabled = false; button.textContent = 'ส่งออกทั้งชุด'; }
+    } catch (error) {
+      const button = document.querySelector('.cmsInvoiceExportAllV42');
+      if (button) { button.disabled = false; button.textContent = 'ส่งออกทั้งชุด'; }
+      alert(`ส่งออกทั้งชุดไม่สำเร็จ: ${error.message || error}`);
     }
   }
 
@@ -1454,6 +2506,7 @@
       state.items = [];
       state.customer = null;
       state.selectedProduct = null;
+      state.editingItemIndex = -1;
       state.note = '';
       state.draftId = '';
       state.validation = null;
@@ -1484,11 +2537,24 @@
     openForm,
     openStatus,
     openHistory,
+    toggleStatusMore,
+    closeStatusMore,
+    openClearStatusDialog,
+    openClearAllDialog,
+    closeLocalClearDialog,
+    clearStatusModeChanged,
+    toggleClearSelectAll,
+    confirmClearStatus,
+    clearAllValidationChanged,
+    confirmClearAll,
     backHome,
     beginComposition,
     endComposition,
     searchCustomer,
     selectCustomer,
+    openAddCustomer,
+    closeAddCustomer,
+    saveNewCustomer,
     searchProduct,
     productSearchKey,
     hideProductSuggestions,
@@ -1498,6 +2564,8 @@
     addNewProduct,
     updateItem,
     focusItem,
+    editItem,
+    cancelEditItem,
     closeItemMenus,
     toggleItemMenu,
     quantityKey,
@@ -1508,6 +2576,8 @@
     confirmRequest,
     generateInvoice,
     openPreview,
+    exportPreviewOne,
+    exportPreviewAll,
     closePreview,
     expectedInvoiceCount: () => expectedInvoiceCount(),
     requestSnapshot,
@@ -1517,6 +2587,7 @@
   window.addEventListener('chokanan-customer-master-updated', refreshCustomerSuggestions);
   document.addEventListener('click', event => {
     if (!event.target?.closest?.('.cmsInvoiceItemMenuWrapV42')) closeItemMenus();
+    if (!event.target?.closest?.('.cmsInvoicePageMoreWrapV42')) closeStatusMore();
   });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
