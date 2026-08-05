@@ -117,9 +117,9 @@
       const key = String(id || '');
       return repo() && (repo().getById(key) || repo().getByInvoiceNumber(key)) || null;
     };
-    if (repo() && typeof repo().subscribe === 'function') repo().subscribe(() => { try { renderHistoryV2(); } catch (error) {} });
-    if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', refreshHistoryV2);
-    else setTimeout(refreshHistoryV2, 0);
+    // Do not subscribe or refresh during application startup. The history page calls
+    // renderHistory() lazily when opened, avoiding a startup loop with Firestore adapters.
+    root.refreshHistoryV2OnDemand = refreshHistoryV2;
   }
 
   root.ChokAnanHistoryV2 = { BUILD, render: renderHistoryV2, refresh: refreshHistoryV2, install };

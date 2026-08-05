@@ -330,7 +330,8 @@
       await requestRef.set({
         status: 'ready_to_print',
         printStatus: 'ready_to_print',
-        generationState: 'native-imported',
+        generationState: 'completed',
+        nativeImportState: 'native-saved',
         importedToNativeHistory: true,
         nativeInvoiceIds,
         generatedInvoiceIds: nativeInvoiceIds,

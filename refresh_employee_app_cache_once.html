@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>รีเฟรชแอปพนักงาน</title>
+<style>
+body{font-family:Tahoma,Arial,sans-serif;background:#eef4fb;color:#17233c;margin:0;padding:24px}
+.card{max-width:680px;margin:40px auto;background:white;border:1px solid #dbe6f3;border-radius:18px;padding:24px;box-shadow:0 12px 35px #0001}
+h1{margin-top:0}.status{padding:14px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;white-space:pre-wrap}
+button{margin-top:16px;border:0;border-radius:12px;background:#2563eb;color:white;padding:12px 18px;font-weight:bold;font-family:inherit;font-size:16px}
+</style>
+</head>
+<body><div class="card">
+<h1>รีเฟรชไฟล์แอปพนักงาน</h1>
+<p>หน้านี้ล้างเฉพาะ Service Worker และ Cache Storage ของเว็บ ไม่ลบสินค้า ลูกค้า localStorage, IndexedDB หรือ Firestore</p>
+<div id="status" class="status">พร้อมรีเฟรช</div>
+<button id="run">ล้างแคชและเปิดแอปรุ่นล่าสุด</button>
+</div>
+<script>
+const statusBox=document.getElementById('status');
+async function run(){
+  const btn=document.getElementById('run');
+  btn.disabled=true;
+  try{
+    statusBox.textContent='กำลังยกเลิก Service Worker...';
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    statusBox.textContent='กำลังล้าง Cache Storage...';
+    if('caches' in window){
+      const names=await caches.keys();
+      await Promise.all(names.map(name=>caches.delete(name)));
+    }
+    statusBox.textContent='เสร็จแล้ว กำลังเปิดหน้าแอป...';
+    setTimeout(()=>location.replace('./index.html?employeeAppRefresh='+Date.now()),500);
+  }catch(err){
+    statusBox.textContent='รีเฟรชไม่สำเร็จ: '+(err&&err.message?err.message:err);
+    btn.disabled=false;
+  }
+}
+document.getElementById('run').addEventListener('click',run);
+</script></body></html>

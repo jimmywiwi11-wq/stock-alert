@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ล้างประวัติใบกำกับภาษี</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Tahoma,"Noto Sans Thai",sans-serif;background:#eef4fb;color:#13223b}
+    .wrap{max-width:760px;margin:40px auto;padding:18px}
+    .card{background:#fff;border:1px solid #d9e5f2;border-radius:18px;padding:24px;box-shadow:0 14px 40px rgba(15,35,65,.1)}
+    h1{margin:0 0 10px;font-size:28px}
+    p{line-height:1.6}
+    .warning{padding:14px;border:1px solid #fecaca;border-radius:12px;background:#fff1f2;color:#991b1b;font-weight:700}
+    label{display:flex;gap:10px;align-items:flex-start;margin:15px 0;padding:12px;border:1px solid #dbe6f3;border-radius:12px;background:#f8fbff}
+    input[type=text]{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+    button{border:0;border-radius:12px;padding:12px 18px;font:700 16px inherit;cursor:pointer}
+    button.primary{background:#dc2626;color:#fff}
+    button.primary:disabled{opacity:.45;cursor:not-allowed}
+    button.secondary{background:#e8eef6;color:#263a55}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .status{margin-top:18px;padding:14px;border-radius:12px;background:#edf6ff;border:1px solid #bfdbfe;white-space:pre-wrap}
+    .progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:10px}
+    .bar{height:100%;width:0;background:#2563eb;transition:width .15s}
+    code{background:#eef2f7;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>ล้างประวัติใบกำกับภาษีทั้งหมด</h1>
+    <p>เครื่องมือนี้ใช้ครั้งเดียวเพื่อเริ่มใช้งานจริง โดยจะล้างเฉพาะข้อมูลประวัติบิลทดสอบ</p>
+    <div class="warning">
+      จะลบข้อมูลต่อไปนี้จริง:
+      <br>• ประวัติในเครื่องของโปรแกรม (<code>localStorage.invoices</code>)
+      <br>• เอกสารทั้งหมดใน Firestore collection <code>taxInvoices</code>
+      <br><br>ไม่ลบสินค้า ลูกค้า Template หรือการตั้งค่าเลขบิล
+    </div>
+
+    <label>
+      <input type="checkbox" id="alsoRequests">
+      <span><b>ล้างคำขอจากพนักงานด้วย</b><br><small>เลือกเฉพาะเมื่อต้องการล้างข้อมูลทดสอบใน <code>invoiceRequests</code> ด้วยทั้งหมด</small></span>
+    </label>
+
+    <label>
+      <input type="checkbox" id="understand">
+      <span>ฉันเข้าใจว่าข้อมูลประวัติบิลทดสอบจะถูกลบจริงจากฐานกลาง</span>
+    </label>
+
+    <p>พิมพ์คำว่า <b>ล้างข้อมูลทดสอบ</b></p>
+    <input type="text" id="phrase" autocomplete="off" placeholder="ล้างข้อมูลทดสอบ">
+
+    <div class="actions">
+      <button class="primary" id="clearBtn" disabled>ล้างข้อมูลทั้งหมด</button>
+      <button class="secondary" id="reloadBtn">ตรวจการเชื่อมต่อใหม่</button>
+    </div>
+
+    <div class="status" id="status">กำลังตรวจการเชื่อมต่อ Firebase...</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={
+  apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",
+  authDomain:"check-chokanan.firebaseapp.com",
+  projectId:"check-chokanan",
+  storageBucket:"check-chokanan.firebasestorage.app",
+  messagingSenderId:"637683943443",
+  appId:"1:637683943443:web:db64ac24fd66b93474d7e6"
+};
+
+let db=null;
+let auth=null;
+let busy=false;
+const statusBox=document.getElementById('status');
+const clearBtn=document.getElementById('clearBtn');
+const understand=document.getElementById('understand');
+const phrase=document.getElementById('phrase');
+const bar=document.getElementById('bar');
+
+function setStatus(text){statusBox.textContent=text}
+function updateEnabled(){
+  clearBtn.disabled=busy || !db || !understand.checked || phrase.value.trim()!=='ล้างข้อมูลทดสอบ';
+}
+function yieldUi(){return new Promise(resolve=>setTimeout(resolve,20))}
+
+async function init(){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+    auth=firebase.auth();
+    db=firebase.firestore();
+    await new Promise(resolve=>{
+      const timer=setTimeout(resolve,2500);
+      auth.onAuthStateChanged(()=>{clearTimeout(timer);resolve()});
+    });
+    const user=auth.currentUser;
+    setStatus(user
+      ? `เชื่อมต่อ Firebase แล้ว\nผู้ใช้: ${user.email || user.uid}`
+      : 'เชื่อมต่อ Firebase แล้ว แต่ยังไม่พบผู้ใช้ที่เข้าสู่ระบบ\nกรุณาเปิดโปรแกรมหลักผ่าน 127.0.0.1 และเข้าสู่ระบบก่อน');
+  }catch(error){
+    db=null;
+    setStatus('เชื่อมต่อ Firebase ไม่สำเร็จ\n'+(error.message||error));
+  }
+  updateEnabled();
+}
+
+async function countCollection(name){
+  const snap=await db.collection(name).get();
+  return snap.size;
+}
+
+async function deleteCollection(name,onProgress){
+  let deleted=0;
+  while(true){
+    const snap=await db.collection(name).limit(200).get();
+    if(snap.empty)break;
+    const batch=db.batch();
+    snap.docs.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+    deleted+=snap.size;
+    onProgress(deleted);
+    await yieldUi();
+  }
+  return deleted;
+}
+
+async function clearAll(){
+  if(busy)return;
+  if(!db)return alert('ยังไม่เชื่อมต่อ Firebase');
+  if(!confirm('ยืนยันล้างประวัติบิลทดสอบทั้งหมดจริงหรือไม่?'))return;
+
+  busy=true;
+  updateEnabled();
+  try{
+    setStatus('กำลังตรวจนับข้อมูล...');
+    const alsoRequests=document.getElementById('alsoRequests').checked;
+    const taxCount=await countCollection('taxInvoices');
+    const requestCount=alsoRequests?await countCollection('invoiceRequests'):0;
+    const total=Math.max(1,taxCount+requestCount);
+    let done=0;
+
+    // Clear local history first. This does not touch customers/products/settings.
+    localStorage.setItem('invoices','[]');
+    localStorage.removeItem('lastTrainingBatch');
+    localStorage.removeItem('lastTrainingDailySummary');
+    localStorage.removeItem('trainingPrintQueue');
+
+    setStatus(`กำลังลบ taxInvoices 0/${taxCount}`);
+    const deletedTax=await deleteCollection('taxInvoices',n=>{
+      done=n;
+      setStatus(`กำลังลบ taxInvoices ${n}/${taxCount}`);
+      bar.style.width=`${Math.min(100,done/total*100)}%`;
+    });
+
+    let deletedRequests=0;
+    if(alsoRequests){
+      setStatus(`ลบ taxInvoices แล้ว ${deletedTax} รายการ\nกำลังลบ invoiceRequests 0/${requestCount}`);
+      deletedRequests=await deleteCollection('invoiceRequests',n=>{
+        done=deletedTax+n;
+        setStatus(`ลบ taxInvoices แล้ว ${deletedTax} รายการ\nกำลังลบ invoiceRequests ${n}/${requestCount}`);
+        bar.style.width=`${Math.min(100,done/total*100)}%`;
+      });
+    }
+
+    bar.style.width='100%';
+    setStatus(
+      `ล้างข้อมูลสำเร็จ\n`+
+      `ประวัติในเครื่อง: ล้างแล้ว\n`+
+      `taxInvoices: ${deletedTax} รายการ\n`+
+      (alsoRequests?`invoiceRequests: ${deletedRequests} รายการ\n`:'')+
+      `\nปิดหน้านี้ แล้วเปิดโปรแกรมออกใบกำกับภาษีใหม่ได้เลย`
+    );
+    alert('ล้างประวัติใบกำกับภาษีทั้งหมดสำเร็จ');
+  }catch(error){
+    setStatus('ล้างข้อมูลไม่สำเร็จ\n'+(error.message||error));
+    alert('ล้างข้อมูลไม่สำเร็จ: '+(error.message||error));
+  }finally{
+    busy=false;
+    updateEnabled();
+  }
+}
+
+understand.addEventListener('change',updateEnabled);
+phrase.addEventListener('input',updateEnabled);
+clearBtn.addEventListener('click',clearAll);
+document.getElementById('reloadBtn').addEventListener('click',init);
+init();
+</script>
+</body>
+</html>
