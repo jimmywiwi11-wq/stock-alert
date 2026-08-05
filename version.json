@@ -1,10 +1,10 @@
 {
-  "version": "8.05.12",
-  "label": "V8.05.12",
-  "build": "20260805-EMPLOYEE-APP-V12",
-  "marker": "V8.05.12-EMPLOYEE-APP-V12",
-  "releasedAt": "2026-08-05T14:25:00+07:00",
-  "message": "Employee app update: add customer flow, compact invoice items, status menu, local status/history controls, and forced PWA cache refresh.",
+  "version": "8.05.13",
+  "label": "V8.05.13",
+  "build": "20260805-EMPLOYEE-APP-V13",
+  "marker": "V8.05.13-EMPLOYEE-APP-V13",
+  "releasedAt": "2026-08-05T14:40:00+07:00",
+  "message": "Fix iPhone PWA update loop, activate the newest service worker automatically, refresh employee invoice-request assets, and preserve all local and Firebase data.",
   "title": "Stock Alert",
-  "updatedAt": "2026-08-05T14:25:00+07:00"
+  "updatedAt": "2026-08-05T14:40:00+07:00"
 }
