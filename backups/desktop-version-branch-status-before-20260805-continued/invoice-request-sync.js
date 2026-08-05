@@ -10,23 +10,6 @@
     return String(value == null ? '' : value).trim();
   }
 
-  function normalizeBranchKey(value){
-    const raw = text(value);
-    const compact = raw.toLowerCase().replace(/\s+/g, '');
-    if (!compact) return '';
-    if (compact === '1' || compact === 'b1' || compact === 'branch1' || compact === 'สาขา1') return 'branch1';
-    if (compact === '2' || compact === 'b2' || compact === 'branch2' || compact === 'สาขา2') return 'branch2';
-    if ((compact.includes('branch') || compact.includes('สาขา')) && compact.includes('1')) return 'branch1';
-    if ((compact.includes('branch') || compact.includes('สาขา')) && compact.includes('2')) return 'branch2';
-    return compact;
-  }
-
-  function branchLabelFromKey(key){
-    if (key === 'branch2') return 'สาขา 2';
-    if (key === 'branch1') return 'สาขา 1';
-    return '';
-  }
-
   function firestoreReady(){
     return !!(root.db && root.firebase && typeof root.db.collection === 'function');
   }
@@ -56,21 +39,12 @@
   async function submit(snapshot){
     const store = root.CMSInvoiceRequestStore;
     const idempotencyKey = text(snapshot && snapshot.idempotencyKey) || `idem_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
-    const branchKey = normalizeBranchKey(snapshot && (snapshot.branchKey || snapshot.requestedBranch || snapshot.branch || snapshot.branchName || snapshot.customerSnapshot?.branch || snapshot.customer?.branch));
-    const branchLabel = branchLabelFromKey(branchKey) || text(snapshot && (snapshot.requestedBranch || snapshot.branchName || snapshot.branch));
     const payloadBase = {
       ...(snapshot || {}),
       idempotencyKey,
       testMode: false,
       ownerUid: text(snapshot && (snapshot.ownerUid || snapshot.requestedByUid)),
       requestedByUid: text(snapshot && (snapshot.requestedByUid || snapshot.ownerUid)),
-      requestedBranch: branchLabel,
-      branch: branchKey,
-      branchKey,
-      branchName: branchLabel,
-      statusHidden: snapshot && snapshot.statusHidden === true,
-      mobileStatusHidden: snapshot && snapshot.mobileStatusHidden === true,
-      hiddenFromMobileStatus: snapshot && snapshot.hiddenFromMobileStatus === true,
       status: 'กำลังดำเนินการ',
       generationState: 'not-started',
       generatedInvoiceIds: [],

@@ -27,7 +27,6 @@
     productEntryErrors: {},
     composing: { customer: false, product: false, productName: false },
     realtimeBound: false,
-    realtimeBranchKey: '',
     realtimeUnsubs: []
   };
 
@@ -65,80 +64,6 @@
     return window.currentDeviceBranch || localStorage.getItem('stockAlertDeviceBranchV764') || 1;
   }
 
-  function normalizeBranchKey(value){
-    const raw = String(value == null ? '' : value).trim();
-    const compact = raw.toLowerCase().replace(/\s+/g, '');
-    if (!compact) return '';
-    if (compact === '1' || compact === 'b1' || compact === 'branch1' || compact === 'สาขา1') return 'branch1';
-    if (compact === '2' || compact === 'b2' || compact === 'branch2' || compact === 'สาขา2') return 'branch2';
-    if ((compact.includes('branch') || compact.includes('สาขา')) && compact.includes('1')) return 'branch1';
-    if ((compact.includes('branch') || compact.includes('สาขา')) && compact.includes('2')) return 'branch2';
-    return compact;
-  }
-
-  function branchLabelFromKey(key){
-    if (key === 'branch2') return 'สาขา 2';
-    if (key === 'branch1') return 'สาขา 1';
-    return text(deviceBranch()) || 'สาขา 1';
-  }
-
-  function currentBranchKey(){
-    return normalizeBranchKey(deviceBranch());
-  }
-
-  function currentBranchLabel(){
-    return branchLabelFromKey(currentBranchKey());
-  }
-
-  function rowBranchKey(row){
-    if (!row) return '';
-    return normalizeBranchKey(
-      row.branchKey ||
-      row.requestedBranch ||
-      row.branch ||
-      row.branchName ||
-      row.sender?.branchKey ||
-      row.sender?.requestedBranch ||
-      row.sender?.branch ||
-      row.customerSnapshot?.branchKey ||
-      row.customerSnapshot?.branch ||
-      row.customer?.branchKey ||
-      row.customer?.branch ||
-      ''
-    );
-  }
-
-  function rowMatchesCurrentBranch(row){
-    const key = rowBranchKey(row);
-    return !!key && key === currentBranchKey();
-  }
-
-  function pairMatchesCurrentBranch(pair){
-    const requestKey = rowBranchKey(pair && pair.request);
-    const invoiceKey = rowBranchKey(pair && pair.invoice);
-    const currentKey = currentBranchKey();
-    return !!currentKey && (requestKey === currentKey || (!requestKey && invoiceKey === currentKey));
-  }
-
-  function recordIsCentrallyHidden(row){
-    return !!(row && (
-      row.statusHidden === true ||
-      row.mobileStatusHidden === true ||
-      row.hiddenFromMobileStatus === true ||
-      row.clearedFromMobileStatus === true
-    ));
-  }
-
-  function requestHiddenFromStatus(row){
-    if (recordIsCentrallyHidden(row)) return true;
-    return isTestMode() && requestIsLocallyHidden(row, true);
-  }
-
-  function pairHiddenFromStatus(pair, includeStatusHidden){
-    if (recordIsCentrallyHidden(pair && pair.request) || recordIsCentrallyHidden(pair && pair.invoice)) return true;
-    return isTestMode() && localPairIsHidden(pair && pair.invoice, pair && pair.request, includeStatusHidden);
-  }
-
   function currentUserUid(){
     return text(window.auth && window.auth.currentUser && window.auth.currentUser.uid || localStorage.getItem('stockAlertUserUid') || '');
   }
@@ -146,17 +71,13 @@
   function sender(){
     const nickname = text(window.nickname || localStorage.getItem('stockAlertNickname') || 'ไม่ระบุ');
     const branch = deviceBranch();
-    const branchKey = normalizeBranchKey(branch);
     const uid = currentUserUid();
     return {
       requestedBy: text(localStorage.getItem('stockAlertUserId') || nickname),
       requestedByUid: uid,
       ownerUid: uid,
       requestedByNickname: nickname,
-      requestedBranch: branchLabelFromKey(branchKey),
-      branch: branchKey,
-      branchKey,
-      branchName: branchLabelFromKey(branchKey),
+      requestedBranch: `สาขา ${branch || 1}`,
       requestedAt: nowIso()
     };
   }
@@ -603,9 +524,6 @@
       ownerUid: s.ownerUid,
       requestedByNickname: s.requestedByNickname,
       requestedBranch: s.requestedBranch,
-      branch: s.branch,
-      branchKey: s.branchKey,
-      branchName: s.branchName,
       requestedAt: base?.requestedAt || s.requestedAt,
       updatedAt: nowIso(),
       customerSnapshot: customerSnapshot(),
@@ -702,39 +620,8 @@
     if (pairs.length) return pairs;
     return (isTestMode() ? store.listRequests() : store.listProductionRequests())
       .filter(requestVisibleInCurrentStatus)
-      .filter(request => !requestHiddenFromStatus(request))
+      .filter(request => !requestIsLocallyHidden(request, true))
       .map(request => ({ invoice: {}, request }));
-  }
-
-  function centralHidePayload(){
-    const s = sender();
-    return {
-      statusHidden: true,
-      mobileStatusHidden: true,
-      hiddenFromMobileStatus: true,
-      hiddenBranchKey: currentBranchKey(),
-      hiddenBranch: currentBranchLabel(),
-      hiddenByUid: s.requestedByUid || '',
-      hiddenBy: s.requestedByNickname || '',
-      hiddenAt: nowIso(),
-      updatedAt: nowIso()
-    };
-  }
-
-  async function hideCentralPair(pair){
-    if (!pairMatchesCurrentBranch(pair)) return false;
-    const requestId = String(
-      pair?.request?.requestId ||
-      pair?.request?.id ||
-      pair?.invoice?.sourceRequestId ||
-      pair?.invoice?.requestId ||
-      ''
-    ).trim();
-    if (!requestId || !sync.firestoreReady() || !window.db) return false;
-    const patch = centralHidePayload();
-    await window.db.collection('invoiceRequests').doc(requestId).set(patch, { merge: true });
-    store.saveProductionRequest({ ...(pair.request || {}), requestId, ...patch });
-    return true;
   }
 
   function clearPairLabel(pair, index){
@@ -787,7 +674,7 @@
     document.querySelectorAll('.cmsInvoiceClearRowV42').forEach(input => { input.checked = !!checked; });
   }
 
-  async function confirmClearStatus(){
+  function confirmClearStatus(){
     const modal = document.getElementById('cmsInvoiceLocalClearModalV42');
     const pairs = modal?._clearPairs || [];
     const mode = document.querySelector('input[name="cmsClearModeV42"]:checked')?.value || 'all';
@@ -803,24 +690,9 @@
     const message = `ยืนยันล้างสถานะ ${selected.length} รายการ?\n\nล้างเฉพาะหน้าสถานะบนมือถือเครื่องนี้\nไม่ลบข้อมูลจากโปรแกรมออกใบกำกับภาษี`;
     if (!confirm(message)) return;
 
-    if (isTestMode()) {
-      hideLocalPairs(selected, MOBILE_STATUS_HIDDEN_KEY);
-      closeLocalClearDialog();
-      renderStatus();
-      return;
-    }
-
-    try {
-      const written = await Promise.all(selected.map(hideCentralPair));
-      if (!written.some(Boolean)) {
-        alert('ไม่สามารถล้างสถานะจากฐานข้อมูลกลางได้ในขณะนี้');
-        return;
-      }
-      closeLocalClearDialog();
-      renderStatus();
-    } catch (error) {
-      alert(`ล้างสถานะไม่สำเร็จ: ${error.message || error}`);
-    }
+    hideLocalPairs(selected, MOBILE_STATUS_HIDDEN_KEY);
+    closeLocalClearDialog();
+    renderStatus();
   }
 
   function openClearAllDialog(){
@@ -852,27 +724,12 @@
     if (button) button.disabled = !(understood && phrase === 'ลบทั้งหมด');
   }
 
-  async function confirmClearAll(){
+  function confirmClearAll(){
     const understood = !!document.getElementById('cmsInvoiceClearUnderstandV42')?.checked;
     const phrase = String(document.getElementById('cmsInvoiceClearPhraseV42')?.value || '').trim();
     if (!understood || phrase !== 'ลบทั้งหมด') return;
 
     if (!confirm('ยืนยันครั้งสุดท้าย?\n\nสถานะและประวัติใบกำกับภาษีในมือถือเครื่องนี้จะหายทั้งหมด\nข้อมูลในโปรแกรมออกใบกำกับภาษีจะไม่ถูกลบ')) return;
-
-    if (!isTestMode()) {
-      try {
-        const written = await Promise.all(currentStatusPairsForClear().map(hideCentralPair));
-        if (!written.some(Boolean)) {
-          alert('ไม่สามารถล้างสถานะจากฐานข้อมูลกลางได้ในขณะนี้');
-          return;
-        }
-        closeLocalClearDialog();
-        renderStatus();
-      } catch (error) {
-        alert(`ล้างสถานะไม่สำเร็จ: ${error.message || error}`);
-      }
-      return;
-    }
 
     const requests = new Map((isTestMode() ? store.listRequests() : store.listProductionRequests()).map(row => [String(row.requestId || ''), row]));
     const allPairs = readMobileHistory().map(invoice => ({ invoice, request: requests.get(invoiceRequestKey(invoice)) || {} }));
@@ -1740,8 +1597,6 @@
   }
 
   function requestVisibleInCurrentStatus(row){
-    if (!isTestMode() && (!rowMatchesCurrentBranch(row) || requestHiddenFromStatus(row))) return false;
-    if (isTestMode() && requestHiddenFromStatus(row)) return false;
     if (!isFullyPrinted(row)) return true;
     return thaiDateKey(printedTimestamp(row)) === currentThaiDateKey();
   }
@@ -1914,8 +1769,7 @@
         return status === 'ready_to_print' || status === 'partially_printed';
       })
       .map(row => ({ invoice: row, request: requests.get(invoiceRequestKey(row)) || {} }))
-      .filter(pair => isTestMode() || pairMatchesCurrentBranch(pair))
-      .filter(pair => !pairHiddenFromStatus(pair, true));
+      .filter(pair => !localPairIsHidden(pair.invoice, pair.request, true));
 
     return dedupeStatusPairs(pairs).sort((a, b) =>
       requestSortStamp(b.request).localeCompare(requestSortStamp(a.request)) ||
@@ -1947,38 +1801,29 @@
   }
 
   function bindRealtime(){
-    if (!sync.firestoreReady() || !window.db) return;
-    const branchKey = currentBranchKey();
-    if (!branchKey) return;
-    if (state.realtimeBound && state.realtimeBranchKey === branchKey) return;
-    state.realtimeUnsubs.splice(0).forEach(unsub => {
-      try { if (typeof unsub === 'function') unsub(); } catch (_) {}
-    });
+    if (state.realtimeBound || !sync.firestoreReady()) return;
+    const uid = sender().requestedByUid;
+    if (!uid || !window.db) return;
     state.realtimeBound = true;
-    state.realtimeBranchKey = branchKey;
     const rerender = () => {
       const active = document.querySelector('#cmsInvoiceRequestStatusPageV42.active, #cmsInvoiceRequestHistoryPageV42.active');
       if (!active) return;
       if (active.id === 'cmsInvoiceRequestStatusPageV42') renderStatus();
       if (active.id === 'cmsInvoiceRequestHistoryPageV42') renderHistory();
     };
-    state.realtimeUnsubs.push(window.db.collection('invoiceRequests').onSnapshot(snapshot => {
-      snapshot.forEach(doc => {
-        const data = { ...(doc.data ? doc.data() : doc), requestId: doc.id || doc.requestId };
-        if (rowMatchesCurrentBranch(data)) saveRequestSnapshotFromDoc(doc);
-      });
+    state.realtimeUnsubs.push(window.db.collection('invoiceRequests').where('requestedByUid', '==', uid).onSnapshot(snapshot => {
+      snapshot.forEach(saveRequestSnapshotFromDoc);
       rerender();
     }, error => console.warn('[invoice-request] request listener failed', error)));
     state.realtimeUnsubs.push(window.db.collection('taxInvoices').onSnapshot(snapshot => {
       const requestIds = new Set((isTestMode() ? store.listRequests() : store.listProductionRequests())
-        .filter(rowMatchesCurrentBranch)
         .map(row => String(row.requestId || row.id || '').trim()).filter(Boolean));
       const rows = [];
       snapshot.forEach(doc => {
         const data = { ...(doc.data() || {}), invoiceId: (doc.data() || {}).invoiceId || doc.id, historyId: doc.id };
+        const ownerUid = String(data.requestedByUid || data.ownerUid || '').trim();
         const sourceRequestId = String(data.sourceRequestId || data.requestId || '').trim();
-        const request = sourceRequestId ? store.listProductionRequests().find(item => String(item.requestId || item.id || '').trim() === sourceRequestId) : null;
-        if (rowMatchesCurrentBranch(data) || (sourceRequestId && requestIds.has(sourceRequestId)) || pairMatchesCurrentBranch({ invoice: data, request })) rows.push(data);
+        if ((ownerUid && ownerUid === uid) || (sourceRequestId && requestIds.has(sourceRequestId))) rows.push(data);
       });
       localStorage.setItem(TAX_INVOICE_HISTORY_KEY, JSON.stringify(rows));
       // Repair legacy request snapshots whose generatedInvoiceIds were never written back by the desktop app.
@@ -2057,7 +1902,7 @@
     const invoiceRows = mobileStatusInvoiceRows();
     const rows = invoiceRows.length ? [] : (isTestMode() ? store.listRequests() : store.listProductionRequests())
       .filter(requestVisibleInCurrentStatus)
-      .filter(request => !requestHiddenFromStatus(request));
+      .filter(request => !requestIsLocallyHidden(request, true));
     document.getElementById('cmsInvoiceRequestStatusPageV42').innerHTML = [
       header('สถานะใบกำกับภาษี', isTestMode() ? 'Test Mode' : 'อัปเดตจาก taxInvoices แบบ realtime'),
       '<div class="cmsInvoicePageMoreWrapV42"><button type="button" class="cmsInvoicePageMoreV42" onclick="CMSInvoiceRequest.toggleStatusMore(event)" aria-label="เมนูเพิ่มเติม">⋮</button><div class="cmsInvoicePageMoreMenuV42" id="cmsInvoiceStatusMoreMenuV42"><button type="button" onclick="CMSInvoiceRequest.openClearStatusDialog()">ล้างสถานะ</button><button type="button" class="danger" onclick="CMSInvoiceRequest.openClearAllDialog()">ล้างประวัติทั้งหมด</button></div></div>',
@@ -2075,8 +1920,7 @@
       readMobileHistory()
         .filter(isFullyPrinted)
         .map(invoice => ({ invoice, request: requestMap.get(invoiceRequestKey(invoice)) || {} }))
-        .filter(pair => isTestMode() || pairMatchesCurrentBranch(pair))
-        .filter(pair => !pairHiddenFromStatus(pair, false))
+        .filter(pair => !localPairIsHidden(pair.invoice, pair.request, false))
     ).map(pair => pair.invoice)
       .sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
@@ -2095,8 +1939,7 @@
       readMobileHistory()
         .filter(isFullyPrinted)
         .map(invoice => ({ invoice, request: requestMap.get(invoiceRequestKey(invoice)) || {} }))
-        .filter(pair => isTestMode() || pairMatchesCurrentBranch(pair))
-        .filter(pair => !pairHiddenFromStatus(pair, false))
+        .filter(pair => !localPairIsHidden(pair.invoice, pair.request, false))
     ).map(pair => pair.invoice)
       .sort((a,b)=>String(printedTimestamp(b)||b.updatedAt||b.createdAt||'').localeCompare(String(printedTimestamp(a)||a.updatedAt||a.createdAt||'')));
     document.getElementById('cmsInvoiceRequestHistoryPageV42').innerHTML = [
