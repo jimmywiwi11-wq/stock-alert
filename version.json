@@ -1,10 +1,10 @@
 {
-  "version": "8.05",
-  "label": "V8.05",
-  "build": "20260804-PER-INVOICE-STATUS-RESET-IV000110",
-  "marker": "V8.05-BUILD-VERIFY-PER-INVOICE-IV000110",
-  "releasedAt": "2026-08-04T00:00:00Z",
-  "message": "Verify-loaded build for per-invoice tax invoice status and IV000110 reset.",
+  "version": "8.05.12",
+  "label": "V8.05.12",
+  "build": "20260805-EMPLOYEE-APP-V12",
+  "marker": "V8.05.12-EMPLOYEE-APP-V12",
+  "releasedAt": "2026-08-05T14:25:00+07:00",
+  "message": "Employee app update: add customer flow, compact invoice items, status menu, local status/history controls, and forced PWA cache refresh.",
   "title": "Stock Alert",
-  "updatedAt": "2026-08-04T00:00:00+07:00"
+  "updatedAt": "2026-08-05T14:25:00+07:00"
 }
