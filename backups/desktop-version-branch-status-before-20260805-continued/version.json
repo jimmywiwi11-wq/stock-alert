@@ -1,0 +1,10 @@
+{
+  "version": "8.05",
+  "label": "V8.05",
+  "build": "20260804-PER-INVOICE-STATUS-RESET-IV000110",
+  "marker": "V8.05-BUILD-VERIFY-PER-INVOICE-IV000110",
+  "releasedAt": "2026-08-04T00:00:00Z",
+  "message": "Verify-loaded build for per-invoice tax invoice status and IV000110 reset.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-08-04T00:00:00+07:00"
+}

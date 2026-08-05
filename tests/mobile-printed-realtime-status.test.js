@@ -3,8 +3,10 @@ const fs = require('fs');
 
 const source = fs.readFileSync('modules/invoice-request/invoice-request.js', 'utf8');
 
-assert.ok(source.includes("window.db.collection('invoiceRequests').where('requestedByUid', '==', uid).onSnapshot"), 'mobile must listen to invoiceRequests realtime');
-assert.ok(source.includes("window.db.collection('taxInvoices').where('requestedByUid', '==', uid).onSnapshot"), 'mobile must listen to taxInvoices realtime');
+assert.ok(source.includes("window.db.collection('invoiceRequests').onSnapshot"), 'mobile must listen to invoiceRequests realtime');
+assert.ok(source.includes("window.db.collection('taxInvoices').onSnapshot"), 'mobile must listen to taxInvoices realtime');
+assert.ok(source.includes('rowMatchesCurrentBranch'), 'mobile realtime rows must be filtered by current branch');
+assert.ok(!source.includes(".where('requestedByUid', '==', uid).onSnapshot"), 'mobile realtime must not be scoped to a single user uid');
 assert.ok(source.includes("if (status === 'printed') return 'สั่งพิมพ์แล้ว';"), 'printed status must render immediately after listener update');
 assert.ok(source.includes("if (status === 'printed') return 'printed';"), 'printed status must use green class');
 

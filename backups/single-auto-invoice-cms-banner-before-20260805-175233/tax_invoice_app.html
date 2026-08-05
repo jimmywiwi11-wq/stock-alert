@@ -2463,14 +2463,6 @@ function bindAutoInvoiceNumberPreviewEvents(){['autoCount','autoTarget','autoMin
 const thaiMonthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 function selectedAutoInvoiceType(){return window.autoInvoiceType?autoInvoiceType.value:'ใบกำกับภาษีย่อ'}
 function autoBuyerForType(type){return type==='ใบกำกับภาษีเต็ม'?{buyerName:'ลูกค้าทั่วไป',buyerTax:'',buyerAddress:''}:{buyerName:'ลูกค้าทั่วไป',buyerTax:'',buyerAddress:''}}
-function refreshAutoSingleCustomerOptions(){
-  if(!window.autoSingleCustomer)return;
-  let selected=autoSingleCustomer.value;
-  let rows=getCustomers().map((c,i)=>{let n=normalizeCustomer(c);return {i,label:[n.code,customerFullName(n),n.taxId].filter(Boolean).join(' - ')}});
-  autoSingleCustomer.innerHTML='<option value="">กรอกข้อมูลเอง</option>'+rows.map(x=>`<option value="${x.i}">${escapeHtml(x.label||('ลูกค้า '+(x.i+1)))}</option>`).join('');
-  if(selected!==''&&rows.some(x=>String(x.i)===String(selected)))autoSingleCustomer.value=selected;
-}
-window.refreshAutoSingleCustomerOptions=refreshAutoSingleCustomerOptions;
 function toggleAutoInvoiceMode(){
   let mode=autoMode.value,monthly=mode==='monthly',single=mode==='single',type=selectedAutoInvoiceType(),isShort=type==='ใบกำกับภาษีย่อ';
   autoSingleDateField.style.display=monthly?'none':'';
@@ -2523,8 +2515,8 @@ function makeMonthlyFullInvoiceDates(count,year,month){
   dates=dates.sort((a,b)=>a-b);
   return dates.map(day=>`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`);
 }
-function buildTrainingInvoice({id,no,date,time,type,vatMode,paperSize,items,calculated,trainingMode,theme,category,batchId,buyer}){
-  buyer=buyer||autoBuyerForType(type);
+function buildTrainingInvoice({id,no,date,time,type,vatMode,paperSize,items,calculated,trainingMode,theme,category,batchId}){
+  let buyer=autoBuyerForType(type);
   return {id,no,date,time,dateTime:`${date}T${time}:00`,type,vatMode,paperSize,...buyer,items,beforeVat:calculated.beforeVat,vat:calculated.vat,total:calculated.total,training:true,trainingMode,trainingTheme:theme,trainingCategory:category,trainingBatchId:batchId,printStatus:'unprinted',printCount:0,updatedAt:`${date}T${time}:00`};
 }
 function generateMonthlyTrainingInvoices(){
@@ -2623,24 +2615,6 @@ function selectAutoSingleCustomerSuggestion(index){
   autoSingleBuyerAddress.value=customerFullAddress(c);
   hideAutoSingleCustomerSuggestions();
 }
-function fillAutoSingleCustomer(){
-  let index=window.autoSingleCustomer?autoSingleCustomer.value:'';
-  if(index==='')return;
-  selectAutoSingleCustomerSuggestion(index);
-}
-function autoSingleBuyerData(type){
-  let selectedIndex=window.autoSingleCustomer?autoSingleCustomer.value:'',selected=selectedIndex!==''?getCustomers()[+selectedIndex]:null;
-  let c=selected?normalizeCustomer(selected):null;
-  let name=c?customerFullName(c):String(window.autoSingleBuyerName?autoSingleBuyerName.value:'').trim();
-  let tax=c?String(c.taxId||c.tax||'').trim():String(window.autoSingleBuyerTax?autoSingleBuyerTax.value:'').trim();
-  let rawAddress=c?customerFullAddress(c):String(window.autoSingleBuyerAddress?autoSingleBuyerAddress.value:'').trim();
-  let parts=c?splitAddressForInvoiceLines(c.address1,c.address2):splitAddressForInvoiceLines(rawAddress,'');
-  let customerId=c?customerStableId(c):'';
-  let snapshot=c?{...c,customerId,customerCode:c.customerCode||c.code||'',customerName:name,companyName:c.companyName||name,address1:parts.address1,address2:parts.address2,customerAddress:parts.buyerAddress,address:parts.buyerAddress,customerTaxId:tax,taxId:tax}:{};
-  return {buyerName:name,buyerAddress:parts.buyerAddress||rawAddress,buyerAddress1:parts.address1,buyerAddress2:parts.address2,buyerTax:tax,customerId,customerSnapshot:snapshot};
-}
-window.fillAutoSingleCustomer=fillAutoSingleCustomer;
-window.autoSingleBuyerData=autoSingleBuyerData;
 function handleAutoSingleCustomerKey(event){
   if(!window.autoSingleCustomerSuggestions)return;
   let rows=autoSingleCustomerSearchRows();
@@ -2760,29 +2734,6 @@ async function makeSingleTrainingItemsExact(grossCents,products,itemCount,vatMod
   let lines=best.chosen.map((x,i)=>singleTrainingLineFromProduct(x.p,best.quantities[i]));
   return shuffleCopy(lines);
 }
-function makeSingleTrainingItemsFallback(grossCents,products,itemCount,vatMode){
-  const target=subtotalCentsForTrainingGross(grossCents,vatMode);
-  let eligible=(products||[]).map(p=>({p,cents:Math.round((+p.price||0)*100)})).filter(x=>x.cents>0&&x.cents<=target);
-  let seen=new Set();eligible=eligible.filter(x=>{let key=String(x.p.id??x.p.code??x.p.name);if(seen.has(key))return false;seen.add(key);return true});
-  itemCount=Math.max(1,Math.min(itemCount,eligible.length));
-  if(!eligible.length||itemCount<1)return null;
-  const cheapest=eligible.slice().sort((a,b)=>a.cents-b.cents).slice(0,itemCount);
-  if(cheapest.reduce((sum,x)=>sum+x.cents,0)>target)return null;
-  let best=null,deadline=performance.now()+700,trials=Math.max(80,Math.min(800,eligible.length*8));
-  for(let trial=0;trial<trials&&performance.now()<deadline;trial++){
-    let chosen=shuffleCopy(eligible).slice(0,itemCount);
-    if(chosen.length<itemCount)continue;
-    chosen.sort((a,b)=>b.cents-a.cents);
-    let previous=chosen.slice(0,-1),sum=previous.reduce((s,x)=>s+x.cents,0),last=chosen[chosen.length-1];
-    if(target-sum<=0){chosen=cheapest.slice();previous=chosen.slice(0,-1);sum=previous.reduce((s,x)=>s+x.cents,0);last=chosen[chosen.length-1]}
-    let adjusted=target-sum;if(adjusted<=0)continue;
-    let diff=Math.abs(adjusted-last.cents),candidate={chosen:previous.concat([{...last,cents:adjusted,adjusted:true}]),diff};
-    if(!best||candidate.diff<best.diff)best=candidate;
-    if(diff===0)break;
-  }
-  let source=best?best.chosen:cheapest.map((x,i)=>i===cheapest.length-1?{...x,cents:target-cheapest.slice(0,-1).reduce((s,y)=>s+y.cents,0),adjusted:true}:x);
-  return source.map(x=>({...singleTrainingLineFromProduct(x.p,1),price:x.cents/100,autoAdjustedPrice:!!x.adjusted}));
-}
 let singleTrainingDraft=null;
 function singleDraftInputSignature(){
   return JSON.stringify({
@@ -2813,11 +2764,8 @@ async function buildSingleTrainingDraft({reroll=false}={}){
   else{numberPlan=getAutoInvoiceStartPlan(type,1);if(!numberPlan)return null}
   let grossTarget=Math.round(target*100),items=await makeSingleTrainingItemsExact(grossTarget,products,itemCount,vatMode);
   if(!items||items.length!==itemCount){
-    items=makeSingleTrainingItemsFallback(grossTarget,products,itemCount,vatMode);
-    if(!items||items.length!==itemCount){
-      setSingleDraftStatus('ไม่พบสินค้าที่มีราคาขายพอสำหรับสร้างรายการตามจำนวนและยอดรวมนี้','error');
-      return null
-    }
+    setSingleDraftStatus('ไม่พบชุดสินค้าราคาจริงที่รวมได้ตรงกับยอดและจำนวนรายการนี้ ลองกดสร้างอีกครั้ง หรือปรับจำนวนรายการ/ยอดรวมเล็กน้อย','error');
+    return null
   }
   let calculated=calcTrainingInvoiceAmounts(items,vatMode),time=autoRandomTime.checked?makeTrainingTimes(1,true)[0]:(autoTimeStart.value||'08:00'),base=singleTrainingDraft&&singleTrainingDraft.signature===signature?singleTrainingDraft.invoice.id:Date.now(),batchId=singleTrainingDraft&&singleTrainingDraft.signature===signature?singleTrainingDraft.invoice.trainingBatchId:'TRS-'+Date.now(),no=numberPlan.numbers[0];
   let inv=buildTrainingInvoice({id:base,no,date,time,type,vatMode,paperSize:paper,items,calculated,trainingMode:'single',theme:null,category:amountKindFromCents(grossTarget,Math.round((+autoMin.value||50)*100),Math.round((+autoMax.value||5000)*100)),batchId,buyer});
@@ -2849,18 +2797,7 @@ async function rerollSingleTrainingItems(){
   try{
     setSingleDraftStatus('กำลังสร้างสินค้าและจำนวนชุดใหม่ โดยคงเลขที่บิลและยอดรวมเดิม...', 'info', true);
     await nextBrowserPaint();
-    let draft;
-    if(oldDraft){
-      let products=store.get('products',[]).filter(p=>(+p.price||0)>0),oldInv=oldDraft.invoice,itemCount=oldInv.items.length,grossTarget=Math.round((+oldInv.total||0)*100);
-      let items=await makeSingleTrainingItemsExact(grossTarget,products,itemCount,oldInv.vatMode);
-      if(!items||items.length!==itemCount)items=makeSingleTrainingItemsFallback(grossTarget,products,itemCount,oldInv.vatMode);
-      if(!items||items.length!==itemCount){setSingleDraftStatus('ยังสร้างชุดรายการใหม่ไม่ได้ กรุณากดอีกครั้ง หรือปรับจำนวนรายการ','error');return}
-      let calculated=calcTrainingInvoiceAmounts(items,oldInv.vatMode);
-      singleTrainingDraft={...oldDraft,invoice:{...oldInv,items,beforeVat:calculated.beforeVat,vat:calculated.vat,total:calculated.total}};
-      draft=singleTrainingDraft;
-    }else{
-      draft=await buildSingleTrainingDraft({reroll:false});
-    }
+    let draft=await buildSingleTrainingDraft({reroll:!!oldDraft});
     if(!draft){setSingleDraftStatus('ยังสร้างชุดรายการใหม่ไม่ได้ กรุณากดอีกครั้ง หรือปรับจำนวนรายการ','error');return}
     if(oldNo)draft.invoice.no=oldNo;
     renderSingleTrainingDraftPreview();
@@ -3267,7 +3204,7 @@ window.onload=()=>{
     const banner=document.createElement('div');
     banner.id='cmsTaxBridgeBannerV3';
     banner.className='hidden-print';
-    banner.style.cssText='position:static;background:#fff7ed;border-bottom:1px solid #fdba74;color:#9a3412;padding:8px 12px;font-weight:bold;font-size:13px';
+    banner.style.cssText='position:sticky;top:0;z-index:9998;background:#fff7ed;border-bottom:1px solid #fdba74;color:#9a3412;padding:8px 12px;font-weight:bold;font-size:13px';
     banner.textContent='โหมดทดสอบข้อมูลสินค้าแบบอ่านอย่างเดียว: กำลังเชื่อมต่อ CMS';
     document.body.insertBefore(banner,document.body.firstChild);
   }
@@ -3621,3 +3558,4 @@ window.onload=()=>{
 </script>
 </body>
 </html>
+
