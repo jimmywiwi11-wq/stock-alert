@@ -7,10 +7,13 @@
     "test:rules": "firebase emulators:exec --project check-chokanan-security-test --only firestore \"node tests/firestore-rules-security.test.js\"",
     "test:schema": "node tests/database-schema-validation.test.js",
     "test:invoice-generator": "node tests/invoice-generator.test.js && node tests/invoice-generator-e2e.test.js && node tests/invoice-history-adapter.test.js",
-    "test:final": "node tests/invoice-generator.test.js && node tests/invoice-generator-e2e.test.js && node tests/invoice-history-adapter.test.js && node tests/database-schema-validation.test.js && node tests/invoice-request.test.js && node tests/product-master.test.js"
+    "test:final": "node tests/invoice-generator.test.js && node tests/invoice-generator-e2e.test.js && node tests/invoice-history-adapter.test.js && node tests/database-schema-validation.test.js && node tests/invoice-request.test.js && node tests/product-master.test.js",
+    "repair:invoice-numbers:dry-run": "node scripts/repair-unprinted-employee-invoice-numbers.mjs --dry-run",
+    "repair:invoice-numbers:apply": "node scripts/repair-unprinted-employee-invoice-numbers.mjs --apply"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase-admin": "^13.0.0",
     "firebase": "^12.0.0",
     "firebase-tools": "^14.0.0"
   }
