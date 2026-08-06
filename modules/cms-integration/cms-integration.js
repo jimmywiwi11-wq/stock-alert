@@ -40,6 +40,8 @@
   let stateBox;
   let bridgeReady = false;
   let frameReadyTimer = null;
+  let runtimeStyleReady = false;
+  let layoutObserver = null;
 
   function taxInvoiceUrl(){
     const version = window.STOCK_ALERT_APP_VERSION || window.APP_VERSION_LABEL || window.APP_VERSION || Date.now();
@@ -64,6 +66,64 @@
 
   function setDesktopClass(){
     document.body.classList.toggle('cmsDesktopAllowedV3', desktopCapable());
+  }
+
+  function ensureRuntimeStyles(){
+    if (runtimeStyleReady && document.getElementById('cmsTaxInvoiceRuntimeStyleV3')) return;
+    runtimeStyleReady = true;
+    const existing = document.getElementById('cmsTaxInvoiceRuntimeStyleV3');
+    if (existing) return;
+    const style = document.createElement('style');
+    style.id = 'cmsTaxInvoiceRuntimeStyleV3';
+    style.textContent = [
+      'body.cmsTaxInvoiceActiveV3{overflow:hidden!important}',
+      'body.cmsTaxInvoiceActiveV3 .phone,body.cmsTaxInvoiceActiveV3 .bottom,body.cmsTaxInvoiceActiveV3 .toast,body.cmsTaxInvoiceActiveV3 .modal:not(.show){display:none!important}',
+      'body.cmsTaxInvoiceActiveV3 #cmsTaxInvoiceModuleV3.cmsModulePageV3.show{display:grid!important;position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;z-index:2147483000!important;grid-template-rows:auto minmax(0,1fr)!important;overflow:hidden!important;background:#f6f8fb!important}',
+      'body.cmsTaxInvoiceActiveV3 #cmsTaxInvoiceModuleV3 .cmsModuleBodyV3{position:relative!important;min-height:0!important;height:100%!important;overflow:hidden!important}',
+      'body.cmsTaxInvoiceActiveV3 #cmsTaxInvoiceModuleV3 .cmsTaxFrameV3{display:block!important;width:100%!important;height:100%!important;border:0!important;background:#fff!important}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function applyFullScreenModuleLayout(){
+    if (!modulePage) return;
+    modulePage.style.setProperty('display', 'grid', 'important');
+    modulePage.style.setProperty('position', 'fixed', 'important');
+    modulePage.style.setProperty('inset', '0', 'important');
+    modulePage.style.setProperty('top', '0', 'important');
+    modulePage.style.setProperty('right', '0', 'important');
+    modulePage.style.setProperty('bottom', '0', 'important');
+    modulePage.style.setProperty('left', '0', 'important');
+    modulePage.style.setProperty('width', '100vw', 'important');
+    modulePage.style.setProperty('height', '100vh', 'important');
+    modulePage.style.setProperty('z-index', '2147483000', 'important');
+    modulePage.style.setProperty('transform', 'none', 'important');
+    modulePage.style.setProperty('grid-template-rows', 'auto minmax(0, 1fr)', 'important');
+    modulePage.style.setProperty('overflow', 'hidden', 'important');
+  }
+
+  function moduleLayoutNeedsRepair(){
+    if (!modulePage) return false;
+    const style = modulePage.style;
+    return style.getPropertyValue('position') !== 'fixed' ||
+      style.getPropertyValue('inset') !== '0px' ||
+      style.getPropertyValue('width') !== '100vw' ||
+      style.getPropertyValue('height') !== '100vh' ||
+      style.getPropertyValue('z-index') !== '2147483000';
+  }
+
+  function ensureFullScreenLayoutObserver(){
+    if (!modulePage || layoutObserver || typeof MutationObserver === 'undefined') return;
+    layoutObserver = new MutationObserver(() => {
+      if (
+        document.body.classList.contains('cmsTaxInvoiceActiveV3') &&
+        modulePage.classList.contains('show') &&
+        moduleLayoutNeedsRepair()
+      ) {
+        applyFullScreenModuleLayout();
+      }
+    });
+    layoutObserver.observe(modulePage, { attributes: true, attributeFilter: ['class', 'style'] });
   }
 
   function safeMessage(type, payload){
@@ -174,6 +234,7 @@
 
   function ensureModulePage(){
     if (modulePage) return;
+    ensureRuntimeStyles();
     modulePage = document.createElement('div');
     modulePage.id = 'cmsTaxInvoiceModuleV3';
     modulePage.className = 'cmsModulePageV3';
@@ -201,6 +262,7 @@
       if (!bridgeReady) postToFrame('CMS_READY', productsPayload());
       window.ChokAnanCMSTaxInvoiceHistoryBridge?.refresh?.();
     });
+    ensureFullScreenLayoutObserver();
   }
 
   function ensureGuard(){
@@ -228,18 +290,27 @@
       showGuard();
       return;
     }
+    ensureRuntimeStyles();
     ensureModulePage();
     bridgeReady = false;
+    document.body.classList.add('cmsTaxInvoiceActiveV3');
     modulePage.classList.add('show');
+    applyFullScreenModuleLayout();
     resetLoadingState();
     if (!frame.src || frame.src === 'about:blank') frame.src = taxInvoiceUrl();
     else if (frameLooksLoaded()) markFrameReady();
     postToFrame('CMS_READY', productsPayload());
+    requestAnimationFrame(applyFullScreenModuleLayout);
+    setTimeout(applyFullScreenModuleLayout, 120);
     scheduleFrameReadyCheck();
   }
 
   function closeModule(){
-    if (modulePage) modulePage.classList.remove('show');
+    document.body.classList.remove('cmsTaxInvoiceActiveV3');
+    if (modulePage) {
+      modulePage.classList.remove('show');
+      modulePage.style.removeProperty('display');
+    }
   }
 
   function requestClose(){
