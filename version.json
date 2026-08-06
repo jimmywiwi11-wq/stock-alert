@@ -4,7 +4,7 @@
   "build": "20260806-EMPLOYEE-REQUEST-AUTO-INVOICE",
   "marker": "V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE",
   "releasedAt": "2026-08-06T00:00:00Z",
-  "message": "Remove desktop employee request UI after automatic invoice generation.",
+  "message": "Remove desktop employee request UI after automatic invoice generation while preserving the latest service worker update flow.",
   "title": "Stock Alert",
   "updatedAt": "2026-08-06T00:00:00+07:00"
 }

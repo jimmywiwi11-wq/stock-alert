@@ -8,6 +8,44 @@ $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Url = "http://127.0.0.1:$Port/index.html"
 
+function Update-ProjectFromGit {
+  param([string]$Root)
+
+  try {
+    $git = Get-Command git.exe -ErrorAction SilentlyContinue
+    if (-not $git) { return $false }
+    if (-not (Test-Path -LiteralPath (Join-Path $Root '.git'))) { return $false }
+
+    $status = & $git.Source -C $Root status --porcelain 2>$null
+    if ($LASTEXITCODE -ne 0) { return $false }
+
+    # Never overwrite local edits. Pull only when the working tree is clean.
+    if ($status) {
+      Write-Host 'Git update skipped because local files have uncommitted changes.'
+      return $false
+    }
+
+    & $git.Source -C $Root fetch origin --quiet 2>$null
+    if ($LASTEXITCODE -ne 0) { return $false }
+
+    $branch = (& $git.Source -C $Root rev-parse --abbrev-ref HEAD 2>$null).Trim()
+    if (-not $branch -or $branch -eq 'HEAD') { $branch = 'main' }
+
+    & $git.Source -C $Root merge --ff-only "origin/$branch" --quiet 2>$null
+    if ($LASTEXITCODE -ne 0) {
+      Write-Host 'Git update was not applied because the branch cannot fast-forward safely.'
+      return $false
+    }
+
+    Write-Host 'Program files are updated from Git.'
+    return $true
+  }
+  catch {
+    Write-Host "Git update skipped: $($_.Exception.Message)"
+    return $false
+  }
+}
+
 function Test-LocalServer {
   param([int]$PortToCheck)
   $client = [System.Net.Sockets.TcpClient]::new()
@@ -36,30 +74,14 @@ function Test-LocalServer {
   }
 }
 
-function Find-PythonCommand {
-  $commands = @(
-    @{ File = 'py'; Args = @('-3') },
-    @{ File = 'python'; Args = @() },
-    @{ File = 'python3'; Args = @() }
-  )
-
-  foreach ($candidate in $commands) {
-    $cmd = Get-Command $candidate.File -ErrorAction SilentlyContinue
-    if ($cmd) {
-      return @{
-        File = $cmd.Source
-        Args = $candidate.Args
-      }
-    }
-  }
-
-  return $null
-}
-
 try {
   if (-not (Test-Path (Join-Path $ProjectRoot 'index.html'))) {
     throw "index.html was not found in $ProjectRoot"
   }
+
+  # Refresh application source files before opening. This does not touch
+  # browser localStorage, IndexedDB, Firestore, products, or customers.
+  Update-ProjectFromGit -Root $ProjectRoot | Out-Null
 
   $isRunning = Test-LocalServer -PortToCheck $Port
   if (-not $isRunning -and -not $NoServer) {
@@ -88,6 +110,8 @@ try {
   }
 
   if (-not $NoOpen) {
+    $cacheBust = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    $openUrl = "$Url?desktopBuild=$cacheBust"
     $edgeCandidates = @(
       "$env:ProgramFiles(x86)\Microsoft\Edge\Application\msedge.exe",
       "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe"
@@ -95,10 +119,10 @@ try {
     $edge = $edgeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 
     if ($edge) {
-      Start-Process -FilePath $edge -ArgumentList @("--app=$Url")
+      Start-Process -FilePath $edge -ArgumentList @("--app=$openUrl")
     }
     else {
-      Start-Process $Url
+      Start-Process $openUrl
     }
   }
 
