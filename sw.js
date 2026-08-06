@@ -1,7 +1,7 @@
-const APP_VERSION='8.05.13';
-const APP_VERSION_LABEL='V8.05.13';
-const BUILD_MARKER='V8.05.13-EMPLOYEE-APP-V13';
-const CACHE_NAME='stock-alert-v8_05_13-employee-app-v13-20260805-1440';
+const APP_VERSION='8.06';
+const APP_VERSION_LABEL='V8.06';
+const BUILD_MARKER='V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE';
+const CACHE_NAME='stock-alert-v8_06-employee-request-auto-invoice-20260806';
 const CACHE_PREFIX='stock-alert-';
 
 const APP_SHELL=[
@@ -75,10 +75,15 @@ function patchIndexHtml(html){
   let output=String(html||'');
   output=output
     .replace(/const APP_VERSION='8\.05';/g,`const APP_VERSION='${APP_VERSION}';`)
+    .replace(/const APP_VERSION='8\.05\.13';/g,`const APP_VERSION='${APP_VERSION}';`)
     .replace(/const APP_VERSION_LABEL='V8\.05';/g,`const APP_VERSION_LABEL='${APP_VERSION_LABEL}';`)
+    .replace(/const APP_VERSION_LABEL='V8\.05\.13';/g,`const APP_VERSION_LABEL='${APP_VERSION_LABEL}';`)
     .replace(/const BUILD_MARKER='V8\.05-BUILD-VERIFY-PER-INVOICE-IV000110';/g,`const BUILD_MARKER='${BUILD_MARKER}';`)
+    .replace(/const BUILD_MARKER='V8\.05\.13-EMPLOYEE-APP-V13';/g,`const BUILD_MARKER='${BUILD_MARKER}';`)
     .replace(/navigator\.serviceWorker\.register\('sw\.js\?v=8\.05'\)/g,`navigator.serviceWorker.register('sw.js?v=${APP_VERSION}')`)
-    .replace(/V8\.05-BUILD-VERIFY-PER-INVOICE-IV000110/g,BUILD_MARKER);
+    .replace(/navigator\.serviceWorker\.register\('sw\.js\?v=8\.05\.13'\)/g,`navigator.serviceWorker.register('sw.js?v=${APP_VERSION}')`)
+    .replace(/V8\.05-BUILD-VERIFY-PER-INVOICE-IV000110/g,BUILD_MARKER)
+    .replace(/V8\.05\.13-EMPLOYEE-APP-V13/g,BUILD_MARKER);
 
   const repairScript=`<script>(function(){try{var v='${APP_VERSION}';window.STOCK_ALERT_APP_VERSION=v;window.STOCK_ALERT_APP_VERSION_LABEL='${APP_VERSION_LABEL}';['stockAlertPendingUpdateVersion','stockAlertUpdateAttemptVersion','stockAlertUpdateAttemptCount','stockAlertLastUpdateAttemptAt','stockAlertLastUpdateError'].forEach(function(k){localStorage.removeItem(k)});sessionStorage.removeItem('stockAlertDismissUpdateVersion');window.addEventListener('load',function(){setTimeout(function(){var title=document.getElementById('updateStatusTitle'),sub=document.getElementById('updateStatusSub'),btn=document.getElementById('appUpdateStatus');if(title)title.textContent='เป็นเวอร์ชันล่าสุดแล้ว';if(sub)sub.textContent='${APP_VERSION_LABEL}';if(btn){btn.classList.remove('hasUpdate','checking');btn.classList.add('latest')}} ,300)}, {once:true});}catch(e){}})();<\/script>`;
   if(output.includes('</body>'))output=output.replace('</body>',repairScript+'</body>');

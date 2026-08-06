@@ -1,10 +1,10 @@
 {
-  "version": "8.05.13",
-  "label": "V8.05.13",
-  "build": "20260805-EMPLOYEE-APP-V13",
-  "marker": "V8.05.13-EMPLOYEE-APP-V13",
-  "releasedAt": "2026-08-05T14:40:00+07:00",
-  "message": "Fix iPhone PWA update loop, activate the newest service worker automatically, refresh employee invoice-request assets, and preserve all local and Firebase data.",
+  "version": "8.06",
+  "label": "V8.06",
+  "build": "20260806-EMPLOYEE-REQUEST-AUTO-INVOICE",
+  "marker": "V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE",
+  "releasedAt": "2026-08-06T00:00:00Z",
+  "message": "Remove desktop employee request UI after automatic invoice generation while preserving the latest service worker update flow.",
   "title": "Stock Alert",
-  "updatedAt": "2026-08-05T14:40:00+07:00"
+  "updatedAt": "2026-08-06T00:00:00+07:00"
 }
