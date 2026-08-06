@@ -637,7 +637,7 @@ button[onclick^="deleteProduct"]:hover,button[onclick^="deleteInvoice"]:hover,bu
   :where(.tax-short) table th,:where(.tax-short) table td{padding:2px 3px!important}
 }
 </style>
-<link rel="stylesheet" href="history-v2.css?v=8.06">
+<link rel="stylesheet" href="history-v2.css?v=8.07">
 
 <style id="invoicePngHistoryEnhancementStyle">
 .png-export-stage{position:absolute;left:-100000px;top:0;z-index:0;background:#fff;padding:0;margin:0;pointer-events:none}
@@ -1151,18 +1151,18 @@ try{if(window.firebase&&!firebase.apps.length)firebase.initializeApp(firebaseCon
 function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[TaxInvoice auth]',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[TaxInvoice auth listener]',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[TaxInvoice auth ready]',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 window.stockAlertAuthReady=stockAlertAuthReady;
 </script>
-<script src="../../modules/customer-master/customer-master.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-chunk-service.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-vat-service.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-generation-validation.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-generation-lock.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-number-reservation.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-generation-audit.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-generator-store.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-generator.js?v=8.06"></script>
-<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.06"></script>
+<script src="../../modules/customer-master/customer-master.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-chunk-service.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-vat-service.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-generation-validation.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-generation-lock.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-number-reservation.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-generation-audit.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-generator-store.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-generator.js?v=8.07"></script>
+<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.07"></script>
 <!-- startup-safe: invoice-history-adapter disabled; CMS bridge supplies employee requests/history on demand -->
 <!-- startup-safe: native-invoice-repository disabled to prevent startup refresh loop -->
 <script>
@@ -3010,6 +3010,7 @@ function uniqueLayoutDisplayName(base,objects,selfId=null){
   if(!used.has(base))return base;let i=2,name=`${base} (${i})`;while(used.has(name)){i++;name=`${base} (${i})`}return name;
 }
 function isCompanyNameObject(o){let key=String(o?.source||o?.id||o?.displayName||o?.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();return key==='companyname'||key==='shopname'}
+function isCustomerAddressObject(o){let key=String(o?.source||o?.id||o?.displayName||o?.fieldName||'').replace(/[\s_-]+/g,'').toLowerCase();return ['buyeraddress','customeraddress','buyeraddress1','buyeraddress2','customeraddress1','customeraddress2'].includes(key)}
 function layoutKeyName(v){return String(v||'').replace(/[\s_-]+/g,'').toLowerCase()}
 function layoutObjectMatchesSource(o,sources){let keys=[o?.source,o?.id,o?.displayName,o?.fieldName].map(layoutKeyName);return (sources||[]).map(layoutKeyName).some(src=>keys.includes(src))}
 function normalizeLayoutObjectIds(layout){if(!layout||!Array.isArray(layout.objects))return layout;let used=new Set();layout.objects.forEach(o=>{let id=String(o.id||'');if(!id||used.has(id)){id=nextLayoutObjectId();while(used.has(id))id=nextLayoutObjectId();o.id=id}used.add(id)});return layout}
@@ -3165,7 +3166,8 @@ function objectStyle(o,cal,design=false){
   let colMap={itemNo:0,itemDescription:1,itemQty:2,itemUnit:3,itemPrice:4,itemAmount:5},sx=+cal.scaleX||1,sy=+cal.scaleY||1,columnShift=(colMap[o.source]||0)*(+cal.columnSpacing||0);
   let x=((+o.x||0)+(+cal.offsetX||0)+(+cal.leftMargin||0)+columnShift)*sx,y=((+o.y||0)+(+cal.offsetY||0)+(+cal.topMargin||0))*sy;
   let w=(+o.w||1)*sx,h=(+o.h||1)*sy,rs=getResolvedTextStyle(o,cal);
-  return `left:${x}mm;top:${y}mm;width:${w}mm;height:${h}mm;font-family:${rs.font},Sarabun,Noto Sans Thai,Tahoma,Leelawadee UI,sans-serif!important;font-size:${rs.fontSizeCss}!important;font-weight:${rs.weight}!important;font-style:${o.italic?'italic':'normal'}!important;text-decoration:${o.underline?'underline':'none'}!important;text-align:${o.align||'left'}!important;transform:rotate(${+o.rotation||0}deg);${rs.transformExtra}line-height:${rs.lineHeight}!important;letter-spacing:${rs.letterSpacing}!important;overflow:${rs.overflow};`;
+  let addressFlow=isCustomerAddressObject(o)?'height:auto!important;max-height:none!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:break-word!important;text-overflow:clip!important;':'';
+  return `left:${x}mm;top:${y}mm;width:${w}mm;height:${h}mm;min-height:${h}mm;${addressFlow}font-family:${rs.font},Sarabun,Noto Sans Thai,Tahoma,Leelawadee UI,sans-serif!important;font-size:${rs.fontSizeCss}!important;font-weight:${rs.weight}!important;font-style:${o.italic?'italic':'normal'}!important;text-decoration:${o.underline?'underline':'none'}!important;text-align:${o.align||'left'}!important;transform:rotate(${+o.rotation||0}deg);${rs.transformExtra}line-height:${rs.lineHeight}!important;letter-spacing:${rs.letterSpacing}!important;overflow:${rs.overflow};`;
 }
 function layoutObjectDebugAttrs(o,layout){
   if(!isCompanyNameObject(o))return '';
@@ -3179,7 +3181,7 @@ function companyNameDebugText(o,layout){
 }
 function renderFullTaxLayoutHtml(data,design=false){
   let layout=activeFullTaxLayout(),cal=layout.calibration||defaultFullTaxCalibration(),grid=design&&layout.designer?.showGrid?`design-grid grid-${String(layout.designer.gridSize).replace('.','')}`:'',overlay=layout.overlay?.enabled&&layout.overlay.image?`<img class="layout-overlay" src="${layout.overlay.image}" style="opacity:${layout.overlay.opacity}">`:'';
-  let objects=(layout.objects||[]).filter(o=>o.visible!==false).map(o=>`<div class="print-object ${isCompanyNameObject(o)?'company-name-object':''} ${design?'design':''} ${design&&o.id===selectedLayoutObjectId?'selected':''} ${o.locked?'locked':''}" data-id="${o.id}"${layoutObjectDebugAttrs(o,layout)} style="${objectStyle(o,cal,design)}">${escapeHtml(objectText(o,data))}${design&&isCompanyNameObject(o)?`<span class="company-render-debug-badge">${escapeHtml(companyNameDebugText(o,layout))}</span>`:''}${design?'<span class="resize-handle"></span>':''}</div>`).join('');
+  let objects=(layout.objects||[]).filter(o=>o.visible!==false).map(o=>`<div class="print-object ${isCompanyNameObject(o)?'company-name-object':''} ${isCustomerAddressObject(o)?'invoice-address-object':''} ${design?'design':''} ${design&&o.id===selectedLayoutObjectId?'selected':''} ${o.locked?'locked':''}" data-id="${o.id}"${layoutObjectDebugAttrs(o,layout)} style="${objectStyle(o,cal,design)}">${escapeHtml(objectText(o,data))}${design&&isCompanyNameObject(o)?`<span class="company-render-debug-badge">${escapeHtml(companyNameDebugText(o,layout))}</span>`:''}${design?'<span class="resize-handle"></span>':''}</div>`).join('');
   return `<div class="invoice-box full-layout-page ${design?'design-mode':'preview-mode'} ${grid}" data-layout-id="${layout.id}">${overlay}${objects}</div>`;
 }
 function renderFullTaxLayoutPreview(){if(!document.getElementById('layoutDesigner')?.classList.contains('active'))clearPrintEditingState(false);invoicePreview.innerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(false),false)}
@@ -3469,8 +3471,8 @@ window.onload=()=>{
   setTimeout(()=>{addCurrentButton();if(document.getElementById('history')?.classList.contains('active'))augment()},250);
 })();
 </script>
-<script src="../../modules/product-master/product-master.js?v=8.06"></script>
-<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.06"></script>
+<script src="../../modules/product-master/product-master.js?v=8.07"></script>
+<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.07"></script>
 
 <script id="pageDataTransferFeature">
 (function(){

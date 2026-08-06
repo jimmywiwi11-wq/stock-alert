@@ -336,17 +336,80 @@
     document.documentElement.classList.remove('cmsInvoiceCustomerModalOpenV42');
   }
 
-  function customerCodeNow(){
-    const date = new Date();
-    const part = [
-      String(date.getFullYear()).slice(-2),
-      String(date.getMonth() + 1).padStart(2, '0'),
-      String(date.getDate()).padStart(2, '0'),
-      String(date.getHours()).padStart(2, '0'),
-      String(date.getMinutes()).padStart(2, '0'),
-      String(date.getSeconds()).padStart(2, '0')
-    ].join('');
-    return `CM${part}${Math.random().toString(36).slice(2,5).toUpperCase()}`;
+  function localCustomerRowsForCode(){
+    const rows = [];
+    try {
+      if (window.ChokAnanCustomerMaster && typeof window.ChokAnanCustomerMaster.getCustomerMaster === 'function') {
+        rows.push(...(window.ChokAnanCustomerMaster.getCustomerMaster({ includeLegacy: true }) || []));
+      }
+    } catch (error) {}
+    try {
+      const recent = JSON.parse(localStorage.getItem('chokananCustomerMasterRecentV1') || '[]');
+      if (Array.isArray(recent)) rows.push(...recent);
+    } catch (error) {}
+    return rows;
+  }
+
+  async function remoteCustomerRowsForCode(){
+    if (!window.db || typeof window.db.collection !== 'function') return [];
+    try {
+      const snap = await window.db.collection('customers').get();
+      return snap.docs.map(doc => ({ ...(doc.data() || {}), firestoreDocId: doc.id }));
+    } catch (error) {
+      console.warn('[employee customer code] cannot read customers for code allocation', error);
+      return [];
+    }
+  }
+
+  function customerRowCode(row){
+    return String(row?.customerCode || row?.code || row?.customerId || row?.id || '').trim();
+  }
+
+  function fallbackNextCustomerCode(rows, prefix='CM', width=3){
+    const used = new Set((rows || []).map(customerRowCode).filter(Boolean));
+    let max = 0;
+    used.forEach(code => {
+      const match = String(code).match(new RegExp(`^${prefix}0*(\\d+)$`, 'i'));
+      if (match) max = Math.max(max, Number(match[1]) || 0);
+    });
+    let next = `${prefix}${String(max + 1).padStart(width, '0')}`;
+    while (used.has(next)) {
+      max += 1;
+      next = `${prefix}${String(max + 1).padStart(width, '0')}`;
+    }
+    return next;
+  }
+
+  async function customerCodeExists(code, rows){
+    const wanted = String(code || '').trim().toLowerCase();
+    if (!wanted) return false;
+    if ((rows || []).some(row => customerRowCode(row).toLowerCase() === wanted)) return true;
+    if (!window.db || typeof window.db.collection !== 'function') return false;
+    try {
+      const [byCustomerCode, byCode, byId] = await Promise.all([
+        window.db.collection('customers').where('customerCode', '==', code).get().catch(() => null),
+        window.db.collection('customers').where('code', '==', code).get().catch(() => null),
+        window.db.collection('customers').doc(code).get().catch(() => null)
+      ]);
+      return !!(byCustomerCode?.docs?.length || byCode?.docs?.length || byId?.exists);
+    } catch (error) {
+      console.warn('[employee customer code] duplicate check failed', error);
+      return false;
+    }
+  }
+
+  async function customerCodeNow(){
+    const generator = window.ChokAnanCustomerMaster && typeof window.ChokAnanCustomerMaster.nextCustomerCode === 'function'
+      ? window.ChokAnanCustomerMaster.nextCustomerCode
+      : fallbackNextCustomerCode;
+    const rows = localCustomerRowsForCode().concat(await remoteCustomerRowsForCode());
+    let code = generator(rows, 'CM', 3);
+    for (let attempt = 0; attempt < 100 && await customerCodeExists(code, rows); attempt += 1) {
+      rows.push({ customerCode: code });
+      code = generator(rows, 'CM', 3);
+    }
+    if (await customerCodeExists(code, rows)) throw new Error('customer-code-allocation-failed');
+    return code;
   }
 
   function newCustomerValue(id){
@@ -412,7 +475,7 @@
     }
 
     try {
-      const customerCode = customerCodeNow();
+      const customerCode = await customerCodeNow();
       const fullName = [prefix, customerName].filter(Boolean).join(' ').trim();
       const address = [address1, address2].filter(Boolean).join(' ').trim();
       const now = nowIso();

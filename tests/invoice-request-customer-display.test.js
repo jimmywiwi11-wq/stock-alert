@@ -12,19 +12,19 @@ assert.ok(requestSource.includes('<label>ลูกค้าที่เลือ
 
 const panelSource = requestSource.slice(requestSource.indexOf('function renderCustomerPanel'), requestSource.indexOf('function renderProductPanel'));
 [
-  '<label>รหัสลูกค้า</label>',
-  '<label>คำนำหน้า</label>',
-  '<label>ชื่อลูกค้า</label>',
-  '<label>เลขภาษี</label>',
-  '<label>โทรศัพท์</label>',
-  '<label>สำนักงานใหญ่/สาขา</label>',
-  '<label>ที่อยู่ 1</label>',
-  '<label>ที่อยู่ 2</label>',
   'c?.taxId',
   'c?.phone',
   'c?.address1',
   'c?.address2'
 ].forEach(text => assert.strictEqual(panelSource.includes(text), false, `employee UI should not render ${text}`));
+[
+  'cmsNewCustomerPrefixV42',
+  'cmsNewCustomerAddress1V42',
+  'cmsNewCustomerAddress2V42',
+  'cmsNewCustomerTaxV42',
+  'await customerCodeNow()'
+].forEach(text => assert.ok(requestSource.includes(text), `employee customer creation should keep ${text}`));
+assert.ok(!requestSource.slice(requestSource.indexOf('async function customerCodeNow'), requestSource.indexOf('function newCustomerValue')).includes('getSeconds'), 'employee customer code must not be timestamp-based');
 
 assert.ok(requestSource.includes('customerSnapshot()'), 'request submit must still use full customerSnapshot');
 const snapshotSource = requestSource.slice(requestSource.indexOf('function customerSnapshot'), requestSource.indexOf('function itemSnapshot'));

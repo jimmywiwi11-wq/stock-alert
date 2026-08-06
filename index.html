@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Stock Alert V8.06</title>
+<title>Stock Alert V8.07</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -135,7 +135,7 @@ input,textarea,select,button{font-size:16px;}
 </style>
 </head>
 <body><div class="phone">
-<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><div id="runtimeBuildMarker" class="runtimeBuildMarker" style="display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.18);color:#e0f2fe;font-size:11px;font-weight:900;letter-spacing:0">V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V8.06</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
+<section id="home" class="page active"><div class="hero"><div class="brand">Stock <span>Alert</span></div><div class="store">โชคอนันต์ ฮาร์ดแวร์</div><div class="sync" id="syncText">กำลังเชื่อมต่อ...</div><div id="runtimeBuildMarker" class="runtimeBuildMarker" style="display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.18);color:#e0f2fe;font-size:11px;font-weight:900;letter-spacing:0">V8.07-BUILD-ADDRESS-CODE-NUMBERING</div><button type="button" class="userEditBtn" onclick="openNameEditor()">เปลี่ยนชื่อผู้ใช้งาน</button><div class="bell"><span class="badge" id="bellBadge">0</span></div><button type="button" class="updateStatus latest" id="appUpdateStatus" onclick="openUpdateDialog()"><span id="updateStatusTitle">เป็นเวอร์ชันล่าสุดแล้ว</span><small id="updateStatusSub">V8.07</small></button><div class="search"><span class="mag">?</span><input id="homeSearch" placeholder="ค้นหาสินค้าทั้ง 2 สาขา..."></div></div><div class="alerts" id="transferAlerts"></div><div class="allShortage" onclick="openList('all')"><div class="allShortageBody"><div class="allShortageIcon"><svg viewBox="0 0 24 24"><path d="M6 5h12M6 12h12M6 19h12"/><path d="M3.5 5h.01M3.5 12h.01M3.5 19h.01"/></svg></div><div class="allShortageText"><div class="allShortageHead" style="margin:0"><h2>ของขาดทั้งหมด</h2><div class="hint" id="allShortageHint">รวม 2 สาขา</div></div><div class="muted">กดเข้าไปดูรายการทั้งหมด</div></div><div class="allShortageAction">ดูรายการ</div></div></div><div class="grid" id="mainGrid"></div><div class="results" id="homeResultsCard"><div id="homeResults" class="empty"></div></div></section>
 
 <section id="summaryPage" class="page"><div class="pageHeader"><button class="back" onclick="go('home')">?</button><div><h2 style="margin:0">ข้อมูล</h2><div class="smallTitle">ภาพรวมรายการทั้งหมดในระบบ</div></div></div><div class="bestSellerTop" onclick="go('bestSellerPage')"><div style="display:flex;align-items:center;gap:14px"><div class="star">??</div><div><b>สินค้าขายดี</b><small>จัดอันดับจากรายการของขาด 1 เดือนล่าสุด</small></div></div><button class="allShortageAction">ดูอันดับ</button></div><div class="summaryPageGrid"><div class="stat"><div class="metric"><span id="statShortage">0</span><span>รายการ</span></div><div class="label">ของขาดทั้งหมด</div></div><div class="stat"><div class="metric"><span id="statOrder">0</span><span>รายการ</span></div><div class="label">ต้องสั่งเข้า</div></div><div class="stat"><div class="metric"><span id="statTransfer">0</span><span>รายการ</span></div><div class="label">ต้องแบ่งของ</div></div><div class="stat"><div class="metric"><span id="statSupplier">0</span><span>รายการ</span></div><div class="label">รอระบุบริษัท</div></div></div><div class="card"><h3 style="margin:0 0 8px">ข้อมูลอื่นๆ</h3><div class="smallTitle">รวมประวัติการแบ่งของและประวัติการส่งสินค้า</div><button class="btn gray" style="width:100%;margin-top:12px" onclick="openTransferHistory()">ดูประวัติการแบ่งของ</button><button class="btn gray" style="width:100%;margin-top:10px" onclick="go('deliveryHistoryPage')">ประวัติการส่งสินค้า</button></div></section><section id="bestSellerPage" class="page"><div class="pageHeader"><button class="back" onclick="go('summaryPage')">?</button><div><h2 style="margin:0">สินค้าขายดี</h2><div class="smallTitle">10 อันดับจากรายการของขาด 1 เดือนล่าสุด</div></div></div><div id="bestSellerBox"></div></section>
 <section id="formPage" class="page"><div class="pageHeader" style="position:relative"><button class="back" onclick="go('home')">?</button><div><h2 id="formTitle" style="margin:0">ลงของขาด</h2><div class="smallTitle">บันทึกหมด / เหลือน้อย</div></div><button class="manageBtn" onclick="openManagePage()">จัดการ</button></div><div class="card"><label>ชื่อสินค้า</label><input class="input" id="nameInput" placeholder="เช่น ทินเนอร์ / ท่อ PVC 2 นิ้ว"><label>หมวดหมู่</label><div id="categoryChips" class="chips"></div><label>สถานะ</label><div class="seg"><button id="outBtn" class="active out" onclick="setStatus('out')">หมดเกลี้ยง</button><button id="lowBtn" onclick="setStatus('low')">เหลือน้อย</button></div><div id="qtyField" style="display:none" class="qtyUnitGrid"><div><label>จำนวนคงเหลือ</label><input class="input" id="qtyInput" type="text" inputmode="text" placeholder="จำนวน"></div><div><label>หน่วย</label><input class="input" id="unitInput" placeholder="ตัว / อัน / ถุง / เส้น"></div></div><label>บริษัทผู้จำหน่าย <span class="supplierUnknown">(ไม่บังคับ)</span></label><input class="input" id="supplierInput" list="supplierOptions" placeholder="ยังไม่ได้ระบุ / SCG / TOA"><datalist id="supplierOptions"></datalist><label>หมายเหตุ</label><textarea id="noteInput" placeholder="ไม่บังคับ"></textarea><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveItem()">บันทึก</button></div></section>
@@ -173,7 +173,7 @@ input,textarea,select,button{font-size:16px;}
   <div class="tab" onclick="go('orderPage')"><div class="tabIcon orderIcon"><svg viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v16l-3-1.5-3 1.5-3-1.5L8 21l-4-2V5a2 2 0 0 1 2-2zm3 6h6v2H9zm0 4h6v2H9z"/></svg></div><span>สั่งของ</span></div>
   <div class="tab" onclick="go('transferMenuPage')"><div class="tabIcon transferIcon"><svg viewBox="0 0 24 24"><path d="M7 6h11l-3-3 1.4-1.4L22.2 7l-5.8 5.4L15 11l3-3H7zm10 12H6l3 3-1.4 1.4L1.8 17l5.8-5.4L9 13l-3 3h11z"/></svg></div><span>แบ่งของ</span></div>
   <div class="tab" onclick="reloadApp()"><div class="tabIcon reloadIcon"><svg viewBox="0 0 24 24"><path d="M12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5 0 .88-.23 1.71-.63 2.43l2.18 2.18A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm-5.55 3.39A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l5-5-5-5v4c-2.76 0-5-2.24-5-5 0-.88.23-1.71.63-2.43L6.45 7.39z"/></svg></div><span>รีโหลด</span></div>
-</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V8.06</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
+</nav><div id="nameModal" class="modal"><div class="sheet"><h2 id="nameModalTitle">ใส่ชื่อเล่นเครื่องนี้</h2><p class="muted">ใช้บันทึกว่าใครลงรายการ ใครแบ่งของ และใครรับของ</p><input class="input" id="nicknameInput" placeholder="เช่น เจมส์ / นัท / บอย"><button id="nameModalSaveBtn" class="btn primary" style="width:100%;margin-top:12px" onclick="saveNickname()">เริ่มใช้งาน</button><button id="nameModalCancelBtn" class="btn gray" style="width:100%;margin-top:8px;display:none" onclick="closeModal('nameModal')">ยกเลิก</button></div></div><div id="transferModal" class="modal"><div class="sheet"><h2 id="tmTitle">แบ่งของ</h2><p class="muted" id="tmSub"></p><label>จำนวนที่แบ่ง</label><input class="input" id="tmQty" type="text" inputmode="text" placeholder="จำนวน"><label>หน่วย</label><input class="input" id="tmUnit" placeholder="อัน / ตัว / ถุง"><button class="btn ok" style="width:100%;margin-top:12px" onclick="confirmTransfer()">บันทึกว่าแบ่งแล้ว</button><button class="btn gray" style="width:100%;margin-top:8px" onclick="closeModal('transferModal')">ยกเลิก</button></div></div><div id="compactListModal" class="modal"><div class="sheet"><h2 id="compactListTitle">รายการสินค้าทั้งหมด</h2><p class="muted">ดูรายชื่อสินค้าแบบย่อ</p><div id="compactListContent" class="compactNames"></div><button class="btn gray" style="width:100%;margin-top:12px" onclick="closeModal('compactListModal')">ปิด</button></div></div><div id="updateModal" class="modal"><div class="sheet"><h2 id="updateModalTitle">ตรวจสอบอัปเดต</h2><p class="muted" id="updateModalDesc">กำลังตรวจสอบเวอร์ชันล่าสุด...</p><div class="updateModalVersion" id="updateModalVersionBox">เวอร์ชันปัจจุบัน <b>V8.07</b></div><div class="rowBtns" id="updateModalBtns"><button class="btn gray" style="flex:1" onclick="closeModal('updateModal')">ภายหลัง</button></div></div></div><div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="./vendor/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyArOggsR6vLn0AeVx-TdqHiLSd6LElfrEc",authDomain:"check-chokanan.firebaseapp.com",projectId:"check-chokanan",storageBucket:"check-chokanan.firebasestorage.app",messagingSenderId:"637683943443",appId:"1:637683943443:web:db64ac24fd66b93474d7e6"};
@@ -758,7 +758,7 @@ function renderPOBuilder(){
 window.StockAlertPerf={start:performance.now(),steps:[],counts:{},blocking:[],mark(name,fn){const t=performance.now();try{return fn()}finally{const d=performance.now()-t;this.steps.push({name,d});this.counts[name]=(this.counts[name]||0)+1;if(d>50)this.blocking.push({name,d});console.log(`[startup] ${name}: ${d.toFixed(1)} ms`);}},wrap(name){const original=window[name]||self[name];if(typeof original!=='function'||original.__profiled)return;const perf=this;const wrapped=function(){return perf.mark(name,()=>original.apply(this,arguments));};wrapped.__profiled=true;try{window[name]=wrapped;}catch(e){}try{self[name]=wrapped;}catch(e){}}};
 ['init','listen','loadLocal','renderAll','renderHomeSearch','renderAllShortage','renderTransferAlerts','renderList','renderTransfers','renderTransferStatus','renderOrders','renderPOBuilder','renderOrderSupplier','renderDeliveredPage','renderDeliveryHistory','renderPending','renderCategoryPage','renderManagePage','renderBestSellers','renderSupplierOptions','bindSearch'].forEach(n=>StockAlertPerf.wrap(n));
 StockAlertPerf.mark('Firebase initialization',()=>online&&db);
-StockAlertPerf.mark('Service worker startup',()=>{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=8.06').catch(()=>{})}});
+StockAlertPerf.mark('Service worker startup',()=>{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=8.07').catch(()=>{})}});
 StockAlertPerf.mark('Event binding',()=>{});
 StockAlertPerf.mark('Navigation binding',()=>{});
 StockAlertPerf.mark('Product database loading',()=>{});
@@ -1824,11 +1824,11 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 
 
-/* === V8.06 Update Loop Fix: controlled update prompt and SW lifecycle === */
+/* === V8.07 Update Loop Fix: controlled update prompt and SW lifecycle === */
 (function(){
-  const APP_VERSION='8.06';
-  const APP_VERSION_LABEL='V8.06';
-  const BUILD_MARKER='V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE';
+  const APP_VERSION='8.07';
+  const APP_VERSION_LABEL='V8.07';
+  const BUILD_MARKER='V8.07-BUILD-ADDRESS-CODE-NUMBERING';
   const DISMISSED_KEY='stockAlertDismissUpdateVersion';
   const PENDING_KEY='stockAlertPendingUpdateVersion';
   const ATTEMPT_VERSION_KEY='stockAlertUpdateAttemptVersion';
@@ -1973,7 +1973,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
       location.replace(location.pathname+'?updated='+Date.now());
     });
     try{
-      updateRegistration=await navigator.serviceWorker.getRegistration()||await navigator.serviceWorker.register('sw.js?v=8.06');
+      updateRegistration=await navigator.serviceWorker.getRegistration()||await navigator.serviceWorker.register('sw.js?v=8.07');
       updateRegistration.addEventListener('updatefound',()=>{
         const worker=updateRegistration.installing;
         if(!worker||worker.__stockAlertUpdateBound)return;
@@ -3487,7 +3487,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   if(typeof basePartialReceive==='function')window.confirmPartialReceive=confirmPartialReceive=function(){const peers=duplicatePeers(currentReceiveOrderId),result=basePartialReceive.apply(this,arguments),source=(purchaseOrders||[]).find(order=>String(order.id)===String(currentReceiveOrderId));syncReceivedPeers(peers,source);return result;};
   window.StockAlertOrderDedup={orderBatchKey,deliveryBatchKey,uniqueOrders,uniqueDeliveries};
   const versionSub=document.getElementById('updateStatusSub'),versionBox=document.querySelector('#updateModalVersionBox b');
-  if(versionSub)versionSub.textContent='V8.06';if(versionBox)versionBox.textContent='V8.06';
+  if(versionSub)versionSub.textContent='V8.07';if(versionBox)versionBox.textContent='V8.07';
 })();
 </script>
 <script>
@@ -4426,7 +4426,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.28 expected delivery + product status + urgent customer orders === */
 (function(){
-  const APP_VERSION='V8.06';
+  const APP_VERSION='V8.07';
   const UNKNOWN_SUPPLIER='ยังไม่ได้ระบุ';
   let pendingUrgentPayload=null;
 
@@ -4764,7 +4764,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
     };
   }
   function versionLabels(){
-    document.title='Stock Alert V8.06';
+    document.title='Stock Alert V8.07';
     document.getElementById('updateStatusSub')&&(document.getElementById('updateStatusSub').textContent=APP_VERSION);
     const versionBox=document.querySelector('#updateModalVersionBox b');if(versionBox)versionBox.textContent=APP_VERSION;
   }
@@ -6127,7 +6127,7 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 <script>
 /* === V7.60 Supplier rename from purchase-order builder + Firebase listener diagnostics === */
 (function(){
-  const APP_VERSION='V8.06';
+  const APP_VERSION='V8.07';
   const SPECIAL_SUPPLIERS=new Set(['ยังไม่ได้ระบุ','ไม่มีที่สั่ง','ไม่ระบุบริษัท']);
   let renameBusy=false;
   function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
@@ -7081,41 +7081,41 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
   ensurePage();ensureEntry();
 })();
 </script>
-<script src="modules/cms-integration/cms-product-adapter.js?v=8.06"></script>
-<script src="modules/cms-integration/cms-invoice-request-status.js?v=8.06"></script>
-<script src="modules/cms-integration/cms-tax-invoice-history-bridge.js?v=8.06"></script>
-<script src="modules/cms-integration/cms-integration.js?v=8.06"></script>
-<script src="modules/product-master/product-master.js?v=8.06"></script>
-<script src="modules/product-master/product-master-stock-alert.js?v=8.06"></script>
-<script src="modules/customer-master/customer-master.js?v=8.06"></script>
-<link rel="stylesheet" href="modules/invoice-request/invoice-request.css?v=8.06">
-<script src="modules/invoice-request/invoice-request-store.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request-validation.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request-customer-search.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request-product-search.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request-summary.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request-sync.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-number-format.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-chunk-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-vat-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-generation-validation.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-history-adapter.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-number-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-generation-lock.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-number-reservation.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-generation-audit.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-preview-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-print-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-status-service.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-generator-store.js?v=8.06"></script>
-<script src="modules/invoice-generator/invoice-generator.js?v=8.06"></script>
-<script src="modules/invoice-request/invoice-request.js?v=8.06"></script>
-<script src="cash-reconciliation.js?v=8.06-cash-label-fix"></script>
+<script src="modules/cms-integration/cms-product-adapter.js?v=8.07"></script>
+<script src="modules/cms-integration/cms-invoice-request-status.js?v=8.07"></script>
+<script src="modules/cms-integration/cms-tax-invoice-history-bridge.js?v=8.07"></script>
+<script src="modules/cms-integration/cms-integration.js?v=8.07"></script>
+<script src="modules/product-master/product-master.js?v=8.07"></script>
+<script src="modules/product-master/product-master-stock-alert.js?v=8.07"></script>
+<script src="modules/customer-master/customer-master.js?v=8.07"></script>
+<link rel="stylesheet" href="modules/invoice-request/invoice-request.css?v=8.07">
+<script src="modules/invoice-request/invoice-request-store.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request-validation.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request-customer-search.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request-product-search.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request-summary.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request-sync.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-number-format.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-chunk-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-vat-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-generation-validation.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-history-adapter.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-number-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-generation-lock.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-number-reservation.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-generation-audit.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-preview-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-print-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-status-service.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-generator-store.js?v=8.07"></script>
+<script src="modules/invoice-generator/invoice-generator.js?v=8.07"></script>
+<script src="modules/invoice-request/invoice-request.js?v=8.07"></script>
+<script src="cash-reconciliation.js?v=8.07-cash-label-fix"></script>
 <script>
 (function(){
-  const APP_VERSION='8.06';
-  const APP_VERSION_LABEL='V8.06';
-  const BUILD_MARKER='V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE';
+  const APP_VERSION='8.07';
+  const APP_VERSION_LABEL='V8.07';
+  const BUILD_MARKER='V8.07-BUILD-ADDRESS-CODE-NUMBERING';
   window.STOCK_ALERT_APP_VERSION=APP_VERSION;
   window.STOCK_ALERT_APP_VERSION_LABEL=APP_VERSION_LABEL;
   window.STOCK_ALERT_BUILD_MARKER=BUILD_MARKER;
@@ -7130,5 +7130,3 @@ setTimeout(()=>{const total=performance.now()-StockAlertPerf.start;console.log(`
 })();
 </script>
 </body></html>
-
-

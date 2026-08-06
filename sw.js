@@ -1,7 +1,7 @@
-const APP_VERSION='8.06';
-const APP_VERSION_LABEL='V8.06';
-const BUILD_MARKER='V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE';
-const CACHE_NAME='stock-alert-v8_06-employee-request-auto-invoice-20260806';
+const APP_VERSION='8.07';
+const APP_VERSION_LABEL='V8.07';
+const BUILD_MARKER='V8.07-BUILD-ADDRESS-CODE-NUMBERING';
+const CACHE_NAME='stock-alert-v8_07-address-code-numbering-20260806';
 const CACHE_PREFIX='stock-alert-';
 
 const APP_SHELL=[

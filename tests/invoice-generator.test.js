@@ -156,6 +156,19 @@ function testLocalHistoryHighestSequence(){
   global.ChokAnanInvoiceHistoryAdapter = previousAdapter;
 }
 
+function testHighestActualTaxInvoicesAllocation(){
+  const snapshot = {
+    docs: [
+      { id: 'IV000115', data: () => ({ invoiceNumber: 'IV000115' }) },
+      { id: 'IV000137', data: () => ({ invoiceNumber: 'IV000137', invoiceSequence: 137 }) }
+    ]
+  };
+  const highest = generator.highestSequenceFromInvoiceSnapshot(snapshot);
+  assert.strictEqual(highest, 137);
+  const plan = generator.buildPlan(request(25), highest, { uid: 'admin-1', by: 'Admin' });
+  assert.deepStrictEqual(plan.invoices.map(invoice => invoice.invoiceNumber), ['IV000138', 'IV000139', 'IV000140']);
+}
+
 function testPreviewAndPrint(){
   const plan = generator.buildPlan(request(11), 0, { uid: 'admin-1', by: 'Admin' });
   const mobile = preview.requestPreviewPayload(request(11), plan.invoices);
@@ -188,6 +201,7 @@ testChunking();
 testVat();
 testValidationAndPlan();
 testLocalHistoryHighestSequence();
+testHighestActualTaxInvoicesAllocation();
 testPreviewAndPrint();
 testTaxInvoicesSingleSourceWritePath();
 
