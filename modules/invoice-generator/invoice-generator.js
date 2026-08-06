@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
 
-  const VERSION = 'phase-5.2-v1';
+  const VERSION = 'phase-5.2-v2';
 
   function requireDeps(){
     const names = [
@@ -21,6 +21,35 @@
 
   function text(value){
     return String(value == null ? '' : value).trim();
+  }
+
+  function invoiceSequenceFromValue(value){
+    const raw = text(value).toUpperCase();
+    if (!raw) return 0;
+    const match = raw.match(/IV\s*0*(\d+)/i) || raw.match(/(\d+)/);
+    return match ? Number(match[1]) || 0 : 0;
+  }
+
+  function highestSequenceFromInvoiceSnapshot(snapshot){
+    let highest = 0;
+    const docs = snapshot && Array.isArray(snapshot.docs) ? snapshot.docs : [];
+    docs.forEach(doc => {
+      const data = doc && typeof doc.data === 'function' ? (doc.data() || {}) : {};
+      const candidates = [
+        data.invoiceSequence,
+        data.invoiceNumber,
+        data.no,
+        data.No,
+        data.invoiceId,
+        data.id,
+        doc && doc.id
+      ];
+      candidates.forEach(value => {
+        const sequence = typeof value === 'number' ? value : invoiceSequenceFromValue(value);
+        if (Number.isFinite(sequence) && sequence > highest) highest = sequence;
+      });
+    });
+    return highest;
   }
 
   function splitAddressForInvoice(address1='', address2=''){
@@ -73,7 +102,7 @@
       id: invoice.invoiceId,
       no: invoice.invoiceNumber,
       date: invoice.invoiceDate,
-      type: '\u0e43\u0e1a\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e20\u0e32\u0e29\u0e35\u0e40\u0e15\u0e47\u0e21',
+      type: 'ใบกำกับภาษีเต็ม',
       vatMode: 'excluded',
       paperSize: '9x11',
       buyerName: invoice.customerSnapshot.customerName,
@@ -114,7 +143,7 @@
       invoiceSequence: sequence,
       invoiceDate: root.ChokAnanInvoiceGeneratorStore.dateText(),
       invoiceType: validation.SETTINGS.invoiceType,
-      type: '\u0e43\u0e1a\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e20\u0e32\u0e29\u0e35\u0e40\u0e15\u0e47\u0e21',
+      type: 'ใบกำกับภาษีเต็ม',
       paperSize: validation.SETTINGS.paperSize,
       vatMode: validation.SETTINGS.vatMode,
       vatRate: validation.SETTINGS.vatRate,
@@ -192,6 +221,7 @@
       const idemRef = store.ref(db, store.IDEMPOTENCY_COLLECTION, idemKey);
       const lockRef = store.ref(db, root.ChokAnanInvoiceGenerationLock.LOCK_COLLECTION, requestId);
       const counterRef = store.ref(db, root.ChokAnanInvoiceNumberService.COUNTER_COLLECTION, root.ChokAnanInvoiceNumberService.COUNTER_DOC);
+      const invoicesQuery = db.collection(store.INVOICE_COLLECTION);
 
       const idemSnap = await transaction.get(idemRef);
       if (idemSnap.exists) return { duplicate: true, ...(idemSnap.data() || {}) };
@@ -205,7 +235,10 @@
       if (lockSnap.exists && root.ChokAnanInvoiceGenerationLock.isActiveLock(lockSnap.data())) throw new Error('request-generation-locked');
 
       const counterSnap = await transaction.get(counterRef);
-      const currentLastSequence = root.ChokAnanInvoiceNumberService.currentSequenceFromCounter(counterSnap.exists ? counterSnap.data() : {});
+      const invoicesSnap = await transaction.get(invoicesQuery);
+      const counterSequence = root.ChokAnanInvoiceNumberService.currentSequenceFromCounter(counterSnap.exists ? counterSnap.data() : {});
+      const actualHighestSequence = highestSequenceFromInvoiceSnapshot(invoicesSnap);
+      const currentLastSequence = Math.max(counterSequence, actualHighestSequence);
       const plan = buildPlan(request, currentLastSequence, actor);
       const invoiceIds = plan.invoices.map(invoice => invoice.invoiceId);
       const now = Date.now();
@@ -223,7 +256,9 @@
         updatedAt: now,
         updatedByUid: actor.uid || '',
         updatedBy: actor.by || 'system',
-        source: 'invoice-request'
+        source: 'invoice-request',
+        reconciledFromActualInvoices: actualHighestSequence,
+        previousCounterSequence: counterSequence
       }, { merge: true });
       transaction.set(idemRef, {
         idempotencyKey: idemKey,
@@ -259,7 +294,7 @@
     return result;
   }
 
-  const api = { VERSION, buildPlan, generateFromRequest, invoicePayload, legacyInvoiceShape };
+  const api = { VERSION, buildPlan, generateFromRequest, invoicePayload, legacyInvoiceShape, invoiceSequenceFromValue, highestSequenceFromInvoiceSnapshot };
   root.ChokAnanInvoiceGenerator = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
