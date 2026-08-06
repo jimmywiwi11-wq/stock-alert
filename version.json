@@ -1,10 +1,10 @@
 {
-  "version": "8.05",
-  "label": "V8.05",
-  "build": "20260804-PER-INVOICE-STATUS-RESET-IV000110",
-  "marker": "V8.05-BUILD-VERIFY-PER-INVOICE-IV000110",
-  "releasedAt": "2026-08-04T00:00:00Z",
-  "message": "Verify-loaded build for per-invoice tax invoice status and IV000110 reset.",
+  "version": "8.06",
+  "label": "V8.06",
+  "build": "20260806-EMPLOYEE-REQUEST-AUTO-INVOICE",
+  "marker": "V8.06-BUILD-EMPLOYEE-REQUEST-AUTO-INVOICE",
+  "releasedAt": "2026-08-06T00:00:00Z",
+  "message": "Remove desktop employee request UI after automatic invoice generation.",
   "title": "Stock Alert",
-  "updatedAt": "2026-08-04T00:00:00+07:00"
+  "updatedAt": "2026-08-06T00:00:00+07:00"
 }

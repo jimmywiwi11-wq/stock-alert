@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
@@ -637,7 +637,7 @@ button[onclick^="deleteProduct"]:hover,button[onclick^="deleteInvoice"]:hover,bu
   :where(.tax-short) table th,:where(.tax-short) table td{padding:2px 3px!important}
 }
 </style>
-<link rel="stylesheet" href="history-v2.css?v=8.05">
+<link rel="stylesheet" href="history-v2.css?v=8.06">
 
 <style id="invoicePngHistoryEnhancementStyle">
 .png-export-stage{position:absolute;left:-100000px;top:0;z-index:0;background:#fff;padding:0;margin:0;pointer-events:none}
@@ -667,14 +667,13 @@ button[onclick^="deleteProduct"]:hover,button[onclick^="deleteInvoice"]:hover,bu
   <div class="app-title">
     <strong>Tax Invoice App</strong>
     <span>โชคอนันต์ ฮาร์ดแวร์ • V33</span>
-    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V34-VERIFY-PER-INVOICE-IV000110</small>
+    <small id="desktopTaxInvoiceRuntimeMarker" style="display:block;color:#bfdbfe;font-size:11px;line-height:1.2">V35-EMPLOYEE-REQUEST-AUTO-INVOICE</small>
   </div>
 </header>
 <nav class="hidden-print">
   <button onclick="showPage('products')" class="active">สินค้า</button>
   <button onclick="showPage('customers')">ลูกค้า</button>
   <button onclick="showPage('invoice')">ออกบิล</button>
-  <button onclick="showPage('employeeRequests')">คำขอจากพนักงาน</button>
   <button onclick="showPage('history')">ประวัติบิล</button>
   <button onclick="showPage('settings')">ตั้งค่า</button>
   <button onclick="showPage('layoutDesigner');initLayoutDesigner()">Print Layout Designer</button>
@@ -839,20 +838,6 @@ CH001	บริษัท	ศรีไพร จำหน่าย จำกั�
     </div>
   </div>
   <div class="card print-card"><div id="invoicePreview"></div></div>
-</section>
-
-<section id="employeeRequests" class="page">
-  <div class="card">
-    <h2>คำขอจากพนักงาน</h2>
-    <div class="notice">คำขอจะค้างอยู่หน้านี้จนกว่าจะเปิดตรวจสอบในหน้าออกบิลเดิม เจ้าของร้านต้องบันทึกและพิมพ์จากหน้าออกบิลเท่านั้น</div>
-    <div class="btn-row">
-      <button class="btn" onclick="requestEmployeeInvoiceRequests()">โหลดคำขอล่าสุด</button>
-      <button class="btn secondary" onclick="renderEmployeeInvoiceRequests()">รีเฟรชหน้าจอ</button>
-    </div>
-    <div id="employeeRequestImportStatus" class="small" style="margin-top:8px">กำลังรอข้อมูลคำขอจากฐานกลาง...</div>
-    <div id="employeeRequestList"></div>
-    <div id="employeeRequestPrintPrep" style="margin-top:12px"></div>
-  </div>
 </section>
 
 <section id="history" class="page">
@@ -1166,15 +1151,23 @@ try{if(window.firebase&&!firebase.apps.length)firebase.initializeApp(firebaseCon
 function stockAlertAuthReady(){if(stockAlertAuthReadyPromise)return stockAlertAuthReadyPromise;stockAlertAuthReadyPromise=new Promise(resolve=>{try{if(!auth)return resolve(null);if(auth.currentUser)return resolve(auth.currentUser);let settled=false,unsub=()=>{};const finish=user=>{if(settled)return;settled=true;try{unsub();}catch(e){}resolve(user||null);};unsub=auth.onAuthStateChanged(user=>{if(user)finish(user);else if(!stockAlertAuthSignInPromise&&auth.signInAnonymously)stockAlertAuthSignInPromise=auth.signInAnonymously().then(cred=>cred.user).catch(error=>{console.warn('[TaxInvoice auth]',error.code||error.name,error.message||error);throw error;});if(stockAlertAuthSignInPromise)stockAlertAuthSignInPromise.then(finish).catch(()=>finish(null));},error=>{console.warn('[TaxInvoice auth listener]',error.code||error.name,error.message||error);finish(null);});setTimeout(()=>finish(auth.currentUser||null),4500);}catch(error){console.warn('[TaxInvoice auth ready]',error);resolve(null);}});return stockAlertAuthReadyPromise;}
 window.stockAlertAuthReady=stockAlertAuthReady;
 </script>
-<script src="../../modules/customer-master/customer-master.js?v=8.05"></script>
-<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.05"></script>
-<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.05"></script>
-<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.05"></script>
+<script src="../../modules/customer-master/customer-master.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-number-format.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-chunk-service.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-vat-service.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-generation-validation.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-number-service.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-generation-lock.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-number-reservation.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-generation-audit.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-generator-store.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-generator.js?v=8.06"></script>
+<script src="../../modules/invoice-generator/invoice-print-service.js?v=8.06"></script>
 <!-- startup-safe: invoice-history-adapter disabled; CMS bridge supplies employee requests/history on demand -->
 <!-- startup-safe: native-invoice-repository disabled to prevent startup refresh loop -->
 <script>
-const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], lastEmployeeNativeSyncPromise=null, productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[], employeeInvoiceRequestRows=[], employeeNativeImportContext=null, employeeRequestImportWaiters={};
-window.DESKTOP_TAX_INVOICE_BUILD='V34-VERIFY-PER-INVOICE-IV000110';
+const VAT=0.07; let editProductIndex=null, editCustomerIndex=null, editInvoiceId=null; let invoiceItems=[], lastSavedInvoiceRecords=[], lastEmployeeNativeSyncPromise=null, productImportPreviewRows=[], productImportDeletePreviewRows=[], customerImportPreviewRows=[], employeeInvoiceRequestRows=[], employeeNativeImportContext=null, employeeRequestImportWaiters={}, employeeRequestAutoGenerationUnsubscribe=null, employeeRequestAutoGenerationStarted=false, employeeRequestAutoGenerationActive=new Set(), employeeRequestAutoGenerationSkipped=new Set();
+window.DESKTOP_TAX_INVOICE_BUILD='V35-EMPLOYEE-REQUEST-AUTO-INVOICE';
 let productBulkSelectMode=false,customerBulkSelectMode=false,selectedProductIds=new Set(),selectedCustomerIds=new Set(),visibleProductIds=[],visibleCustomerIds=[];
 const THAI_PRINT_FONT_STACK='"TH Sarabun New","Sarabun","Noto Sans Thai","Tahoma","Leelawadee UI",sans-serif';
 function nextFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
@@ -1302,7 +1295,7 @@ function checkCustomerDuplicateLive(){
   if(typeof cDupMsg!=='undefined') cDupMsg.textContent=dup?`พบข้อมูลลูกค้าซ้ำ: ${dup.code} ${customerFullName(dup)||dup.name} มีอยู่แล้ว`:'';
   return dup;
 }
-function showPage(id){if(id!=='layoutDesigner')clearPrintEditingState(false);document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));let activeButton=(typeof event!=='undefined'&&event&&event.target)?event.target:document.querySelector(`nav button[onclick*="showPage('${id}')"]`);activeButton?.classList?.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active'); if(id==='invoice'){refreshInvoiceSelects();renderInvoiceItems()} if(id==='employeeRequests'){requestEmployeeInvoiceRequests();renderEmployeeInvoiceRequests()} if(id==='history')renderHistory(); if(id==='autoInvoice')renderTrainingInvoices(); if(id==='settings')refreshBackupStatus();}
+function showPage(id){if(id==='employeeRequests')id='history';if(id!=='layoutDesigner')clearPrintEditingState(false);document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));let activeButton=(typeof event!=='undefined'&&event&&event.target)?event.target:document.querySelector(`nav button[onclick*="showPage('${id}')"]`);activeButton?.classList?.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));let page=document.getElementById(id);if(!page)return;page.classList.add('active'); if(id==='invoice'){refreshInvoiceSelects();renderInvoiceItems()} if(id==='history')renderHistory(); if(id==='autoInvoice')renderTrainingInvoices(); if(id==='settings')refreshBackupStatus();}
 function saveProduct(){let arr=store.get('products',[]);let item={code:pCode.value||nextCode(thaiInitials(pName.value),arr,5),name:pName.value,unit:pUnit.value,cost:+pCost.value||0,price:+pPrice.value||0}; if(!item.name)return alert('กรุณาใส่ชื่อสินค้า'); let dup=findDuplicateProduct(item,arr,editProductIndex); if(dup)return alert('ไม่สามารถบันทึกได้ เพราะมีสินค้านี้อยู่แล้ว: '+dup.code+' '+dup.name); if(editProductIndex!==null)arr[editProductIndex]=item; else arr.push(item); store.set('products',arr); clearProductForm();renderProducts();refreshInvoiceSelects();}
 function clearProductForm(){editProductIndex=null;pCode.value='';pName.value='';pUnit.value='';pCost.value='';pPrice.value='';if(typeof pDupMsg!=='undefined')pDupMsg.textContent='';previewProductCode()}
 function editProduct(i){let x=store.get('products',[])[i];editProductIndex=i;pCode.value=x.code;pName.value=x.name;pUnit.value=x.unit;pCost.value=x.cost;pPrice.value=x.price;scrollTo(0,0)}
@@ -2075,8 +2068,14 @@ function employeeRequestStatus(row){let status=String(row?.status||'').toLowerCa
 function nativeInvoicesForRequest(requestId){let id=String(requestId||'');if(!id)return [];return store.get('invoices',[]).filter(inv=>String(inv.sourceRequestId||inv.requestId||'')===id)}
 function requestNeedsNativeImport(row){return !nativeInvoicesForRequest(employeeRequestId(row)).length&&!(row?.importedToNativeHistory&&Array.isArray(row.nativeInvoiceIds)&&row.nativeInvoiceIds.length)}
 function normalizeEmployeeRequest(row,id=''){row=row||{};let customer=row.customerSnapshot||row.customer||{};let items=Array.isArray(row.items)?row.items:(Array.isArray(row.itemsSnapshot)?row.itemsSnapshot:[]);return {...row,id:row.id||id||row.requestId||row.requestNumber,requestId:row.requestId||id||row.id||'',customerSnapshot:customer,items}}
-function applyEmployeeRequestRows(rows,meta={}){employeeInvoiceRequestRows=(Array.isArray(rows)?rows:[]).map(x=>normalizeEmployeeRequest(x)).sort((a,b)=>String(b.requestedAt||b.createdAt||b.updatedAt||'').localeCompare(String(a.requestedAt||a.createdAt||a.updatedAt||'')));let box=document.getElementById('employeeRequestImportStatus');if(box)box.textContent=`รับคำขอจากฐานกลาง ${employeeInvoiceRequestRows.length} รายการ${meta.bridgeBuild?' • '+meta.bridgeBuild:''}`;renderEmployeeInvoiceRequests()}
+function applyEmployeeRequestRows(rows,meta={}){employeeInvoiceRequestRows=(Array.isArray(rows)?rows:[]).map(x=>normalizeEmployeeRequest(x)).sort((a,b)=>String(b.requestedAt||b.createdAt||b.updatedAt||'').localeCompare(String(a.requestedAt||a.createdAt||a.updatedAt||'')));let box=document.getElementById('employeeRequestImportStatus');if(box)box.textContent=`รับคำขอจากฐานกลาง ${employeeInvoiceRequestRows.length} รายการ${meta.bridgeBuild?' • '+meta.bridgeBuild:''}`;processEmployeeRequestAutoGeneration(employeeInvoiceRequestRows,meta);renderEmployeeInvoiceRequests()}
 function requestEmployeeInvoiceRequests(){if(window.TaxInvoiceCMSBridge&&typeof TaxInvoiceCMSBridge.requestEmployeeRequests==='function')TaxInvoiceCMSBridge.requestEmployeeRequests();if(window.db&&typeof db.collection==='function'&&!(new URLSearchParams(location.search).get('cmsTest')==='1')){db.collection('invoiceRequests').get().then(snap=>applyEmployeeRequestRows((snap.docs||[]).map(doc=>normalizeEmployeeRequest(doc.data()||{},doc.id)),{source:'firestore'})).catch(e=>{let box=document.getElementById('employeeRequestImportStatus');if(box)box.textContent='โหลดคำขอไม่ได้: '+(e.message||e)});return}let fixture=store.get('employeeInvoiceRequestsFixture',[]);if(Array.isArray(fixture)&&fixture.length)applyEmployeeRequestRows(fixture,{source:'fixture'})}
+function employeeRequestGeneratedIds(row){return (Array.isArray(row?.generatedInvoiceIds)&&row.generatedInvoiceIds.length?row.generatedInvoiceIds:(Array.isArray(row?.nativeInvoiceIds)?row.nativeInvoiceIds:[])).map(x=>String(x||'').trim()).filter(Boolean)}
+function employeeRequestReadyForAutoGeneration(row){let id=employeeRequestId(row),status=String(row?.status||'').toLowerCase(),printStatus=String(row?.printStatus||'').toLowerCase(),generationState=String(row?.generationState||'not-started').toLowerCase();if(!id||row?.testMode===true)return false;if(employeeRequestAutoGenerationActive.has(id)||employeeRequestAutoGenerationSkipped.has(id))return false;if(employeeRequestGeneratedIds(row).length||row?.generated===true||!requestNeedsNativeImport(row))return false;if(generationState&&generationState!=='not-started')return false;if(['ready_to_print','printed','partially_printed','failed','error'].includes(status)||['ready_to_print','printed','partially_printed'].includes(printStatus))return false;return true}
+async function upsertGeneratedEmployeeInvoicesIntoHistory(invoiceIds){let ids=(invoiceIds||[]).map(x=>String(x||'').trim()).filter(Boolean);if(!ids.length||!(window.db&&typeof db.collection==='function'))return[];let snaps=await Promise.all(ids.map(id=>db.collection('taxInvoices').doc(id).get().catch(()=>null)));let invoices=snaps.filter(s=>s&&s.exists).map(s=>({...(s.data()||{}),invoiceId:(s.data()||{}).invoiceId||s.id,id:(s.data()||{}).id||s.id,historyId:s.id}));if(!invoices.length)return[];let current=store.get('invoices',[]),seen=new Set(invoices.flatMap(x=>[x.invoiceId,x.id,x.no,x.invoiceNumber].map(v=>String(v||'').trim()).filter(Boolean)));let next=[...invoices,...current.filter(x=>![x.invoiceId,x.id,x.no,x.invoiceNumber].some(v=>seen.has(String(v||'').trim())))];store.set('invoices',next);return invoices}
+async function autoGenerateEmployeeInvoiceRequest(row){let id=employeeRequestId(row);if(!id)return;employeeRequestAutoGenerationActive.add(id);try{if(typeof stockAlertAuthReady==='function')await stockAlertAuthReady();if(!window.ChokAnanInvoiceGenerator||typeof ChokAnanInvoiceGenerator.generateFromRequest!=='function')throw new Error('invoice-generator-not-ready');let result=await ChokAnanInvoiceGenerator.generateFromRequest(id,{generationVersion:'v1',actor:{uid:auth?.currentUser?.uid||'',by:'tax-invoice-desktop-auto'}});await upsertGeneratedEmployeeInvoicesIntoHistory(result.invoiceIds||result.generatedInvoiceIds||[]);if(window.ChokAnanInvoiceHistoryAdapter&&typeof ChokAnanInvoiceHistoryAdapter.refreshFirestoreHistoryOnce==='function')ChokAnanInvoiceHistoryAdapter.refreshFirestoreHistoryOnce({render:()=>{try{renderHistory()}catch(e){}},reason:'employee-request-auto-generated'}).catch(()=>null);try{renderHistory()}catch(e){}}catch(e){let message=e&&e.message||String(e);if(/already|duplicate|locked|not-processing|not-started|ready|generated/.test(message))employeeRequestAutoGenerationSkipped.add(id);console.warn('[employee request auto generation]',id,message)}finally{employeeRequestAutoGenerationActive.delete(id)}}
+function processEmployeeRequestAutoGeneration(rows,meta={}){(Array.isArray(rows)?rows:[]).filter(employeeRequestReadyForAutoGeneration).forEach(row=>autoGenerateEmployeeInvoiceRequest(row))}
+function startEmployeeRequestAutoGenerationListener(){if(employeeRequestAutoGenerationStarted)return;employeeRequestAutoGenerationStarted=true;if(!(window.db&&typeof db.collection==='function'))return;try{employeeRequestAutoGenerationUnsubscribe=db.collection('invoiceRequests').onSnapshot(snapshot=>{let rows=(snapshot.docs||[]).map(doc=>normalizeEmployeeRequest(doc.data()||{},doc.id));applyEmployeeRequestRows(rows,{source:'firestore-listener',auto:true})},error=>console.warn('[employee request listener]',error))}catch(e){console.warn('[employee request listener init]',e)}}
 function employeeRequestItemRows(row){return (row.items||[]).map((x,i)=>({code:x.productCode||x.code||'',name:x.productName||x.name||'สินค้า',qty:x.quantity||x.qty||0,unit:x.unit||'',price:+(x.salePrice||x.price||0),cost:+(x.cost||0),requestItemId:x.requestItemId||'',rowNumber:x.rowNumber||i+1,itemSnapshot:x}))}
 function mapEmployeeRequestCustomerToNativeInvoice(row){
   let raw=(row&&row.customerSnapshot)||(row&&row.customer)||{};
@@ -3229,8 +3228,8 @@ function exportPrinterCalibration(){downloadJson('printer-calibration.json',acti
 function importPrinterCalibration(input){let f=input.files?.[0];input.value='';if(!f)return;f.text().then(t=>{let l=activeFullTaxLayout();l.calibration=Object.assign(defaultFullTaxCalibration(),JSON.parse(t));saveActiveFullTaxLayout(l);initLayoutDesigner();renderInvoicePreview()}).catch(e=>alert(e.message))}
 async function printFullTaxTest(){let box=document.getElementById('templatePrintCanvas');if(!box)return;clearPrintEditingState(false);let oldTitle=document.title;document.title=' ';applyDynamicPageStyle('9x11');box.innerHTML=renderFullTaxLayoutHtml(currentFullTaxPrintData(true),false);await waitForThaiFontsReady();document.body.classList.add('full-tax-test-print');setTimeout(()=>{window.print();setTimeout(()=>{document.body.classList.remove('full-tax-test-print');box.innerHTML='';document.title=oldTitle;applyDynamicPageStyle();initLayoutDesigner()},800)},80)}
 window.onload=()=>{
-  // Safe startup: load product/customer data first. History and Firestore syncing are
-  // intentionally deferred until the user opens the History or Employee Requests page.
+  // Safe startup: load product/customer data first, then attach the lightweight
+  // invoiceRequests listener so employee invoice requests generate automatically.
   // This preserves all existing localStorage/IndexedDB/Firestore data while preventing
   // the main UI from freezing during startup.
   try{initFullTaxLayoutSystem()}catch(e){console.error('[startup] layout',e)}
@@ -3250,6 +3249,7 @@ window.onload=()=>{
   }catch(e){console.error('[startup] automatic invoice',e)}
   // Defer non-critical heavy work so the program is interactive immediately.
   setTimeout(()=>{try{renderTrainingInvoices()}catch(e){console.error('[startup] training',e)}},100);
+  setTimeout(()=>{try{startEmployeeRequestAutoGenerationListener()}catch(e){console.error('[startup] employee request auto listener',e)}},160);
   setTimeout(()=>{try{initializeBackupSystem()}catch(e){console.error('[startup] backup',e)}},250);
   document.documentElement.dataset.taxInvoiceReady='1';
 }
@@ -3457,8 +3457,8 @@ window.onload=()=>{
   setTimeout(()=>{addCurrentButton();if(document.getElementById('history')?.classList.contains('active'))augment()},250);
 })();
 </script>
-<script src="../../modules/product-master/product-master.js?v=8.05"></script>
-<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.05"></script>
+<script src="../../modules/product-master/product-master.js?v=8.06"></script>
+<script src="../../modules/product-master/product-master-tax-bridge.js?v=8.06"></script>
 
 <script id="pageDataTransferFeature">
 (function(){

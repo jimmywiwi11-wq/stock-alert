@@ -34,7 +34,7 @@ self.addEventListener('fetch', event => {
   if (url.pathname.endsWith('/version.json')) {
     event.respondWith(
       fetch(req, { cache: 'no-store' }).catch(() =>
-        new Response(JSON.stringify({ version:'8.05', label:'V8.05', offline:true }), {
+        new Response(JSON.stringify({ version:'8.06', label:'V8.06', offline:true }), {
           headers: { 'Content-Type':'application/json' }
         })
       )
