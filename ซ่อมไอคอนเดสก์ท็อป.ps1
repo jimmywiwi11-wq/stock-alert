@@ -1,6 +1,7 @@
 ﻿$ErrorActionPreference = "Stop"
 
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = (Resolve-Path -LiteralPath $ProjectRoot).Path
 $Desktop = [Environment]::GetFolderPath("Desktop")
 $ShortcutPath = Join-Path $Desktop "ChokAnan Management System.lnk"
 $Launcher = Join-Path $ProjectRoot "start_cms.bat"
@@ -10,6 +11,7 @@ if (!(Test-Path -LiteralPath $Launcher)) {
 }
 
 $IconCandidates = @(
+  (Join-Path $ProjectRoot "desktop\tax-invoice\chokanan_cms_logo.ico"),
   (Join-Path $ProjectRoot "desktop\tax-invoice\assets\icons\icon.ico"),
   (Join-Path $ProjectRoot "icons\icon.ico"),
   (Join-Path $ProjectRoot "desktop\tax-invoice\assets\icons\favicon.ico")
@@ -19,8 +21,10 @@ $IconPath = $IconCandidates | Where-Object { Test-Path -LiteralPath $_ } | Selec
 $WshShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
 $Shortcut.TargetPath = $Launcher
+$Shortcut.Arguments = ""
 $Shortcut.WorkingDirectory = $ProjectRoot
 $Shortcut.Description = "ChokAnan Management System"
+$Shortcut.WindowStyle = 1
 if ($IconPath) {
   $Shortcut.IconLocation = "$IconPath,0"
 }

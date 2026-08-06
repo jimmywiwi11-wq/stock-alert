@@ -10,8 +10,18 @@ if (-not $Root) {
 }
 
 $Root = (Resolve-Path -LiteralPath $Root).Path
+if (-not (Test-Path -LiteralPath (Join-Path $Root 'index.html') -PathType Leaf)) {
+  throw "index.html was not found in $Root"
+}
+
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Parse('127.0.0.1'), $Port)
-$listener.Start()
+try {
+  $listener.Start()
+  Write-Host "ChokAnan local server listening at http://127.0.0.1:$Port/ from $Root"
+}
+catch {
+  throw "Could not listen on port $Port. $($_.Exception.Message)"
+}
 
 function Get-MimeType {
   param([string]$Path)
