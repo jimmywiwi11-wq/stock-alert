@@ -43,6 +43,18 @@
     return normalizeKey(invoice && (invoice.id || invoice.invoiceId || invoice.historyId || invoice.no || invoice.invoiceNumber));
   }
 
+  function hasPrintedState(invoice){
+    const status = normalizeKey(invoice && invoice.status).toLowerCase();
+    const printStatus = normalizeKey(invoice && invoice.printStatus).toLowerCase();
+    return invoice && (
+      invoice.printed === true ||
+      Boolean(invoice.printedAt) ||
+      Number(invoice.printCount || 0) > 0 ||
+      status === 'printed' ||
+      printStatus === 'printed'
+    );
+  }
+
   function historyButtonLabel(button){
     return normalizeKey(button && button.textContent).replace(/\s+/g,' ');
   }
@@ -140,6 +152,10 @@
     }
     const invoice = findInvoice(invoiceKey);
 
+    if (action === 'edit' && hasPrintedState(invoice)) {
+      root.alert('บิลนี้พิมพ์แล้ว ไม่อนุญาตให้แก้ไขจากปุ่มนี้');
+      return;
+    }
     if (action === 'print' || action === 'view' || action === 'edit') {
       showInvoiceRecord(invoice,true);
       return;

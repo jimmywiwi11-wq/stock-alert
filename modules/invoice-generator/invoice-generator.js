@@ -52,6 +52,48 @@
     return highest;
   }
 
+  function highestSequenceFromInvoiceRows(rows){
+    let highest = 0;
+    (Array.isArray(rows) ? rows : []).forEach(row => {
+      const candidates = [
+        row && row.invoiceSequence,
+        row && row.invoiceNumber,
+        row && row.no,
+        row && row.No,
+        row && row.invoiceNo,
+        row && row.number,
+        row && row.invoiceId,
+        row && row.id,
+        row && row.historyId
+      ];
+      candidates.forEach(value => {
+        const sequence = typeof value === 'number' ? value : invoiceSequenceFromValue(value);
+        if (Number.isFinite(sequence) && sequence > highest) highest = sequence;
+      });
+    });
+    return highest;
+  }
+
+  function highestSequenceFromLocalInvoiceHistory(){
+    const rows = [];
+    try {
+      if (root.ChokAnanInvoiceHistoryAdapter && typeof root.ChokAnanInvoiceHistoryAdapter.getUnifiedHistoryRows === 'function') {
+        rows.push(...(root.ChokAnanInvoiceHistoryAdapter.getUnifiedHistoryRows() || []));
+      }
+    } catch (error) {
+      console.warn('[invoice generator local history reconcile] adapter read failed', error);
+    }
+    try {
+      if (root.localStorage && typeof root.localStorage.getItem === 'function') {
+        const stored = JSON.parse(root.localStorage.getItem('invoices') || '[]');
+        rows.push(...(Array.isArray(stored) ? stored : []));
+      }
+    } catch (error) {
+      console.warn('[invoice generator local history reconcile] localStorage read failed', error);
+    }
+    return highestSequenceFromInvoiceRows(rows);
+  }
+
   function splitAddressForInvoice(address1='', address2=''){
     const first = text(address1).replace(/\r/g, '');
     const second = text(address2).replace(/\r/g, '');
@@ -238,7 +280,8 @@
       const invoicesSnap = await transaction.get(invoicesQuery);
       const counterSequence = root.ChokAnanInvoiceNumberService.currentSequenceFromCounter(counterSnap.exists ? counterSnap.data() : {});
       const actualHighestSequence = highestSequenceFromInvoiceSnapshot(invoicesSnap);
-      const currentLastSequence = Math.max(counterSequence, actualHighestSequence);
+      const localHighestSequence = highestSequenceFromLocalInvoiceHistory();
+      const currentLastSequence = Math.max(counterSequence, actualHighestSequence, localHighestSequence);
       const plan = buildPlan(request, currentLastSequence, actor);
       const invoiceIds = plan.invoices.map(invoice => invoice.invoiceId);
       const now = Date.now();
@@ -258,6 +301,7 @@
         updatedBy: actor.by || 'system',
         source: 'invoice-request',
         reconciledFromActualInvoices: actualHighestSequence,
+        reconciledFromLocalHistory: localHighestSequence,
         previousCounterSequence: counterSequence
       }, { merge: true });
       transaction.set(idemRef, {
@@ -294,7 +338,7 @@
     return result;
   }
 
-  const api = { VERSION, buildPlan, generateFromRequest, invoicePayload, legacyInvoiceShape, invoiceSequenceFromValue, highestSequenceFromInvoiceSnapshot };
+  const api = { VERSION, buildPlan, generateFromRequest, invoicePayload, legacyInvoiceShape, invoiceSequenceFromValue, highestSequenceFromInvoiceSnapshot, highestSequenceFromInvoiceRows, highestSequenceFromLocalInvoiceHistory };
   root.ChokAnanInvoiceGenerator = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

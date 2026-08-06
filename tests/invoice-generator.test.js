@@ -131,6 +131,31 @@ function testValidationAndPlan(){
   assert.ok(plan.batch.vatAmount > 0);
 }
 
+function testLocalHistoryHighestSequence(){
+  const previousStorage = global.localStorage;
+  const previousAdapter = global.ChokAnanInvoiceHistoryAdapter;
+  global.localStorage = {
+    getItem(key){
+      if (key !== 'invoices') return null;
+      return JSON.stringify([
+        { invoiceNumber: 'IV000137' },
+        { no: 'IV000118' }
+      ]);
+    }
+  };
+  global.ChokAnanInvoiceHistoryAdapter = {
+    getUnifiedHistoryRows(){
+      return [
+        { invoiceNumber: 'IV000140' },
+        { id: 'IV000139' }
+      ];
+    }
+  };
+  assert.strictEqual(generator.highestSequenceFromLocalInvoiceHistory(), 140);
+  global.localStorage = previousStorage;
+  global.ChokAnanInvoiceHistoryAdapter = previousAdapter;
+}
+
 function testPreviewAndPrint(){
   const plan = generator.buildPlan(request(11), 0, { uid: 'admin-1', by: 'Admin' });
   const mobile = preview.requestPreviewPayload(request(11), plan.invoices);
@@ -162,6 +187,7 @@ testInvoiceNumbers();
 testChunking();
 testVat();
 testValidationAndPlan();
+testLocalHistoryHighestSequence();
 testPreviewAndPrint();
 testTaxInvoicesSingleSourceWritePath();
 
