@@ -1,4 +1,15 @@
 {
+  "hosting": {
+    "site": "check-chokanan",
+    "public": ".hosting-stock-alert",
+    "predeploy": ["node scripts/prepare-stock-alert-hosting.cjs"],
+    "ignore": ["**/.*", "**/node_modules/**"],
+    "headers": [
+      { "source": "**", "headers": [{ "key": "Cache-Control", "value": "no-cache" }, { "key": "X-Content-Type-Options", "value": "nosniff" }] },
+      { "source": "/version.json", "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }] },
+      { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }] }
+    ]
+  },
   "firestore": {
     "rules": "firestore.rules"
   },
