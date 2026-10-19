@@ -1,0 +1,10 @@
+{
+  "version": "8.12",
+  "label": "V8.12",
+  "build": "20261019-CASH-DETAIL",
+  "marker": "V8.12-BUILD-CASH-DETAIL",
+  "releasedAt": "2026-10-19T00:00:00+07:00",
+  "message": "Rename opening and closing cash, add optional closing denomination amounts, automatic thousand-note count, and banknote-only reports without double counting.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-10-19T00:00:00+07:00"
+}

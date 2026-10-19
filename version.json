@@ -1,10 +1,10 @@
 {
-  "version": "8.07",
-  "label": "V8.07",
-  "build": "20260806-ADDRESS-CODE-NUMBERING",
-  "marker": "V8.07-BUILD-ADDRESS-CODE-NUMBERING",
-  "releasedAt": "2026-08-06T00:00:00Z",
-  "message": "Expand invoice address display, standardize employee customer codes, and reconcile next invoice numbering.",
+  "version": "8.14",
+  "label": "V8.14",
+  "build": "20261019-CASH-DAY-ROLLOVER",
+  "marker": "V8.14-BUILD-CASH-DAY-ROLLOVER",
+  "releasedAt": "2026-10-19T00:00:00+07:00",
+  "message": "Start a fresh cash day at midnight or app resume, keeping previous-day autosaves available in history without deleting original data.",
   "title": "Stock Alert",
-  "updatedAt": "2026-08-06T00:00:00+07:00"
+  "updatedAt": "2026-10-19T00:00:00+07:00"
 }

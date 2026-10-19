@@ -1,0 +1,10 @@
+{
+  "version": "8.10",
+  "label": "V8.10",
+  "build": "20261018-CASH-MORNING-ENTRY",
+  "marker": "V8.10-BUILD-CASH-MORNING-ENTRY",
+  "releasedAt": "2026-10-18T00:00:00Z",
+  "message": "Show first morning cash entry separately from editing previously saved morning cash, per branch and day.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-10-18T00:00:00+07:00"
+}

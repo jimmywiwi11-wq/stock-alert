@@ -1,7 +1,7 @@
-const APP_VERSION='8.07';
-const APP_VERSION_LABEL='V8.07';
-const BUILD_MARKER='V8.07-BUILD-ADDRESS-CODE-NUMBERING';
-const CACHE_NAME='stock-alert-v8_07-address-code-numbering-20260806';
+const APP_VERSION='8.14';
+const APP_VERSION_LABEL='V8.14';
+const BUILD_MARKER='V8.14-BUILD-CASH-DAY-ROLLOVER';
+const CACHE_NAME='stock-alert-v8_14-cash-day-rollover-20261019';
 const CACHE_PREFIX='stock-alert-';
 
 const APP_SHELL=[
@@ -34,6 +34,7 @@ const APP_SHELL=[
 ];
 
 const NETWORK_FIRST_PATHS=[
+  '/cash-reconciliation.js',
   '/version.json',
   '/app.js',
   '/modules/invoice-request/',

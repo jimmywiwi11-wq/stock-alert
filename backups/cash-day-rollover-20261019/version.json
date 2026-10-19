@@ -1,0 +1,10 @@
+{
+  "version": "8.13",
+  "label": "V8.13",
+  "build": "20261019-CASH-WITHDRAWAL-PAIRS",
+  "marker": "V8.13-BUILD-CASH-WITHDRAWAL-PAIRS",
+  "releasedAt": "2026-10-19T00:00:00+07:00",
+  "message": "Record timestamped thousand-note pickups and deduct from expected cash; pair counts and amounts for cash inputs and report amounts with note counts.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-10-19T00:00:00+07:00"
+}

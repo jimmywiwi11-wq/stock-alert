@@ -1,0 +1,10 @@
+{
+  "version": "8.09",
+  "label": "V8.09",
+  "build": "20261018-CASH-MORNING-EDIT",
+  "marker": "V8.09-BUILD-CASH-MORNING-EDIT",
+  "releasedAt": "2026-10-18T00:00:00Z",
+  "message": "Hide morning cash input after saving and provide an edit button while preserving the summary and shared cash data.",
+  "title": "Stock Alert",
+  "updatedAt": "2026-10-18T00:00:00+07:00"
+}

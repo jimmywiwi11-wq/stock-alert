@@ -1,0 +1,46 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync('cash-reconciliation.js','utf8');
+const code=source.slice(source.indexOf('  const cashAutoFields='),source.indexOf('  async function cloudSet('));
+const clone=x=>JSON.parse(JSON.stringify(x));
+function context(storage=new Map(),online=false){
+  const state={connected:online,fail:false,cloud:{},calls:0};
+  const blank=(branch,date)=>({branch,date,morningChange:'',sales:'',transfer:'',expenses:[],cashAdds:[],exchangeTransactions:[]});
+  const ctx={AUTO_PENDING_KEY:'pending',cashAutoTimer:null,cashAutoPromise:null,cashAutoRevision:0,cashSaving:false,navigator:{onLine:online},Date,console:{warn(){}},setTimeout:()=>1,clearTimeout(){},normalize:clone,stripMorningBank:clone,userName:()=> 'test',draftKey:(b,d)=>b+'_'+d,docId:(t,b,d)=>t+'_'+b+'_'+d,CASH_COLL:'cash',emptyRecord:blank,ready:()=>state.connected,read:(k,d)=>storage.has(k)?JSON.parse(storage.get(k)):d,write:(k,v)=>storage.set(k,JSON.stringify(v)),getRecord:(b,d)=>storage.has(b+'_'+d)?JSON.parse(storage.get(b+'_'+d)):blank(b,d),setDraftLocal:r=>storage.set(r.branch+'_'+r.date,JSON.stringify(r)),db:{collection:()=>({doc:id=>({id})}),runTransaction:async fn=>{state.calls++;if(state.fail)throw Error('offline');return fn({get:async ref=>({exists:!!state.cloud[ref.id],data:()=>clone(state.cloud[ref.id])}),set:(ref,row)=>{state.cloud[ref.id]=clone(row)}})}}};
+  vm.createContext(ctx);vm.runInContext(code,ctx);return {ctx,state,storage};
+}
+(async()=>{
+  const {ctx,state,storage}=context();
+  const record={...ctx.emptyRecord(1,'today'),morningChange:100,exchangeTransactions:[{id:'ex1',amount:4000,fromType:'1000',toType:'100',time:'11:37'}]};
+  ctx.queueCashAutosave(record);
+  assert.equal(JSON.parse(storage.get('1_today')).exchangeTransactions[0].amount,4000,'exchange persists before timers/network');
+  const restarted=context(storage,true);
+  assert.equal(restarted.ctx.getRecord(1,'today').exchangeTransactions[0].time,'11:37','reload restores exchange details');
+  restarted.state.cloud.record_1_today={...ctx.emptyRecord(1,'today'),sales:900,expenses:[{id:'remoteExpense',amount:30}],exchangeTransactions:[{id:'ex2',amount:200}],updatedAt:1};
+  await restarted.ctx.flushCashAutosaves();
+  const shared=restarted.state.cloud.draft_1_today;
+  assert.equal(shared.sales,900,'untouched remote sales preserved');assert.equal(shared.expenses[0].amount,30);
+  assert.deepEqual(shared.exchangeTransactions.map(r=>r.id),['ex2','ex1'],'independent device exchanges both preserved');
+  assert.equal(storage.get('pending'),'{}');
+  const racing=context(new Map(),true);
+  racing.ctx.queueCashAutosave(record);
+  const syncing=racing.ctx.flushCashAutosaves();
+  racing.ctx.queueCashAutosave({...record,note:'typed while syncing'});
+  await syncing;await racing.ctx.flushCashAutosaves();
+  assert.equal(racing.state.cloud.draft_1_today.note,'typed while syncing','edit during an in-flight transaction survives');
+  racing.ctx.queueCashAutosave({...record,branch:2,date:'tomorrow',note:'other branch and date'});
+  await racing.ctx.flushCashAutosaves();
+  assert.equal(racing.state.cloud.draft_2_tomorrow.note,'other branch and date');
+  assert.equal(racing.state.cloud.draft_1_today.note,'typed while syncing','branch/date drafts stay separate');
+  ctx.queueCashAutosave({...record,note:'offline note'});state.connected=true;ctx.navigator.onLine=true;state.fail=true;
+  await ctx.flushCashAutosaves();assert.ok(Object.keys(JSON.parse(storage.get('pending'))).length,'failed sync remains durable');
+  assert.equal(await ctx.finishCashAutosaveBeforeSubmit(),false,'manual submit cannot race failed pending sync');
+  const remote={...record,exchangeTransactions:[{id:'ex1',amount:4000},{id:'ex2',amount:200}]};
+  const merged=ctx.mergeCashAutoRecord(remote,record,{...record,exchangeTransactions:[]});
+  assert.deepEqual(clone(merged.exchangeTransactions),[{id:'ex2',amount:200}],'delete only locally removed entry');
+  const sharedWithdrawals=ctx.mergeCashAutoRecord({...record,cashWithdrawals:[{id:'other-device',amount:1000}]},{...record,cashWithdrawals:[]},{...record,cashWithdrawals:[{id:'local',amount:8000}]});
+  assert.deepEqual(clone(sharedWithdrawals.cashWithdrawals).map(row=>row.id),['other-device','local'],'independent cash withdrawals remain separate');
+  assert.equal(source.includes("!confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้ใช่หรือไม่?')"),false);
+  console.log('Autosave passed: immediate local persistence, reload, offline retry queue, conflict-safe array merge and submit sequencing.');
+})().catch(e=>{console.error(e);process.exitCode=1});
